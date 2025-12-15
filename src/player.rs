@@ -2,7 +2,7 @@ use std::fmt::Debug;
 
 use crate::{
     item::Items,
-    quest::{MutQuest, Quest, QuestStatus, Quests},
+    quest::{QuestStatus, Quests},
 };
 
 #[derive(Clone, Debug, Default)]
@@ -87,10 +87,22 @@ impl Player {
             self.backpack.remove(index);
         }
 
-        // quest is finished and returned to backlog
+        // quest is finished
         self.quests[position_active_quest]
             .get_inner_mut_quest()
             .change_to_closed();
+
+        // add rewarded items
+        let mut rewarded_items = self.quests[position_active_quest]
+            .get_inner_quest()
+            .list_reward_items();
+        self.backpack.append(&mut rewarded_items);
+
+        // add new quest(s)
+        let mut new_quests = self.quests[position_active_quest]
+            .get_inner_quest()
+            .list_follow_up_quests();
+        self.quests.append(&mut new_quests);
 
         Ok(())
     }

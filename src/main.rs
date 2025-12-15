@@ -23,14 +23,14 @@ fn main() {
     my_game.get_player().select_new_active_quest();
 
     my_game.get_player().solve_quest().unwrap();
-    println!("The first quest is solved");
+    println!("The first quest is solved\n");
 
     println!(
-        "Your quest list is empty: {}",
+        "Your quest list is updated:\n{}",
         my_game.get_player().show_unsolved_quests()
     );
     println!(
-        "Your items are used: {}",
+        "Your backup is updated:\n{}",
         my_game.get_player().show_backpack()
     );
 }
