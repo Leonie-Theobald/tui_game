@@ -3,7 +3,7 @@ pub trait Item {
     fn get_description(&self) -> &'static str;
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum Items {
     RustyKey(RustyKey),
 }
@@ -11,7 +11,7 @@ pub enum Items {
 impl Items {
     pub fn get_inner_item(&self) -> impl Item {
         match self {
-            Items::RustyKey(inner_rusty_key) => inner_rusty_key,
+            Self::RustyKey(inner_item) => inner_item,
         }
     }
 }
@@ -28,7 +28,7 @@ impl std::fmt::Display for Items {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct RustyKey;
 
 impl Item for &RustyKey {
