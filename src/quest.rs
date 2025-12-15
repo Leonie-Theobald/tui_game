@@ -8,6 +8,7 @@ pub trait Quest {
 
 pub trait MutQuest {
     fn change_to_closed(&mut self);
+    fn change_to_active(&mut self);
 }
 
 #[derive(Clone, Debug)]
@@ -39,6 +40,7 @@ impl std::fmt::Display for Quests {
 pub enum QuestStatus {
     #[default]
     Open,
+    Active,
     Finished,
 }
 
@@ -64,5 +66,9 @@ impl Quest for &OpenRustyLock {
 impl MutQuest for &mut OpenRustyLock {
     fn change_to_closed(&mut self) {
         self.status = QuestStatus::Finished;
+    }
+
+    fn change_to_active(&mut self) {
+        self.status = QuestStatus::Active;
     }
 }

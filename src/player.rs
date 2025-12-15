@@ -46,29 +46,39 @@ impl Player {
         quests
     }
 
+    pub fn select_new_active_quest(&mut self) {
+        // TODO: method to select needs to be changed later
+        if let Some(quest) = self.quests.first_mut() {
+            quest.get_inner_mut_quest().change_to_active()
+        }
+    }
+
     pub fn solve_quest(&mut self) -> Result<(), ()> {
-        let mut active_quest = {
-            let first_quest = self.quests.swap_remove(0);
-            if first_quest.get_inner_quest().get_status() != &QuestStatus::Open {
-                self.quests.push(first_quest);
-                return Err(());
-            }
-            first_quest
+        // find active quest which should be solved next
+        let position_active_quest = match self
+            .quests
+            .iter()
+            .position(|quest| quest.get_inner_quest().get_status() == &QuestStatus::Active)
+        {
+            None => return Err(()),
+            Some(position) => position,
         };
 
         // check that all necessary items to solve quest are available
-        if !active_quest
+        if !self.quests[position_active_quest]
             .get_inner_quest()
             .list_necessary_items()
             .iter()
             .all(|necessary_item| self.backpack.contains(necessary_item))
         {
-            self.quests.push(active_quest);
             return Err(());
         }
 
         // removed used items
-        for used_item in active_quest.get_inner_quest().list_necessary_items() {
+        for used_item in self.quests[position_active_quest]
+            .get_inner_quest()
+            .list_necessary_items()
+        {
             let index = self
                 .backpack
                 .iter()
@@ -78,8 +88,9 @@ impl Player {
         }
 
         // quest is finished and returned to backlog
-        active_quest.get_inner_mut_quest().change_to_closed();
-        self.quests.push(active_quest);
+        self.quests[position_active_quest]
+            .get_inner_mut_quest()
+            .change_to_closed();
 
         Ok(())
     }

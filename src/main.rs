@@ -20,6 +20,8 @@ fn main() {
         my_game.get_player().show_all_quests()
     );
 
+    my_game.get_player().select_new_active_quest();
+
     my_game.get_player().solve_quest().unwrap();
     println!("The first quest is solved");
 
