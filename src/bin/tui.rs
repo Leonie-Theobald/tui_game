@@ -27,14 +27,12 @@ fn main() {
     );
 
     let mut avatar = Avatar {
-        current_grid: grid.clone(),
-        current_position: Position {
-            coordinates: Vector {
-                horizontal: 17,
-                vertical: 15,
-            },
-            orientation: Orientation::East,
+        grid: grid.clone(),
+        coordinates: Vector {
+            horizontal: 17,
+            vertical: 15,
         },
+        orientation: Orientation::East,
     };
 
     avatar.move_in_direction(Orientation::North);
@@ -57,12 +55,6 @@ fn main() {
 struct Vector {
     horizontal: usize,
     vertical: usize,
-}
-
-#[derive(Debug, Clone, PartialEq, Default)]
-struct Position {
-    coordinates: Vector,
-    orientation: Orientation,
 }
 
 #[derive(Clone, Debug, Default, PartialEq)]
@@ -94,11 +86,11 @@ impl Grid {
         }
     }
 
-    fn get_new_free_position(
+    fn get_new_free_coordinates(
         &self,
         coordinates: &Vector,
         orientation: &Orientation,
-    ) -> Result<Position, TuiError> {
+    ) -> Result<Vector, TuiError> {
         // check general bounds
         let is_furthest_north = coordinates.vertical == 0;
         let is_furthest_west = coordinates.horizontal == 0;
@@ -132,10 +124,7 @@ impl Grid {
         // if the pixel is white space then it is a free pixel
         let pixel = self.pixels[new_coordinates.vertical][new_coordinates.horizontal];
         match pixel {
-            ' ' => Ok(Position {
-                coordinates: new_coordinates,
-                orientation: orientation.clone(),
-            }),
+            ' ' => Ok(new_coordinates),
             _ => Err(TuiError::PositionBlocked),
         }
     }
@@ -194,34 +183,34 @@ impl Canvas {
 }
 
 struct Avatar {
-    current_grid: Grid,
-    current_position: Position,
+    grid: Grid,
+    coordinates: Vector,
+    orientation: Orientation,
 }
 
 impl Avatar {
     fn move_in_direction(&mut self, orientation: Orientation) {
         // avatar rotates to face requested direction
-        self.current_position.orientation = orientation.clone();
+        self.orientation = orientation.clone();
 
         // check if avatar can make one step
-        if let Ok(new_position) = self
-            .current_grid
-            .get_new_free_position(&self.current_position.coordinates, &orientation)
+        if let Ok(new_coordinates) = self
+            .grid
+            .get_new_free_coordinates(&self.coordinates, &orientation)
         {
-            self.current_position = new_position;
+            self.coordinates = new_coordinates;
         }
     }
 
     fn map_into_grid(&self) -> Grid {
         let mut grid = Grid::empty();
-        let symbol = match self.current_position.orientation {
+        let symbol = match self.orientation {
             Orientation::North => '▲',
             Orientation::East => '▶',
             Orientation::South => '▼',
             Orientation::West => '◀',
         };
-        grid.pixels[self.current_position.coordinates.vertical]
-            [self.current_position.coordinates.horizontal] = symbol;
+        grid.pixels[self.coordinates.vertical][self.coordinates.horizontal] = symbol;
 
         grid
     }
@@ -233,23 +222,24 @@ mod tests {
 
     #[test]
     fn move_right_unblocked() {
-        let start_position = Position::default();
+        let start_coordinates = Vector::default();
+        let start_orientation = Orientation::North;
         let mut avatar = Avatar {
-            current_grid: Grid::empty(),
-            current_position: start_position,
+            grid: Grid::empty(),
+            coordinates: start_coordinates,
+            orientation: start_orientation,
         };
 
         avatar.move_in_direction(Orientation::East);
 
-        let end_position = Position {
-            coordinates: Vector {
-                horizontal: 1,
-                vertical: 0,
-            },
-            orientation: Orientation::East,
+        let end_coordinates = Vector {
+            horizontal: 1,
+            vertical: 0,
         };
+        let end_orientation = Orientation::East;
 
-        assert_eq!(avatar.current_position, end_position);
+        assert_eq!(avatar.coordinates, end_coordinates);
+        assert_eq!(avatar.orientation, end_orientation);
     }
 
     #[test]
@@ -257,30 +247,32 @@ mod tests {
         let mut grid = Grid::empty();
         grid.pixels[1][0] = 'x';
 
-        let start_position = Position::default();
+        let start_coordinates = Vector::default();
+        let start_orientation = Orientation::North;
         let mut avatar = Avatar {
-            current_grid: grid,
-            current_position: start_position,
+            grid,
+            coordinates: start_coordinates,
+            orientation: start_orientation,
         };
 
         avatar.move_in_direction(Orientation::South);
 
-        let end_position = Position {
-            orientation: Orientation::South,
-            ..Default::default()
-        };
+        let end_coordinates = Vector::default();
+        let end_orientation = Orientation::South;
 
-        assert_eq!(avatar.current_position, end_position);
+        assert_eq!(avatar.coordinates, end_coordinates);
+        assert_eq!(avatar.orientation, end_orientation);
     }
 
     #[test]
     fn move_in_circle() {
-        let start_position = Position {
-            ..Default::default()
-        };
+        let start_coordinates = Vector::default();
+        let start_orientation = Orientation::North;
+
         let mut avatar = Avatar {
-            current_grid: Grid::empty(),
-            current_position: start_position,
+            grid: Grid::empty(),
+            coordinates: start_coordinates,
+            orientation: start_orientation,
         };
 
         avatar.move_in_direction(Orientation::East);
@@ -288,8 +280,10 @@ mod tests {
         avatar.move_in_direction(Orientation::West);
         avatar.move_in_direction(Orientation::North);
 
-        let end_position = Position::default();
+        let end_coordinates = Vector::default();
+        let end_orientation = Orientation::North;
 
-        assert_eq!(avatar.current_position, end_position);
+        assert_eq!(avatar.coordinates, end_coordinates);
+        assert_eq!(avatar.orientation, end_orientation);
     }
 }
