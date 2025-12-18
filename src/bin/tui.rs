@@ -1,7 +1,5 @@
 use std::io::{Write, stdin, stdout};
-use termion::event::Key;
-use termion::input::TermRead;
-use termion::raw::IntoRawMode;
+use termion::{event::Key, input::TermRead, raw::IntoRawMode};
 
 fn main() {
     let grid = Grid::import_from_string(
@@ -32,16 +30,11 @@ fn main() {
     );
 
     let mut avatar = Avatar {
-        grid: grid.clone(),
         coordinates: Vector {
             horizontal: 17,
             vertical: 15,
         },
         orientation: Orientation::East,
-    };
-
-    let mut canvas = Canvas {
-        grids: vec![grid.clone(), avatar.map_into_grid()],
     };
 
     let mut stdout = stdout().into_raw_mode().unwrap();
@@ -58,18 +51,21 @@ fn main() {
             }
         };
 
-        avatar.move_in_direction(orientation);
-        canvas.grids[1] = avatar.map_into_grid();
+        avatar.move_in_direction(&grid, orientation);
         write!(
             stdout,
-            "{}{}{}",
+            "{}{}{}{}{}{}",
             termion::clear::All,
             termion::cursor::Goto(1, 1),
-            canvas.visualize()
+            grid.draw(),
+            termion::cursor::Goto(1, 1),
+            avatar.draw_into_grid(),
+            termion::cursor::Goto(1, 1),
         )
         .unwrap();
         stdout.flush().unwrap();
     }
+    write!(stdout, "{}", termion::clear::All).unwrap();
     stdout.suspend_raw_mode().unwrap();
 }
 
@@ -167,8 +163,6 @@ impl Grid {
     }
 
     fn draw(&self) -> String {
-        //     let joined_lines = self.pixels.join(&['\n'][..]);
-        //     joined_lines.iter().collect()
         self.pixels
             .iter()
             .map(|row| row.iter().collect())
@@ -177,69 +171,38 @@ impl Grid {
     }
 }
 
-#[derive(Debug)]
-struct Canvas {
-    grids: Vec<Grid>,
-}
-
-impl Canvas {
-    fn merge_grids(&self) -> Grid {
-        let mut grid = Grid::empty();
-
-        // go through each object
-        for object in &self.grids {
-            // go through the lines
-            for (line_index, line) in object.pixels.iter().enumerate() {
-                // go through the chars in the line
-                for (column_index, character) in line.iter().enumerate() {
-                    // ultimately every character is checked
-                    // a non-white space character overwrites the grid
-                    if character != &' ' {
-                        grid.pixels[line_index][column_index] = *character;
-                    }
-                }
-            }
-        }
-
-        grid
-    }
-
-    fn visualize(&self) -> String {
-        self.merge_grids().draw()
-    }
-}
-
 struct Avatar {
-    grid: Grid,
     coordinates: Vector,
     orientation: Orientation,
 }
 
 impl Avatar {
-    fn move_in_direction(&mut self, orientation: Orientation) {
+    fn move_in_direction(&mut self, grid: &Grid, orientation: Orientation) {
         // avatar rotates to face requested direction
         self.orientation = orientation.clone();
 
         // check if avatar can make one step
-        if let Ok(new_coordinates) = self
-            .grid
-            .get_new_free_coordinates(&self.coordinates, &orientation)
+        if let Ok(new_coordinates) = grid.get_new_free_coordinates(&self.coordinates, &orientation)
         {
             self.coordinates = new_coordinates;
         }
     }
 
-    fn map_into_grid(&self) -> Grid {
-        let mut grid = Grid::empty();
+    fn draw_into_grid(&self) -> String {
         let symbol = match self.orientation {
             Orientation::North => '▲',
             Orientation::East => '▶',
             Orientation::South => '▼',
             Orientation::West => '◀',
         };
-        grid.pixels[self.coordinates.vertical][self.coordinates.horizontal] = symbol;
-
-        grid
+        format!(
+            "{}{}",
+            termion::cursor::Goto(
+                self.coordinates.horizontal as u16,
+                self.coordinates.vertical as u16
+            ),
+            symbol
+        )
     }
 }
 
@@ -252,12 +215,11 @@ mod tests {
         let start_coordinates = Vector::default();
         let start_orientation = Orientation::North;
         let mut avatar = Avatar {
-            grid: Grid::empty(),
             coordinates: start_coordinates,
             orientation: start_orientation,
         };
 
-        avatar.move_in_direction(Orientation::East);
+        avatar.move_in_direction(&Grid::empty(), Orientation::East);
 
         let end_coordinates = Vector {
             horizontal: 1,
@@ -277,12 +239,11 @@ mod tests {
         let start_coordinates = Vector::default();
         let start_orientation = Orientation::North;
         let mut avatar = Avatar {
-            grid,
             coordinates: start_coordinates,
             orientation: start_orientation,
         };
 
-        avatar.move_in_direction(Orientation::South);
+        avatar.move_in_direction(&grid, Orientation::South);
 
         let end_coordinates = Vector::default();
         let end_orientation = Orientation::South;
@@ -297,15 +258,14 @@ mod tests {
         let start_orientation = Orientation::North;
 
         let mut avatar = Avatar {
-            grid: Grid::empty(),
             coordinates: start_coordinates,
             orientation: start_orientation,
         };
 
-        avatar.move_in_direction(Orientation::East);
-        avatar.move_in_direction(Orientation::South);
-        avatar.move_in_direction(Orientation::West);
-        avatar.move_in_direction(Orientation::North);
+        avatar.move_in_direction(&Grid::empty(), Orientation::East);
+        avatar.move_in_direction(&Grid::empty(), Orientation::South);
+        avatar.move_in_direction(&Grid::empty(), Orientation::West);
+        avatar.move_in_direction(&Grid::empty(), Orientation::North);
 
         let end_coordinates = Vector::default();
         let end_orientation = Orientation::North;
