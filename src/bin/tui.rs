@@ -1,5 +1,5 @@
 use std::io::{Write, stdin, stdout};
-use termion::{event::Key, input::TermRead, raw::IntoRawMode};
+use termion::{color, event::Key, input::TermRead, raw::IntoRawMode};
 
 fn main() {
     let grid = Grid::import_from_string(
@@ -54,19 +54,55 @@ fn main() {
         avatar.move_in_direction(&grid, orientation);
         write!(
             stdout,
-            "{}{}{}{}{}{}",
+            "{}{}{}{}",
             termion::clear::All,
-            termion::cursor::Goto(1, 1),
             grid.draw(),
-            termion::cursor::Goto(1, 1),
-            avatar.draw_into_grid(),
-            termion::cursor::Goto(1, 1),
+            avatar.draw(),
+            termion::cursor::Hide,
         )
         .unwrap();
         stdout.flush().unwrap();
     }
     write!(stdout, "{}", termion::clear::All).unwrap();
     stdout.suspend_raw_mode().unwrap();
+}
+
+trait Drawable {
+    fn draw(&self) -> String;
+}
+
+impl Drawable for Avatar {
+    fn draw(&self) -> String {
+        let symbol = match self.orientation {
+            Orientation::North => '▲',
+            Orientation::East => '▶',
+            Orientation::South => '▼',
+            Orientation::West => '◀',
+        };
+        format!(
+            "{}{}{}{}",
+            termion::cursor::Goto(
+                self.coordinates.horizontal as u16,
+                self.coordinates.vertical as u16
+            ),
+            color::Fg(color::Magenta),
+            symbol,
+            color::Fg(color::Reset),
+        )
+    }
+}
+
+impl Drawable for Grid {
+    fn draw(&self) -> String {
+        let grid = self
+            .pixels
+            .iter()
+            .map(|row| row.iter().collect())
+            .collect::<Vec<String>>()
+            .join("\r\n");
+
+        format!("{}{}", termion::cursor::Goto(1, 1), grid)
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Default)]
@@ -161,14 +197,6 @@ impl Grid {
 
         grid
     }
-
-    fn draw(&self) -> String {
-        self.pixels
-            .iter()
-            .map(|row| row.iter().collect())
-            .collect::<Vec<String>>()
-            .join("\r\n")
-    }
 }
 
 struct Avatar {
@@ -186,23 +214,6 @@ impl Avatar {
         {
             self.coordinates = new_coordinates;
         }
-    }
-
-    fn draw_into_grid(&self) -> String {
-        let symbol = match self.orientation {
-            Orientation::North => '▲',
-            Orientation::East => '▶',
-            Orientation::South => '▼',
-            Orientation::West => '◀',
-        };
-        format!(
-            "{}{}",
-            termion::cursor::Goto(
-                self.coordinates.horizontal as u16,
-                self.coordinates.vertical as u16
-            ),
-            symbol
-        )
     }
 }
 
