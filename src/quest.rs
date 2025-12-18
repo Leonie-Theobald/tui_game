@@ -12,8 +12,86 @@ pub struct QuestList {
 }
 
 impl QuestList {
+    pub fn initiate() -> Self {
+        let open_rusty_lock = Quests::OpenRustyLock(OpenRustyLock::default());
+        Self {
+            list: vec![open_rusty_lock],
+            visible: false,
+        }
+    }
     pub fn toggle_visibility(&mut self) {
         self.visible = !self.visible;
+    }
+
+    pub fn get_unsolved_quests(&self) -> Vec<Quests> {
+        let mut unsolved_quests = Vec::new();
+        for quest in &self.list {
+            if quest.get_inner_quest().get_status() != &QuestStatus::Finished {
+                unsolved_quests.push(quest.clone())
+            }
+        }
+
+        unsolved_quests
+    }
+
+    pub fn select_new_active_quest(&mut self) {
+        // TODO: method to select needs to be changed later
+        if let Some(quest) = self.list.first_mut() {
+            quest.get_inner_mut_quest().change_to_active()
+        }
+    }
+
+    pub fn solve_quest(&mut self, items: &mut Vec<Items>) -> Result<(), ()> {
+        // find active quest which should be solved next
+        let position_active_quest = match self
+            .list
+            .iter()
+            .position(|quest| quest.get_inner_quest().get_status() == &QuestStatus::Active)
+        {
+            None => return Err(()),
+            Some(position) => position,
+        };
+
+        // check that all necessary items to solve quest are available
+        if !self.list[position_active_quest]
+            .get_inner_quest()
+            .list_necessary_items()
+            .iter()
+            .all(|necessary_item| items.contains(necessary_item))
+        {
+            return Err(());
+        }
+
+        // removed used items
+        for used_item in self.list[position_active_quest]
+            .get_inner_quest()
+            .list_necessary_items()
+        {
+            let index = items
+                .iter()
+                .position(|available_item| available_item == used_item)
+                .expect("Checked before that backpack contains all necessary items");
+            items.remove(index);
+        }
+
+        // quest is finished
+        self.list[position_active_quest]
+            .get_inner_mut_quest()
+            .change_to_closed();
+
+        // generate rewarded items
+        let mut rewarded_items = self.list[position_active_quest]
+            .get_inner_quest()
+            .list_reward_items();
+        items.append(&mut rewarded_items);
+
+        // generate new quest(s)
+        let mut new_quests = self.list[position_active_quest]
+            .get_inner_quest()
+            .list_follow_up_quests();
+        self.list.append(&mut new_quests);
+
+        Ok(())
     }
 }
 
@@ -23,10 +101,12 @@ impl Drawable for QuestList {
             return String::new();
         }
 
+        let unsolved_quests = self.get_unsolved_quests();
+
         // format each quest line and find out longest quest line
         let mut length_longest_quest_line = 0;
         let mut joined_quests = String::new();
-        for (index, quest) in self.list.iter().enumerate() {
+        for (index, quest) in unsolved_quests.iter().enumerate() {
             let line = format!(
                 "{}{}{}{}",
                 termion::cursor::Goto(4, 3 + index as u16),
@@ -52,7 +132,7 @@ impl Drawable for QuestList {
 
         // height depends on number of quests
         let mut background = String::new();
-        for index in 0..self.list.len() + 2 {
+        for index in 0..unsolved_quests.len() + 2 {
             background.push_str(&format!(
                 "{}{}",
                 termion::cursor::Goto(2, 2 + index as u16),

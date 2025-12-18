@@ -10,6 +10,7 @@ use tui::Drawable;
 
 use crate::{
     player::Player,
+    quest::QuestList,
     tui::{Orientation, grid::Grid},
 };
 
@@ -17,6 +18,7 @@ fn main() {
     println!("INF: Game is initiated");
 
     let mut my_player = Player::initiate();
+    let mut my_quests = QuestList::initiate();
     let grid = Grid::import_from_string(
         "┌──────────────────────────────────────────────────────────────────────────────┐
 │                                                                              │
@@ -51,7 +53,13 @@ fn main() {
             Key::Char('w') => my_player.move_in_direction(&grid, Orientation::North),
             Key::Char('d') => my_player.move_in_direction(&grid, Orientation::East),
             Key::Char('s') => my_player.move_in_direction(&grid, Orientation::South),
-            Key::Char('q') => my_player.quests.toggle_visibility(),
+            Key::Char('q') => my_quests.toggle_visibility(),
+            Key::Char('r') => {
+                my_quests.select_new_active_quest();
+                my_quests
+                    .solve_quest(&mut my_player.backpack)
+                    .expect("Couldn't solve quest");
+            }
             Key::Ctrl('c') => break,
             _ => {
                 write!(stdout, "\r\nUnknown character... Exiting\r\n").unwrap();
@@ -65,7 +73,7 @@ fn main() {
             termion::clear::All,
             grid.draw(),
             my_player.draw(),
-            my_player.quests.draw(),
+            my_quests.draw(),
             termion::cursor::Hide,
         )
         .unwrap();
