@@ -1,3 +1,8 @@
+use std::io::{Write, stdin, stdout};
+use termion::event::Key;
+use termion::input::TermRead;
+use termion::raw::IntoRawMode;
+
 fn main() {
     let grid = Grid::import_from_string(
         "┌──────────────────────────────────────────────────────────────────────────────┐
@@ -35,20 +40,37 @@ fn main() {
         orientation: Orientation::East,
     };
 
-    avatar.move_in_direction(Orientation::North);
-    avatar.move_in_direction(Orientation::North);
-    avatar.move_in_direction(Orientation::East);
-    avatar.move_in_direction(Orientation::East);
-    avatar.move_in_direction(Orientation::East);
-    avatar.move_in_direction(Orientation::East);
-    avatar.move_in_direction(Orientation::North);
-    avatar.move_in_direction(Orientation::North);
-
-    let canvas = Canvas {
-        grids: vec![grid, avatar.map_into_grid()],
+    let mut canvas = Canvas {
+        grids: vec![grid.clone(), avatar.map_into_grid()],
     };
 
-    println!("Grid:\n{}", canvas.visualize());
+    let mut stdout = stdout().into_raw_mode().unwrap();
+    for k in stdin().keys() {
+        let orientation = match k.as_ref().unwrap() {
+            Key::Char('a') => Orientation::West,
+            Key::Char('w') => Orientation::North,
+            Key::Char('d') => Orientation::East,
+            Key::Char('s') => Orientation::South,
+            Key::Ctrl('c') => return,
+            _ => {
+                write!(stdout, "\r\nUnknown character... Exiting\r\n").unwrap();
+                break;
+            }
+        };
+
+        avatar.move_in_direction(orientation);
+        canvas.grids[1] = avatar.map_into_grid();
+        write!(
+            stdout,
+            "{}{}{}",
+            termion::clear::All,
+            termion::cursor::Goto(1, 1),
+            canvas.visualize()
+        )
+        .unwrap();
+        stdout.flush().unwrap();
+    }
+    stdout.suspend_raw_mode().unwrap();
 }
 
 #[derive(Clone, Debug, PartialEq, Default)]
@@ -145,8 +167,13 @@ impl Grid {
     }
 
     fn draw(&self) -> String {
-        let joined_lines = self.pixels.join(&['\n'][..]);
-        joined_lines.iter().collect()
+        //     let joined_lines = self.pixels.join(&['\n'][..]);
+        //     joined_lines.iter().collect()
+        self.pixels
+            .iter()
+            .map(|row| row.iter().collect())
+            .collect::<Vec<String>>()
+            .join("\r\n")
     }
 }
 
