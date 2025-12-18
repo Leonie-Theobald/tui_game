@@ -2,8 +2,8 @@ use std::fmt::Debug;
 use termion::color;
 
 use crate::{
-    item::Items,
-    quest::{QuestList, QuestStatus},
+    item::{Items, RustyKey},
+    quest::{OpenRustyLock, QuestList, QuestStatus, Quests},
     tui::{Drawable, Orientation, Vector, grid::Grid},
 };
 
@@ -17,6 +17,28 @@ pub struct Player {
 }
 
 impl Player {
+    pub fn initiate() -> Self {
+        let mut player = Player {
+            name: "Leonie",
+            backpack: Vec::new(),
+            quests: QuestList::default(),
+            coordinates: Vector {
+                horizontal: 15,
+                vertical: 14,
+            },
+            orientation: Orientation::North,
+        };
+
+        // add available item to players backpack
+        let rusty_key = Items::RustyKey(RustyKey);
+        player.backpack.push(rusty_key);
+
+        // add first quest
+        let open_rusty_lock = Quests::OpenRustyLock(OpenRustyLock::default());
+        player.quests.list.push(open_rusty_lock);
+
+        player
+    }
     pub fn show_name(&self) -> &'static str {
         self.name
     }

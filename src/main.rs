@@ -1,4 +1,3 @@
-mod game;
 mod item;
 mod player;
 mod quest;
@@ -7,15 +6,17 @@ mod tui;
 use std::io::{Write, stdin, stdout};
 use termion::{event::Key, input::TermRead, raw::IntoRawMode};
 
-use game::Game;
 use tui::Drawable;
 
-use crate::tui::{Orientation, grid::Grid};
+use crate::{
+    player::Player,
+    tui::{Orientation, grid::Grid},
+};
 
 fn main() {
     println!("INF: Game is initiated");
-    let mut my_game = Game::initiate();
 
+    let mut my_player = Player::initiate();
     let grid = Grid::import_from_string(
         "┌──────────────────────────────────────────────────────────────────────────────┐
 │                                                                              │
@@ -46,19 +47,11 @@ fn main() {
     let mut stdout = stdout().into_raw_mode().unwrap();
     for k in stdin().keys() {
         match k.as_ref().unwrap() {
-            Key::Char('a') => my_game
-                .get_player()
-                .move_in_direction(&grid, Orientation::West),
-            Key::Char('w') => my_game
-                .get_player()
-                .move_in_direction(&grid, Orientation::North),
-            Key::Char('d') => my_game
-                .get_player()
-                .move_in_direction(&grid, Orientation::East),
-            Key::Char('s') => my_game
-                .get_player()
-                .move_in_direction(&grid, Orientation::South),
-            Key::Char('q') => my_game.get_player().quests.toggle_visibility(),
+            Key::Char('a') => my_player.move_in_direction(&grid, Orientation::West),
+            Key::Char('w') => my_player.move_in_direction(&grid, Orientation::North),
+            Key::Char('d') => my_player.move_in_direction(&grid, Orientation::East),
+            Key::Char('s') => my_player.move_in_direction(&grid, Orientation::South),
+            Key::Char('q') => my_player.quests.toggle_visibility(),
             Key::Ctrl('c') => break,
             _ => {
                 write!(stdout, "\r\nUnknown character... Exiting\r\n").unwrap();
@@ -71,8 +64,8 @@ fn main() {
             "{}{}{}{}{}",
             termion::clear::All,
             grid.draw(),
-            my_game.get_player().draw(),
-            my_game.get_player().quests.draw(),
+            my_player.draw(),
+            my_player.quests.draw(),
             termion::cursor::Hide,
         )
         .unwrap();
@@ -89,26 +82,26 @@ fn main() {
     stdout.suspend_raw_mode().unwrap();
     println!(
         "{}, you can use these items:\n{}",
-        my_game.get_player().show_name(),
-        my_game.get_player().show_backpack()
+        my_player.show_name(),
+        my_player.show_backpack()
     );
 
     // println!(
     //     "All your quests:\n{}",
-    //     my_game.get_player().show_all_quests()
+    //     my_player.show_all_quests()
     // );
     //
-    // my_game.get_player().select_new_active_quest();
+    // my_player.select_new_active_quest();
     //
-    // my_game.get_player().solve_quest().unwrap();
+    // my_player.solve_quest().unwrap();
     // println!("The first quest is solved\n");
     //
     // println!(
     //     "Your quest list is updated:\n{}",
-    //     my_game.get_player().show_unsolved_quests()
+    //     my_player.show_unsolved_quests()
     // );
     // println!(
     //     "Your backup is updated:\n{}",
-    //     my_game.get_player().show_backpack()
+    //     my_player.show_backpack()
     // );
 }
