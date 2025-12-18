@@ -1,7 +1,8 @@
 use crate::{
     item::{Items, RustyKey},
     player::Player,
-    quest::{OpenRustyLock, Quests},
+    quest::{OpenRustyLock, QuestList, Quests},
+    tui::{Orientation, Vector},
 };
 
 #[derive(Debug, Default)]
@@ -14,7 +15,12 @@ impl Game {
         let mut player = Player {
             name: "Leonie",
             backpack: Vec::new(),
-            quests: Vec::new(),
+            quests: QuestList::default(),
+            coordinates: Vector {
+                horizontal: 15,
+                vertical: 14,
+            },
+            orientation: Orientation::North,
         };
 
         // add available item to players backpack
@@ -23,7 +29,7 @@ impl Game {
 
         // add first quest
         let open_rusty_lock = Quests::OpenRustyLock(OpenRustyLock::default());
-        player.quests.push(open_rusty_lock);
+        player.quests.list.push(open_rusty_lock);
 
         Game { player }
     }
