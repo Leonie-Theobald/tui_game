@@ -63,7 +63,7 @@ fn main() {
         .unwrap();
         stdout.flush().unwrap();
     }
-    write!(stdout, "{}", termion::clear::All).unwrap();
+    write!(stdout, "{}{}", termion::clear::All, termion::cursor::Show).unwrap();
     stdout.suspend_raw_mode().unwrap();
 }
 
