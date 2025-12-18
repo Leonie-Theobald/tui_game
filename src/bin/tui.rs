@@ -37,34 +37,58 @@ fn main() {
         orientation: Orientation::East,
     };
 
+    let mut quests = Quests {
+        list: vec!["1. Find this", "2. Solve that", "3. Enjoy"],
+        visible: false,
+    };
+
     let mut stdout = stdout().into_raw_mode().unwrap();
     for k in stdin().keys() {
-        let orientation = match k.as_ref().unwrap() {
-            Key::Char('a') => Orientation::West,
-            Key::Char('w') => Orientation::North,
-            Key::Char('d') => Orientation::East,
-            Key::Char('s') => Orientation::South,
-            Key::Ctrl('c') => return,
+        match k.as_ref().unwrap() {
+            Key::Char('a') => avatar.move_in_direction(&grid, Orientation::West),
+            Key::Char('w') => avatar.move_in_direction(&grid, Orientation::North),
+            Key::Char('d') => avatar.move_in_direction(&grid, Orientation::East),
+            Key::Char('s') => avatar.move_in_direction(&grid, Orientation::South),
+            Key::Char('q') => quests.toggle_visibility(),
+            Key::Ctrl('c') => break,
             _ => {
                 write!(stdout, "\r\nUnknown character... Exiting\r\n").unwrap();
                 break;
             }
         };
 
-        avatar.move_in_direction(&grid, orientation);
         write!(
             stdout,
-            "{}{}{}{}",
+            "{}{}{}{}{}",
             termion::clear::All,
             grid.draw(),
             avatar.draw(),
+            quests.draw(),
             termion::cursor::Hide,
         )
         .unwrap();
         stdout.flush().unwrap();
     }
-    write!(stdout, "{}{}", termion::clear::All, termion::cursor::Show).unwrap();
+    write!(
+        stdout,
+        "{}{}{}",
+        termion::clear::All,
+        termion::cursor::Goto(1, 1),
+        termion::cursor::Show
+    )
+    .unwrap();
     stdout.suspend_raw_mode().unwrap();
+}
+
+struct Quests {
+    list: Vec<&'static str>,
+    visible: bool,
+}
+
+impl Quests {
+    fn toggle_visibility(&mut self) {
+        self.visible = !self.visible;
+    }
 }
 
 trait Drawable {
@@ -102,6 +126,54 @@ impl Drawable for Grid {
             .join("\r\n");
 
         format!("{}{}", termion::cursor::Goto(1, 1), grid)
+    }
+}
+
+impl Drawable for Quests {
+    fn draw(&self) -> String {
+        if !self.visible {
+            return String::new();
+        }
+
+        // format each quest line and find out longest quest line
+        let mut length_longest_quest_line = 0;
+        let mut joined_quests = String::new();
+        for (index, quest) in self.list.iter().enumerate() {
+            let line = format!(
+                "{}{}{}{}",
+                termion::cursor::Goto(4, 3 + index as u16),
+                color::Bg(color::Blue),
+                quest,
+                color::Bg(color::Reset),
+            );
+            joined_quests.push_str(&line);
+
+            if quest.len() > length_longest_quest_line {
+                length_longest_quest_line = quest.len();
+            }
+        }
+
+        // format background depending on number of quests and the longest quest line
+        // line length depends on quests length
+        let background_line = format!(
+            "{}{}{}",
+            color::Bg(color::Blue),
+            " ".repeat(length_longest_quest_line + 4),
+            color::Bg(color::Reset),
+        );
+
+        // height depends on number of quests
+        let mut background = String::new();
+        for index in 0..self.list.len() + 2 {
+            background.push_str(&format!(
+                "{}{}",
+                termion::cursor::Goto(2, 2 + index as u16),
+                background_line
+            ))
+        }
+
+        // merge background and written quests
+        format!("{}{}", background, joined_quests)
     }
 }
 
