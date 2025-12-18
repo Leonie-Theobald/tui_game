@@ -82,8 +82,8 @@ impl Drawable for Avatar {
         format!(
             "{}{}{}{}",
             termion::cursor::Goto(
-                self.coordinates.horizontal as u16,
-                self.coordinates.vertical as u16
+                (self.coordinates.horizontal + 1) as u16,
+                (self.coordinates.vertical + 1) as u16
             ),
             color::Fg(color::Magenta),
             symbol,
