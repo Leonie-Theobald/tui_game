@@ -1,7 +1,7 @@
 use termion::color;
 
 use crate::{
-    item::{Candle, Items, RustyKey, TreasureMap},
+    item::{Candle, CollectedItems, Items, RustyKey, TreasureMap},
     tui::Drawable,
 };
 
@@ -19,19 +19,17 @@ impl QuestList {
             visible: false,
         }
     }
+
     pub fn toggle_visibility(&mut self) {
         self.visible = !self.visible;
     }
 
     pub fn get_unsolved_quests(&self) -> Vec<Quests> {
-        let mut unsolved_quests = Vec::new();
-        for quest in &self.list {
-            if quest.get_inner_quest().get_status() != &QuestStatus::Finished {
-                unsolved_quests.push(quest.clone())
-            }
-        }
-
-        unsolved_quests
+        self.list
+            .clone()
+            .into_iter()
+            .filter(|quest| quest.get_inner_quest().get_status() != &QuestStatus::Finished)
+            .collect()
     }
 
     pub fn select_new_active_quest(&mut self) {
@@ -41,7 +39,7 @@ impl QuestList {
         }
     }
 
-    pub fn solve_quest(&mut self, items: &mut Vec<Items>) -> Result<(), ()> {
+    pub fn solve_quest(&mut self, collected_items: &mut CollectedItems) -> Result<(), ()> {
         // find active quest which should be solved next
         let position_active_quest = match self
             .list
@@ -57,7 +55,7 @@ impl QuestList {
             .get_inner_quest()
             .list_necessary_items()
             .iter()
-            .all(|necessary_item| items.contains(necessary_item))
+            .all(|necessary_item| collected_items.list.contains(necessary_item))
         {
             return Err(());
         }
@@ -67,11 +65,12 @@ impl QuestList {
             .get_inner_quest()
             .list_necessary_items()
         {
-            let index = items
+            let index = collected_items
+                .list
                 .iter()
                 .position(|available_item| available_item == used_item)
                 .expect("Checked before that backpack contains all necessary items");
-            items.remove(index);
+            collected_items.list.remove(index);
         }
 
         // quest is finished
@@ -83,7 +82,7 @@ impl QuestList {
         let mut rewarded_items = self.list[position_active_quest]
             .get_inner_quest()
             .list_reward_items();
-        items.append(&mut rewarded_items);
+        collected_items.list.append(&mut rewarded_items);
 
         // generate new quest(s)
         let mut new_quests = self.list[position_active_quest]
@@ -144,6 +143,7 @@ impl Drawable for QuestList {
         format!("{}{}", background, joined_quests)
     }
 }
+
 pub trait Quest {
     fn get_description(&self) -> &'static str;
     fn list_necessary_items(&self) -> &[Items];

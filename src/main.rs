@@ -9,6 +9,7 @@ use termion::{event::Key, input::TermRead, raw::IntoRawMode};
 use tui::Drawable;
 
 use crate::{
+    item::CollectedItems,
     player::Player,
     quest::QuestList,
     tui::{Orientation, grid::Grid},
@@ -19,6 +20,7 @@ fn main() {
 
     let mut my_player = Player::initiate();
     let mut my_quests = QuestList::initiate();
+    let mut my_collected_items = CollectedItems::initiate();
     let grid = Grid::import_from_string(
         "┌──────────────────────────────────────────────────────────────────────────────┐
 │                                                                              │
@@ -54,10 +56,11 @@ fn main() {
             Key::Char('d') => my_player.move_in_direction(&grid, Orientation::East),
             Key::Char('s') => my_player.move_in_direction(&grid, Orientation::South),
             Key::Char('q') => my_quests.toggle_visibility(),
+            Key::Char('e') => my_collected_items.toggle_visibility(),
             Key::Char('r') => {
                 my_quests.select_new_active_quest();
                 my_quests
-                    .solve_quest(&mut my_player.backpack)
+                    .solve_quest(&mut my_collected_items)
                     .expect("Couldn't solve quest");
             }
             Key::Ctrl('c') => break,
@@ -69,11 +72,12 @@ fn main() {
 
         write!(
             stdout,
-            "{}{}{}{}{}",
+            "{}{}{}{}{}{}",
             termion::clear::All,
             grid.draw(),
             my_player.draw(),
             my_quests.draw(),
+            my_collected_items.draw(),
             termion::cursor::Hide,
         )
         .unwrap();
@@ -89,9 +93,9 @@ fn main() {
     .unwrap();
     stdout.suspend_raw_mode().unwrap();
     println!(
-        "{}, you can use these items:\n{}",
+        "{}, you can use these items:\n{:?}",
         my_player.show_name(),
-        my_player.show_backpack()
+        my_collected_items.list
     );
 
     // println!(

@@ -1,49 +1,29 @@
 use std::fmt::Debug;
 use termion::color;
 
-use crate::{
-    item::{Items, RustyKey},
-    tui::{Drawable, Orientation, Vector, grid::Grid},
-};
+use crate::tui::{Drawable, Orientation, Vector, grid::Grid};
 
 #[derive(Clone, Debug, Default)]
 pub struct Player {
     pub name: &'static str,
-    pub backpack: Vec<Items>,
     pub coordinates: Vector,
     pub orientation: Orientation,
 }
 
 impl Player {
     pub fn initiate() -> Self {
-        let mut player = Player {
+        Self {
             name: "Leonie",
-            backpack: Vec::new(),
             coordinates: Vector {
                 horizontal: 15,
                 vertical: 14,
             },
             orientation: Orientation::North,
-        };
-
-        // add available item to players backpack
-        let rusty_key = Items::RustyKey(RustyKey);
-        player.backpack.push(rusty_key);
-
-        player
+        }
     }
 
     pub fn show_name(&self) -> &'static str {
         self.name
-    }
-
-    pub fn show_backpack(&self) -> String {
-        let mut backpack = String::new();
-        for item in &self.backpack {
-            backpack.push_str(&item.to_string())
-        }
-
-        backpack
     }
 
     pub fn move_in_direction(&mut self, grid: &Grid, orientation: Orientation) {
