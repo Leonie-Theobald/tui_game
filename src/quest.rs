@@ -167,9 +167,6 @@ pub trait Quest {
     fn get_status(&self) -> &QuestStatus;
     fn list_reward_items(&self) -> Vec<CollectableItem>;
     fn list_follow_up_quests(&self) -> Vec<Quests>;
-}
-
-pub trait MutQuest {
     fn change_to_closed(&mut self);
     fn change_to_active(&mut self);
 }
@@ -222,9 +219,7 @@ impl Quest for OpenRustyLock {
     fn list_follow_up_quests(&self) -> Vec<Quests> {
         vec![Quests::LightCandle(LightCandle::default())]
     }
-}
 
-impl MutQuest for OpenRustyLock {
     fn change_to_closed(&mut self) {
         self.status = QuestStatus::Finished;
     }
@@ -259,9 +254,7 @@ impl Quest for LightCandle {
     fn list_follow_up_quests(&self) -> Vec<Quests> {
         Vec::new()
     }
-}
 
-impl MutQuest for LightCandle {
     fn change_to_closed(&mut self) {
         self.status = QuestStatus::Finished;
     }
