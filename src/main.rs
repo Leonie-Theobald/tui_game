@@ -69,7 +69,7 @@ fn main() {
             Key::Char('r') => {
                 my_quests.select_new_active_quest();
                 my_quests
-                    .solve_quest(&mut my_collected_items)
+                    .solve_quest(&mut my_collected_items, &my_stationed_items)
                     .expect("Couldn't solve quest");
             }
             Key::Ctrl('c') => break,

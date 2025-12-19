@@ -1,6 +1,9 @@
 use crate::{
-    item::collected_item::{
-        CollectableItem, candle::Candle, rusty_key::RustyKey, treasure_map::TreasureMap,
+    item::{
+        collected_item::{
+            CollectableItem, candle::Candle, rusty_key::RustyKey, treasure_map::TreasureMap,
+        },
+        stationed_item::StationaryItem,
     },
     quest_log::quest::{IsQuest, Quest, QuestStatus, light_candle::LightCandle},
 };
@@ -15,8 +18,8 @@ impl IsQuest for OpenRustyLock {
         "This old, wooden door is locked. Open it"
     }
 
-    fn list_necessary_items(&self) -> &[CollectableItem] {
-        &[CollectableItem::RustyKey(RustyKey)]
+    fn list_necessary_collected_items(&self) -> Vec<CollectableItem> {
+        vec![CollectableItem::RustyKey(RustyKey)]
     }
 
     fn get_status(&self) -> &QuestStatus {
@@ -40,5 +43,9 @@ impl IsQuest for OpenRustyLock {
 
     fn change_to_active(&mut self) {
         self.status = QuestStatus::Active;
+    }
+
+    fn list_necessary_stationed_item(&self) -> Vec<StationaryItem> {
+        todo!()
     }
 }

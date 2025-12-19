@@ -1,5 +1,8 @@
 use crate::{
-    item::collected_item::{CollectableItem, candle::Candle},
+    item::{
+        collected_item::{CollectableItem, candle::Candle},
+        stationed_item::StationaryItem,
+    },
     quest_log::quest::{IsQuest, Quest, QuestStatus},
 };
 
@@ -13,8 +16,8 @@ impl IsQuest for LightCandle {
         "The candle is not burning. Try to lighten it."
     }
 
-    fn list_necessary_items(&self) -> &[CollectableItem] {
-        &[CollectableItem::Candle(Candle)]
+    fn list_necessary_collected_items(&self) -> Vec<CollectableItem> {
+        vec![CollectableItem::Candle(Candle)]
     }
 
     fn get_status(&self) -> &QuestStatus {
@@ -35,5 +38,9 @@ impl IsQuest for LightCandle {
 
     fn change_to_active(&mut self) {
         self.status = QuestStatus::Active;
+    }
+
+    fn list_necessary_stationed_item(&self) -> Vec<StationaryItem> {
+        todo!()
     }
 }

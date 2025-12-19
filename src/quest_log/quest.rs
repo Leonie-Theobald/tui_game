@@ -1,15 +1,19 @@
 use crate::{
-    item::collected_item::CollectableItem,
+    item::{collected_item::CollectableItem, stationed_item::StationaryItem},
     method_on_inner_quest,
-    quest_log::quest::{light_candle::LightCandle, open_rusty_lock::OpenRustyLock},
+    quest_log::quest::{
+        light_candle::LightCandle, open_rusty_lock::OpenRustyLock, unwrap_packet::UnwrapPacket,
+    },
 };
 
 pub mod light_candle;
 pub mod open_rusty_lock;
+pub mod unwrap_packet;
 
 pub trait IsQuest {
     fn get_description(&self) -> &'static str;
-    fn list_necessary_items(&self) -> &[CollectableItem];
+    fn list_necessary_collected_items(&self) -> Vec<CollectableItem>;
+    fn list_necessary_stationed_item(&self) -> Vec<StationaryItem>;
     fn get_status(&self) -> &QuestStatus;
     fn list_reward_items(&self) -> Vec<CollectableItem>;
     fn list_follow_up_quests(&self) -> Vec<Quest>;
@@ -21,6 +25,7 @@ pub trait IsQuest {
 pub enum Quest {
     OpenRustyLock(OpenRustyLock),
     LightCandle(LightCandle),
+    UnwrapPacket(UnwrapPacket),
 }
 
 impl std::fmt::Display for Quest {

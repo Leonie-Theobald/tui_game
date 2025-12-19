@@ -20,7 +20,7 @@ pub struct CollectedItems {
 impl CollectedItems {
     pub fn initiate() -> Self {
         Self {
-            list: vec![CollectableItem::RustyKey(RustyKey)],
+            list: Vec::new(),
             visible: false,
         }
     }

@@ -5,7 +5,7 @@ pub struct RustyKey;
 
 impl Item for RustyKey {
     fn get_name(&self) -> &'static str {
-        "Rust Key"
+        "Rusty Key"
     }
 
     fn get_description(&self) -> &'static str {

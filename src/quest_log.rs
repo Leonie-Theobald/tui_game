@@ -3,8 +3,8 @@ mod quest;
 use termion::color;
 
 use crate::{
-    item::collected_item::CollectedItems,
-    quest_log::quest::{IsQuest, Quest, QuestStatus, open_rusty_lock::OpenRustyLock},
+    item::{collected_item::CollectedItems, stationed_item::StationedItems},
+    quest_log::quest::{IsQuest, Quest, QuestStatus, unwrap_packet::UnwrapPacket},
     tui::Drawable,
 };
 
@@ -14,6 +14,7 @@ macro_rules! method_on_inner_quest {
         match &$value {
             Quest::OpenRustyLock(inner) => inner.$method(),
             Quest::LightCandle(inner) => inner.$method(),
+            Quest::UnwrapPacket(inner) => inner.$method(),
         }
     };
 }
@@ -24,6 +25,7 @@ macro_rules! mut_method_on_inner_quest {
         match $value {
             Quest::OpenRustyLock(inner) => inner.$method(),
             Quest::LightCandle(inner) => inner.$method(),
+            Quest::UnwrapPacket(inner) => inner.$method(),
         }
     };
 }
@@ -36,9 +38,9 @@ pub struct QuestLog {
 
 impl QuestLog {
     pub fn initiate() -> Self {
-        let open_rusty_lock = Quest::OpenRustyLock(OpenRustyLock::default());
+        let unwrap_packet = Quest::UnwrapPacket(UnwrapPacket::default());
         Self {
-            list: vec![open_rusty_lock],
+            list: vec![unwrap_packet],
             visible: false,
         }
     }
@@ -62,7 +64,11 @@ impl QuestLog {
         }
     }
 
-    pub fn solve_quest(&mut self, collected_items: &mut CollectedItems) -> Result<(), ()> {
+    pub fn solve_quest(
+        &mut self,
+        collected_items: &mut CollectedItems,
+        stationed_items: &StationedItems,
+    ) -> Result<(), ()> {
         // find active quest which should be solved next
         let position_active_quest = match self
             .list
@@ -73,24 +79,39 @@ impl QuestLog {
             Some(position) => position,
         };
 
-        // check that all necessary items to solve quest are available
-        let necessary_items =
-            method_on_inner_quest!(self.list[position_active_quest], list_necessary_items);
-        if !necessary_items
+        // check that all collectable items necessary to solve quest are available
+        let necessary_collected_items = method_on_inner_quest!(
+            self.list[position_active_quest],
+            list_necessary_collected_items
+        );
+        if !necessary_collected_items
             .iter()
             .all(|necessary_item| collected_items.list.contains(necessary_item))
         {
             return Err(());
         }
 
-        // removed used items
-        for used_item in
-            method_on_inner_quest!(self.list[position_active_quest], list_necessary_items)
+        // check that all stationary items necessary to solve quest are available
+        let necessary_stationed_items = method_on_inner_quest!(
+            self.list[position_active_quest],
+            list_necessary_stationed_item
+        );
+        if !necessary_stationed_items
+            .iter()
+            .all(|necessary_item| stationed_items.list.contains(necessary_item))
         {
+            return Err(());
+        }
+
+        // removed used items
+        for used_item in method_on_inner_quest!(
+            self.list[position_active_quest],
+            list_necessary_collected_items
+        ) {
             let index = collected_items
                 .list
                 .iter()
-                .position(|available_item| available_item == used_item)
+                .position(|available_item| *available_item == used_item)
                 .expect("Checked before that backpack contains all necessary items");
             collected_items.list.remove(index);
         }
