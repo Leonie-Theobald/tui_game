@@ -1,7 +1,10 @@
 use termion::color;
 
 use crate::{
-    item::{Candle, CollectedItems, Items, RustyKey, TreasureMap},
+    item::collected_item::{
+        CollectableItem, CollectedItems, candle::Candle, rusty_key::RustyKey,
+        treasure_map::TreasureMap,
+    },
     tui::Drawable,
 };
 
@@ -146,9 +149,9 @@ impl Drawable for QuestList {
 
 pub trait Quest {
     fn get_description(&self) -> &'static str;
-    fn list_necessary_items(&self) -> &[Items];
+    fn list_necessary_items(&self) -> &[CollectableItem];
     fn get_status(&self) -> &QuestStatus;
-    fn list_reward_items(&self) -> Vec<Items>;
+    fn list_reward_items(&self) -> Vec<CollectableItem>;
     fn list_follow_up_quests(&self) -> Vec<Quests>;
 }
 
@@ -203,16 +206,19 @@ impl Quest for OpenRustyLock {
         "This old, wooden door is locked. Open it"
     }
 
-    fn list_necessary_items(&self) -> &[Items] {
-        &[Items::RustyKey(RustyKey)]
+    fn list_necessary_items(&self) -> &[CollectableItem] {
+        &[CollectableItem::RustyKey(RustyKey)]
     }
 
     fn get_status(&self) -> &QuestStatus {
         &self.status
     }
 
-    fn list_reward_items(&self) -> Vec<Items> {
-        vec![Items::Candle(Candle), Items::TreasureMap(TreasureMap)]
+    fn list_reward_items(&self) -> Vec<CollectableItem> {
+        vec![
+            CollectableItem::Candle(Candle),
+            CollectableItem::TreasureMap(TreasureMap),
+        ]
     }
 
     fn list_follow_up_quests(&self) -> Vec<Quests> {
@@ -240,15 +246,15 @@ impl Quest for LightCandle {
         "The candle is not burning. Try to lighten it."
     }
 
-    fn list_necessary_items(&self) -> &[Items] {
-        &[Items::Candle(Candle)]
+    fn list_necessary_items(&self) -> &[CollectableItem] {
+        &[CollectableItem::Candle(Candle)]
     }
 
     fn get_status(&self) -> &QuestStatus {
         &self.status
     }
 
-    fn list_reward_items(&self) -> Vec<Items> {
+    fn list_reward_items(&self) -> Vec<CollectableItem> {
         Vec::new()
     }
 

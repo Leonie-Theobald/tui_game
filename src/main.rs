@@ -9,7 +9,7 @@ use termion::{event::Key, input::TermRead, raw::IntoRawMode};
 use tui::Drawable;
 
 use crate::{
-    item::CollectedItems,
+    item::collected_item::CollectedItems,
     player::Player,
     quest::QuestList,
     tui::{Orientation, grid::Grid},
