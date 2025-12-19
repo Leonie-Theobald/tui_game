@@ -1,6 +1,6 @@
 mod item;
 mod player;
-mod quest;
+mod quest_log;
 mod tui;
 
 use std::io::{Write, stdin, stdout};
@@ -11,7 +11,7 @@ use tui::Drawable;
 use crate::{
     item::{collected_item::CollectedItems, stationed_item::StationedItems},
     player::Player,
-    quest::QuestList,
+    quest_log::QuestLog,
     tui::{Orientation, grid::Grid},
 };
 
@@ -19,7 +19,7 @@ fn main() {
     println!("INF: Game is initiated");
 
     let mut my_player = Player::initiate();
-    let mut my_quests = QuestList::initiate();
+    let mut my_quests = QuestLog::initiate();
     let mut my_collected_items = CollectedItems::initiate();
     let my_stationed_items = StationedItems::initiate();
     let grid = Grid::import_from_string(

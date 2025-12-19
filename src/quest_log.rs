@@ -1,40 +1,42 @@
+mod quest;
+
 use termion::color;
 
 use crate::{
-    item::collected_item::{
-        CollectableItem, CollectedItems, candle::Candle, rusty_key::RustyKey,
-        treasure_map::TreasureMap,
-    },
+    item::collected_item::CollectedItems,
+    quest_log::quest::{IsQuest, Quest, QuestStatus, open_rusty_lock::OpenRustyLock},
     tui::Drawable,
 };
 
+#[macro_export]
 macro_rules! method_on_inner_quest {
     ($value:expr, $method:ident) => {
         match &$value {
-            Quests::OpenRustyLock(inner) => inner.$method(),
-            Quests::LightCandle(inner) => inner.$method(),
+            Quest::OpenRustyLock(inner) => inner.$method(),
+            Quest::LightCandle(inner) => inner.$method(),
         }
     };
 }
 
+#[macro_export]
 macro_rules! mut_method_on_inner_quest {
     ($value:expr, $method:ident) => {
         match $value {
-            Quests::OpenRustyLock(inner) => inner.$method(),
-            Quests::LightCandle(inner) => inner.$method(),
+            Quest::OpenRustyLock(inner) => inner.$method(),
+            Quest::LightCandle(inner) => inner.$method(),
         }
     };
 }
 
 #[derive(Clone, Debug, Default)]
-pub struct QuestList {
-    pub list: Vec<Quests>,
+pub struct QuestLog {
+    pub list: Vec<Quest>,
     pub visible: bool,
 }
 
-impl QuestList {
+impl QuestLog {
     pub fn initiate() -> Self {
-        let open_rusty_lock = Quests::OpenRustyLock(OpenRustyLock::default());
+        let open_rusty_lock = Quest::OpenRustyLock(OpenRustyLock::default());
         Self {
             list: vec![open_rusty_lock],
             visible: false,
@@ -45,7 +47,7 @@ impl QuestList {
         self.visible = !self.visible;
     }
 
-    pub fn get_unsolved_quests(&self) -> Vec<Quests> {
+    pub fn get_unsolved_quests(&self) -> Vec<Quest> {
         self.list
             .clone()
             .into_iter()
@@ -110,7 +112,7 @@ impl QuestList {
     }
 }
 
-impl Drawable for QuestList {
+impl Drawable for QuestLog {
     fn draw(&self) -> String {
         if !self.visible {
             return String::new();
@@ -158,108 +160,5 @@ impl Drawable for QuestList {
 
         // merge background and written quests
         format!("{}{}", background, joined_quests)
-    }
-}
-
-pub trait Quest {
-    fn get_description(&self) -> &'static str;
-    fn list_necessary_items(&self) -> &[CollectableItem];
-    fn get_status(&self) -> &QuestStatus;
-    fn list_reward_items(&self) -> Vec<CollectableItem>;
-    fn list_follow_up_quests(&self) -> Vec<Quests>;
-    fn change_to_closed(&mut self);
-    fn change_to_active(&mut self);
-}
-
-#[derive(Clone, Debug)]
-pub enum Quests {
-    OpenRustyLock(OpenRustyLock),
-    LightCandle(LightCandle),
-}
-
-impl std::fmt::Display for Quests {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        writeln!(f, "{}", method_on_inner_quest!(self, get_description))
-    }
-}
-
-#[derive(Clone, Debug, Default, PartialEq)]
-pub enum QuestStatus {
-    #[default]
-    Open,
-    Active,
-    Finished,
-}
-
-#[derive(Clone, Debug, Default)]
-pub struct OpenRustyLock {
-    status: QuestStatus,
-}
-
-impl Quest for OpenRustyLock {
-    fn get_description(&self) -> &'static str {
-        "This old, wooden door is locked. Open it"
-    }
-
-    fn list_necessary_items(&self) -> &[CollectableItem] {
-        &[CollectableItem::RustyKey(RustyKey)]
-    }
-
-    fn get_status(&self) -> &QuestStatus {
-        &self.status
-    }
-
-    fn list_reward_items(&self) -> Vec<CollectableItem> {
-        vec![
-            CollectableItem::Candle(Candle),
-            CollectableItem::TreasureMap(TreasureMap),
-        ]
-    }
-
-    fn list_follow_up_quests(&self) -> Vec<Quests> {
-        vec![Quests::LightCandle(LightCandle::default())]
-    }
-
-    fn change_to_closed(&mut self) {
-        self.status = QuestStatus::Finished;
-    }
-
-    fn change_to_active(&mut self) {
-        self.status = QuestStatus::Active;
-    }
-}
-
-#[derive(Clone, Debug, Default)]
-pub struct LightCandle {
-    status: QuestStatus,
-}
-
-impl Quest for LightCandle {
-    fn get_description(&self) -> &'static str {
-        "The candle is not burning. Try to lighten it."
-    }
-
-    fn list_necessary_items(&self) -> &[CollectableItem] {
-        &[CollectableItem::Candle(Candle)]
-    }
-
-    fn get_status(&self) -> &QuestStatus {
-        &self.status
-    }
-
-    fn list_reward_items(&self) -> Vec<CollectableItem> {
-        Vec::new()
-    }
-
-    fn list_follow_up_quests(&self) -> Vec<Quests> {
-        Vec::new()
-    }
-
-    fn change_to_closed(&mut self) {
-        self.status = QuestStatus::Finished;
-    }
-
-    fn change_to_active(&mut self) {
-        self.status = QuestStatus::Active;
     }
 }
