@@ -27,14 +27,20 @@ pub enum StationaryItem {
     Packet(Packet),
 }
 
+macro_rules! method_on_inner_stationed_item {
+    ($value:expr, $method:ident) => {
+        match $value {
+            StationaryItem::Packet(inner) => inner.$method(),
+        }
+    };
+}
+
 impl Drawable for StationedItems {
     fn draw(&self) -> String {
         let mut joined_items = String::new();
 
         for item in &self.list {
-            let drawn_item = match item {
-                StationaryItem::Packet(packet) => packet.draw(),
-            };
+            let drawn_item = method_on_inner_stationed_item!(item, draw);
             joined_items.push_str(&drawn_item);
         }
 

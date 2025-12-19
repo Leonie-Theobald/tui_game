@@ -8,6 +8,24 @@ use crate::{
     tui::Drawable,
 };
 
+macro_rules! method_on_inner_quest {
+    ($value:expr, $method:ident) => {
+        match &$value {
+            Quests::OpenRustyLock(inner) => inner.$method(),
+            Quests::LightCandle(inner) => inner.$method(),
+        }
+    };
+}
+
+macro_rules! mut_method_on_inner_quest {
+    ($value:expr, $method:ident) => {
+        match $value {
+            Quests::OpenRustyLock(inner) => inner.$method(),
+            Quests::LightCandle(inner) => inner.$method(),
+        }
+    };
+}
+
 #[derive(Clone, Debug, Default)]
 pub struct QuestList {
     pub list: Vec<Quests>,
@@ -31,14 +49,14 @@ impl QuestList {
         self.list
             .clone()
             .into_iter()
-            .filter(|quest| quest.get_inner_quest().get_status() != &QuestStatus::Finished)
+            .filter(|quest| method_on_inner_quest!(quest, get_status) != &QuestStatus::Finished)
             .collect()
     }
 
     pub fn select_new_active_quest(&mut self) {
         // TODO: method to select needs to be changed later
         if let Some(quest) = self.list.first_mut() {
-            quest.get_inner_mut_quest().change_to_active()
+            mut_method_on_inner_quest!(quest, change_to_active)
         }
     }
 
@@ -47,16 +65,16 @@ impl QuestList {
         let position_active_quest = match self
             .list
             .iter()
-            .position(|quest| quest.get_inner_quest().get_status() == &QuestStatus::Active)
+            .position(|quest| method_on_inner_quest!(quest, get_status) == &QuestStatus::Active)
         {
             None => return Err(()),
             Some(position) => position,
         };
 
         // check that all necessary items to solve quest are available
-        if !self.list[position_active_quest]
-            .get_inner_quest()
-            .list_necessary_items()
+        let necessary_items =
+            method_on_inner_quest!(self.list[position_active_quest], list_necessary_items);
+        if !necessary_items
             .iter()
             .all(|necessary_item| collected_items.list.contains(necessary_item))
         {
@@ -64,9 +82,8 @@ impl QuestList {
         }
 
         // removed used items
-        for used_item in self.list[position_active_quest]
-            .get_inner_quest()
-            .list_necessary_items()
+        for used_item in
+            method_on_inner_quest!(self.list[position_active_quest], list_necessary_items)
         {
             let index = collected_items
                 .list
@@ -77,20 +94,16 @@ impl QuestList {
         }
 
         // quest is finished
-        self.list[position_active_quest]
-            .get_inner_mut_quest()
-            .change_to_closed();
+        mut_method_on_inner_quest!(&mut self.list[position_active_quest], change_to_closed);
 
         // generate rewarded items
-        let mut rewarded_items = self.list[position_active_quest]
-            .get_inner_quest()
-            .list_reward_items();
+        let mut rewarded_items =
+            method_on_inner_quest!(self.list[position_active_quest], list_reward_items);
         collected_items.list.append(&mut rewarded_items);
 
         // generate new quest(s)
-        let mut new_quests = self.list[position_active_quest]
-            .get_inner_quest()
-            .list_follow_up_quests();
+        let mut new_quests =
+            method_on_inner_quest!(self.list[position_active_quest], list_follow_up_quests);
         self.list.append(&mut new_quests);
 
         Ok(())
@@ -118,8 +131,9 @@ impl Drawable for QuestList {
             );
             joined_quests.push_str(&line);
 
-            if quest.get_inner_quest().get_description().len() > length_longest_quest_line {
-                length_longest_quest_line = quest.get_inner_quest().get_description().len();
+            let description = method_on_inner_quest!(quest, get_description);
+            if description.len() > length_longest_quest_line {
+                length_longest_quest_line = description.len();
             }
         }
 
@@ -166,25 +180,9 @@ pub enum Quests {
     LightCandle(LightCandle),
 }
 
-impl Quests {
-    pub fn get_inner_quest(&self) -> &dyn Quest {
-        match self {
-            Self::OpenRustyLock(inner_quest) => inner_quest,
-            Self::LightCandle(light_candle) => light_candle,
-        }
-    }
-
-    pub fn get_inner_mut_quest(&mut self) -> &mut dyn MutQuest {
-        match self {
-            Self::OpenRustyLock(inner_quest) => inner_quest,
-            Self::LightCandle(inner_quest) => inner_quest,
-        }
-    }
-}
-
 impl std::fmt::Display for Quests {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        writeln!(f, "{}", self.get_inner_quest().get_description())
+        writeln!(f, "{}", method_on_inner_quest!(self, get_description))
     }
 }
 

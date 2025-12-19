@@ -37,25 +37,29 @@ pub enum CollectableItem {
     TreasureMap(TreasureMap),
 }
 
-impl CollectableItem {
-    pub fn get_inner_item(&self) -> &dyn Item {
-        match self {
-            Self::RustyKey(inner_item) => inner_item,
-            Self::Candle(candle) => candle,
-            Self::TreasureMap(treasure_map) => treasure_map,
+macro_rules! method_on_inner_collected_item {
+    ($value:expr, $method:ident) => {
+        match $value {
+            CollectableItem::RustyKey(inner) => inner.$method(),
+            CollectableItem::Candle(inner) => inner.$method(),
+            CollectableItem::TreasureMap(inner) => inner.$method(),
         }
-    }
+    };
 }
 
 impl std::fmt::Display for CollectableItem {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let inner_item = self.get_inner_item();
-        writeln!(
-            f,
-            "{} - {}",
-            inner_item.get_name(),
-            inner_item.get_description()
-        )
+        //     let inner_item = self.get_inner_item();
+        //     writeln!(
+        //         f,
+        //         "{} - {}",
+        //         inner_item.get_name(),
+        //         inner_item.get_description()
+        //     )
+        let name = method_on_inner_collected_item!(self, get_name);
+        let description = method_on_inner_collected_item!(self, get_description);
+
+        writeln!(f, "{} - {}", name, description)
     }
 }
 
@@ -72,13 +76,14 @@ impl Drawable for CollectedItems {
                 "{}{}{}{}",
                 termion::cursor::Goto(4, 13 + index as u16),
                 color::Bg(color::Red),
-                item.get_inner_item().get_name(),
+                method_on_inner_collected_item!(item, get_name),
                 color::Bg(color::Reset),
             );
             joined_items.push_str(&line);
 
-            if item.get_inner_item().get_name().len() > length_longest_item_line {
-                length_longest_item_line = item.get_inner_item().get_name().len();
+            let item_name = method_on_inner_collected_item!(item, get_name);
+            if item_name.len() > length_longest_item_line {
+                length_longest_item_line = item_name.len();
             }
         }
 
