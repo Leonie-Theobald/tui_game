@@ -1,5 +1,6 @@
 use crate::{
     item::{Item, stationed_item::Stationary},
+    quest_log::quest::{Quest, QuestStatus, unwrap_packet::UnwrapPacket},
     tui::{Drawable, Vector},
 };
 
@@ -9,7 +10,18 @@ const COORDINATES: Vector = Vector {
 };
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct Packet;
+pub struct Packet {
+    linked_quest: Quest,
+}
+
+impl Packet {
+    pub fn initiate() -> Self {
+        let linked_quest = Quest::UnwrapPacket(UnwrapPacket {
+            status: QuestStatus::Open,
+        });
+        Self { linked_quest }
+    }
+}
 
 impl Item for Packet {
     fn get_name(&self) -> &'static str {
@@ -38,6 +50,10 @@ impl Stationary for Packet {
         }
 
         blocked_coordinate
+    }
+
+    fn get_linked_quest(&self) -> &Quest {
+        &self.linked_quest
     }
 }
 

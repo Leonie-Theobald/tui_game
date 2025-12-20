@@ -3,6 +3,7 @@ pub mod packet;
 use crate::{
     item::stationed_item::packet::Packet,
     method_on_inner_stationed_item,
+    quest_log::quest::Quest,
     tui::{Drawable, Vector},
 };
 
@@ -14,7 +15,7 @@ pub struct StationedItems {
 impl StationedItems {
     pub fn initiate() -> Self {
         Self {
-            list: vec![StationaryItem::Packet(Packet)],
+            list: vec![StationaryItem::Packet(Packet::initiate())],
         }
     }
 
@@ -34,10 +35,21 @@ impl StationedItems {
 
         accessible_stationed_items
     }
+
+    // TODO: Changed to Vec<&Quest>
+    pub fn get_all_linked_quests(&self) -> Vec<Quest> {
+        self.list
+            .iter()
+            .map(|stationed_item| {
+                method_on_inner_stationed_item!(stationed_item, get_linked_quest).clone()
+            })
+            .collect()
+    }
 }
 
 pub trait Stationary {
     fn list_blocking_coordinates(&self) -> Vec<Vector>;
+    fn get_linked_quest(&self) -> &Quest;
 }
 
 #[derive(Clone, Debug, PartialEq)]

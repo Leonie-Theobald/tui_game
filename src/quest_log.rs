@@ -1,4 +1,4 @@
-mod quest;
+pub mod quest;
 
 use termion::color;
 
@@ -38,9 +38,8 @@ pub struct QuestLog {
 
 impl QuestLog {
     pub fn initiate() -> Self {
-        let unwrap_packet = Quest::UnwrapPacket(UnwrapPacket::default());
         Self {
-            list: vec![unwrap_packet],
+            list: Vec::new(),
             visible: false,
         }
     }
@@ -67,7 +66,7 @@ impl QuestLog {
     pub fn solve_quest(
         &mut self,
         collected_items: &mut CollectedItems,
-        stationary_items: &Vec<&StationaryItem>,
+        // stationary_items: &Vec<&StationaryItem>,
     ) -> Result<(), ()> {
         // find active quest which should be solved next
         let position_active_quest = match self
@@ -92,18 +91,18 @@ impl QuestLog {
         }
 
         // check that all stationary items necessary to solve quest are available
-        let necessary_stationed_items = method_on_inner_quest!(
-            self.list[position_active_quest],
-            list_necessary_stationed_item
-        );
-        if !necessary_stationed_items
-            .iter()
-            .all(|necessary_item| stationary_items.contains(&necessary_item))
-        {
-            return Err(());
-        }
-
-        // removed used items
+        // let necessary_stationed_items = method_on_inner_quest!(
+        //     self.list[position_active_quest],
+        //     list_necessary_stationed_item
+        // );
+        // if !necessary_stationed_items
+        //     .iter()
+        //     .all(|necessary_item| stationary_items.contains(&necessary_item))
+        // {
+        //     return Err(());
+        // }
+        //
+        // // removed used items
         for used_item in method_on_inner_quest!(
             self.list[position_active_quest],
             list_necessary_collected_items

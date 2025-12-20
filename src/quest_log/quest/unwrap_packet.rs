@@ -1,14 +1,11 @@
 use crate::{
-    item::{
-        collected_item::{CollectableItem, rusty_key::RustyKey},
-        stationed_item::{StationaryItem, packet::Packet},
-    },
+    item::collected_item::{CollectableItem, rusty_key::RustyKey},
     quest_log::quest::{IsQuest, Quest, QuestStatus, open_rusty_lock::OpenRustyLock},
 };
 
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, Default, PartialEq)]
 pub struct UnwrapPacket {
-    status: QuestStatus,
+    pub status: QuestStatus,
 }
 
 impl IsQuest for UnwrapPacket {
@@ -38,9 +35,5 @@ impl IsQuest for UnwrapPacket {
 
     fn change_to_active(&mut self) {
         self.status = QuestStatus::Active;
-    }
-
-    fn list_necessary_stationed_item(&self) -> Vec<StationaryItem> {
-        vec![StationaryItem::Packet(Packet)]
     }
 }

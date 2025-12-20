@@ -51,6 +51,7 @@ fn main() {
 
     let mut stdout = stdout().into_raw_mode().unwrap();
     for k in stdin().keys() {
+        my_quests.list = my_stationed_items.get_all_linked_quests();
         match k.as_ref().unwrap() {
             Key::Char('a') => {
                 my_player.move_in_direction(&grid, &my_stationed_items, Orientation::West)
@@ -69,10 +70,10 @@ fn main() {
             Key::Char('r') => {
                 my_quests.select_new_active_quest();
                 let target_coordinates = my_player.get_facing_coordinates();
-                let accessible_stationary_items =
-                    my_stationed_items.accessible_stationary_items(target_coordinates);
+                // let accessible_stationary_items =
+                //     my_stationed_items.accessible_stationary_items(target_coordinates);
                 my_quests
-                    .solve_quest(&mut my_collected_items, &accessible_stationary_items)
+                    .solve_quest(&mut my_collected_items)
                     .expect("Couldn't solve quest");
             }
             Key::Ctrl('c') => break,

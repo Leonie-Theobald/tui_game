@@ -1,12 +1,9 @@
 use crate::{
-    item::{
-        collected_item::{CollectableItem, candle::Candle},
-        stationed_item::StationaryItem,
-    },
+    item::collected_item::{CollectableItem, candle::Candle},
     quest_log::quest::{IsQuest, Quest, QuestStatus},
 };
 
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, Default, PartialEq)]
 pub struct LightCandle {
     status: QuestStatus,
 }
@@ -38,9 +35,5 @@ impl IsQuest for LightCandle {
 
     fn change_to_active(&mut self) {
         self.status = QuestStatus::Active;
-    }
-
-    fn list_necessary_stationed_item(&self) -> Vec<StationaryItem> {
-        todo!()
     }
 }

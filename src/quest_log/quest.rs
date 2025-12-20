@@ -1,5 +1,5 @@
 use crate::{
-    item::{collected_item::CollectableItem, stationed_item::StationaryItem},
+    item::collected_item::CollectableItem,
     method_on_inner_quest,
     quest_log::quest::{
         light_candle::LightCandle, open_rusty_lock::OpenRustyLock, unwrap_packet::UnwrapPacket,
@@ -13,7 +13,6 @@ pub mod unwrap_packet;
 pub trait IsQuest {
     fn get_description(&self) -> &'static str;
     fn list_necessary_collected_items(&self) -> Vec<CollectableItem>;
-    fn list_necessary_stationed_item(&self) -> Vec<StationaryItem>;
     fn get_status(&self) -> &QuestStatus;
     fn list_reward_items(&self) -> Vec<CollectableItem>;
     fn list_follow_up_quests(&self) -> Vec<Quest>;
@@ -21,7 +20,7 @@ pub trait IsQuest {
     fn change_to_active(&mut self);
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum Quest {
     OpenRustyLock(OpenRustyLock),
     LightCandle(LightCandle),
