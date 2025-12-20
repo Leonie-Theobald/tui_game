@@ -3,7 +3,7 @@ mod quest;
 use termion::color;
 
 use crate::{
-    item::{collected_item::CollectedItems, stationed_item::StationedItems},
+    item::{collected_item::CollectedItems, stationed_item::StationaryItem},
     quest_log::quest::{IsQuest, Quest, QuestStatus, unwrap_packet::UnwrapPacket},
     tui::Drawable,
 };
@@ -67,7 +67,7 @@ impl QuestLog {
     pub fn solve_quest(
         &mut self,
         collected_items: &mut CollectedItems,
-        stationed_items: &StationedItems,
+        stationary_items: &Vec<&StationaryItem>,
     ) -> Result<(), ()> {
         // find active quest which should be solved next
         let position_active_quest = match self
@@ -98,7 +98,7 @@ impl QuestLog {
         );
         if !necessary_stationed_items
             .iter()
-            .all(|necessary_item| stationed_items.list.contains(necessary_item))
+            .all(|necessary_item| stationary_items.contains(&necessary_item))
         {
             return Err(());
         }

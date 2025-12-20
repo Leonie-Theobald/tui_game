@@ -57,7 +57,22 @@ impl Player {
             self.coordinates = new_coordinates;
         }
     }
+
+    /// The position the player is facing for interactions
+    /// Right in front of the player
+    pub fn get_facing_coordinates(&self) -> Vector {
+        let mut target_coordinates = self.coordinates.clone();
+        match self.orientation {
+            Orientation::North => target_coordinates.vertical -= 1,
+            Orientation::East => target_coordinates.horizontal += 1,
+            Orientation::South => target_coordinates.vertical -= 1,
+            Orientation::West => target_coordinates.horizontal -= 1,
+        };
+
+        target_coordinates
+    }
 }
+
 impl Drawable for Player {
     fn draw(&self) -> String {
         let symbol = match self.orientation {

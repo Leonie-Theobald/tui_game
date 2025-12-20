@@ -68,8 +68,11 @@ fn main() {
             Key::Char('e') => my_collected_items.toggle_visibility(),
             Key::Char('r') => {
                 my_quests.select_new_active_quest();
+                let target_coordinates = my_player.get_facing_coordinates();
+                let accessible_stationary_items =
+                    my_stationed_items.accessible_stationary_items(target_coordinates);
                 my_quests
-                    .solve_quest(&mut my_collected_items, &my_stationed_items)
+                    .solve_quest(&mut my_collected_items, &accessible_stationary_items)
                     .expect("Couldn't solve quest");
             }
             Key::Ctrl('c') => break,
