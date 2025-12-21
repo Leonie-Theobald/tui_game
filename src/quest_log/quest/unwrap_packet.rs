@@ -36,4 +36,45 @@ impl IsQuest for UnwrapPacket {
     fn change_to_active(&mut self) {
         self.status = QuestStatus::Active;
     }
+
+    fn solve(&mut self, collected_items: &mut crate::item::collected_item::CollectedItems) {
+        // check that all collectable items necessary to solve quest are available
+        if !self
+            .list_necessary_collected_items()
+            .iter()
+            .all(|necessary_item| collected_items.list.contains(necessary_item))
+        {
+            panic!("Not all necessary collected items are available")
+        }
+
+        // check that all stationary items necessary to solve quest are available
+        // let necessary_stationed_items = method_on_inner_quest!(
+        //     self.list[position_active_quest],
+        //     list_necessary_stationed_item
+        // );
+        // if !necessary_stationed_items
+        //     .iter()
+        //     .all(|necessary_item| stationary_items.contains(&necessary_item))
+        // {
+        //     return Err(());
+        // }
+
+        // removed used items
+        for used_item in self.list_necessary_collected_items() {
+            let index = collected_items
+                .list
+                .iter()
+                .position(|available_item| *available_item == used_item)
+                .expect("Checked before that backpack contains all necessary items");
+            collected_items.list.remove(index);
+        }
+
+        // quest is finished
+        self.change_to_closed();
+
+        // generate rewarded items
+        collected_items.list.append(&mut self.list_reward_items());
+
+        // generate new quest(s)
+    }
 }

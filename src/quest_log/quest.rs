@@ -1,5 +1,5 @@
 use crate::{
-    item::collected_item::CollectableItem,
+    item::collected_item::{CollectableItem, CollectedItems},
     method_on_inner_quest,
     quest_log::quest::{
         light_candle::LightCandle, open_rusty_lock::OpenRustyLock, unwrap_packet::UnwrapPacket,
@@ -18,6 +18,7 @@ pub trait IsQuest {
     fn list_follow_up_quests(&self) -> Vec<Quest>;
     fn change_to_closed(&mut self);
     fn change_to_active(&mut self);
+    fn solve(&mut self, collected_items: &mut CollectedItems);
 }
 
 #[derive(Clone, Debug, PartialEq)]

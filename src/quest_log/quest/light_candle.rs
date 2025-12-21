@@ -36,4 +36,8 @@ impl IsQuest for LightCandle {
     fn change_to_active(&mut self) {
         self.status = QuestStatus::Active;
     }
+
+    fn solve(&mut self, collected_items: &mut crate::item::collected_item::CollectedItems) {
+        todo!()
+    }
 }

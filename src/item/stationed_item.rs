@@ -7,7 +7,7 @@ use crate::{
     tui::{Drawable, Vector},
 };
 
-#[derive(PartialEq)]
+#[derive(Debug, PartialEq)]
 pub struct StationedItems {
     pub list: Vec<StationaryItem>,
 }
@@ -19,11 +19,14 @@ impl StationedItems {
         }
     }
 
-    pub fn accessible_stationary_items(&self, target_coordinates: Vector) -> Vec<&StationaryItem> {
+    pub fn accessible_stationary_items(
+        &mut self,
+        target_coordinates: Vector,
+    ) -> Vec<&mut StationaryItem> {
         // go through each item and check whether any of its covered coordinates is the one
         // the player accesses right now
         let mut accessible_stationed_items = Vec::new();
-        for stationed_item in &self.list {
+        for stationed_item in &mut self.list {
             if method_on_inner_stationed_item!(stationed_item, list_blocking_coordinates)
                 .contains(&target_coordinates)
             {
@@ -37,19 +40,33 @@ impl StationedItems {
     }
 
     // TODO: Changed to Vec<&Quest>
-    pub fn get_all_linked_quests(&self) -> Vec<Quest> {
-        self.list
-            .iter()
-            .map(|stationed_item| {
-                method_on_inner_stationed_item!(stationed_item, get_linked_quest).clone()
-            })
-            .collect()
+    pub fn get_all_linked_quests(&mut self, target_coordinates: Vector) -> Vec<&mut Quest> {
+        todo!()
+        // let mut accessible_items = self.accessible_stationary_items(target_coordinates);
+        // let linked_quest = method_on_inner_stationed_item!(first_accessible_item, get_linked_quest);
+        //
+        // Some(linked_quest)
+        // self.list
+        //     .iter()
+        //     .map(|stationed_item| {
+        //         method_on_inner_stationed_item!(stationed_item, get_linked_quest).clone()
+        //     })
+        //     .collect()
+    }
+
+    pub fn get_one_linked_quest(&mut self, target_coordinates: Vector) -> Option<&mut Quest> {
+        todo!()
+        // let mut accessible_items = self.accessible_stationary_items(target_coordinates);
+        // let first_accessible_item = &mut accessible_items[0];
+        // let linked_quest = method_on_inner_stationed_item!(first_accessible_item, get_linked_quest);
+        //
+        // Some(linked_quest)
     }
 }
 
 pub trait Stationary {
     fn list_blocking_coordinates(&self) -> Vec<Vector>;
-    fn get_linked_quest(&self) -> &Quest;
+    fn get_linked_quest(&mut self) -> &mut Quest;
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -59,6 +76,15 @@ pub enum StationaryItem {
 
 #[macro_export]
 macro_rules! method_on_inner_stationed_item {
+    ($value:expr, $method:ident) => {
+        match &$value {
+            StationaryItem::Packet(inner) => inner.$method(),
+        }
+    };
+}
+
+#[macro_export]
+macro_rules! mut_method_on_inner_stationed_item {
     ($value:expr, $method:ident) => {
         match $value {
             StationaryItem::Packet(inner) => inner.$method(),

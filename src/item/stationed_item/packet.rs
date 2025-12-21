@@ -52,8 +52,8 @@ impl Stationary for Packet {
         blocked_coordinate
     }
 
-    fn get_linked_quest(&self) -> &Quest {
-        &self.linked_quest
+    fn get_linked_quest(&mut self) -> &mut Quest {
+        &mut self.linked_quest
     }
 }
 

@@ -11,7 +11,7 @@ use crate::{
 };
 use termion::color;
 
-#[derive(PartialEq)]
+#[derive(Debug, PartialEq)]
 pub struct CollectedItems {
     pub list: Vec<CollectableItem>,
     pub visible: bool,
