@@ -1,6 +1,6 @@
 use crate::{
     item::{Item, stationed_item::Stationary},
-    quest_log::quest::{Quest, QuestStatus, unwrap_packet::UnwrapPacket},
+    quest::{Quest, QuestStatus, unwrap_packet::UnwrapPacket},
     tui::{Drawable, Vector},
 };
 

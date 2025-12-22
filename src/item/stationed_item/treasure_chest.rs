@@ -1,6 +1,6 @@
 use crate::{
     item::{Item, stationed_item::Stationary},
-    quest_log::quest::{Quest, QuestStatus, unlock_treasure_chest::UnlockTreasureChest},
+    quest::{Quest, QuestStatus, unlock_treasure_chest::UnlockTreasureChest},
     tui::{Drawable, Vector},
 };
 

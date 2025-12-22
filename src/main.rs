@@ -1,6 +1,6 @@
 mod item;
 mod player;
-mod quest_log;
+mod quest;
 mod tui;
 
 use std::io::{Write, stdin, stdout};
@@ -14,7 +14,7 @@ use crate::{
         stationed_item::{Stationary, StationaryItem, StationedItems},
     },
     player::Player,
-    quest_log::quest::{IsQuest, Quest},
+    quest::{IsQuest, Quest},
     tui::{Orientation, grid::Grid},
 };
 
@@ -74,14 +74,25 @@ fn main() {
                 let target_coordinates = my_player.get_facing_coordinates();
                 let mut accessible_items =
                     my_stationed_items.accessible_stationary_items(target_coordinates);
-                let first_accessible_item = accessible_items.first_mut().unwrap();
+                let first_accessible_item = match accessible_items.first_mut() {
+                    Some(item) => item,
+                    None => {
+                        continue;
+                    }
+                };
                 let linked_quest =
                     mut_method_on_inner_stationed_item!(first_accessible_item, get_linked_quest);
 
-                let mut new_stationed_items = match linked_quest {
-                    Quest::UnwrapPacket(inner) => inner.solve(&mut my_collected_items),
-                    Quest::UnlockTreasureChest(inner) => inner.solve(&mut my_collected_items),
+                let result = match linked_quest {
+                    Quest::UnwrapPacket(inner) => inner.try_solve(&mut my_collected_items),
+                    Quest::UnlockTreasureChest(inner) => inner.try_solve(&mut my_collected_items),
                 };
+                if let Err(_err) = result {
+                    continue;
+                }
+
+                let mut new_stationed_items =
+                    method_on_inner_quest!(linked_quest, list_reward_stationary_items);
                 my_stationed_items.list.append(&mut new_stationed_items);
             }
             Key::Ctrl('c') => break,

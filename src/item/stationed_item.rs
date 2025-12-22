@@ -4,7 +4,7 @@ pub mod treasure_chest;
 use crate::{
     item::stationed_item::{packet::Packet, treasure_chest::TreasureChest},
     method_on_inner_stationed_item,
-    quest_log::quest::Quest,
+    quest::Quest,
     tui::{Drawable, Vector},
 };
 
