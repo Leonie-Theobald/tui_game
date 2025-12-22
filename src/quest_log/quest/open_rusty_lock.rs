@@ -1,6 +1,9 @@
 use crate::{
-    item::collected_item::{
-        CollectableItem, candle::Candle, rusty_key::RustyKey, treasure_map::TreasureMap,
+    item::{
+        collected_item::{
+            CollectableItem, candle::Candle, rusty_key::RustyKey, treasure_map::TreasureMap,
+        },
+        stationed_item::StationaryItem,
     },
     quest_log::quest::{IsQuest, Quest, QuestStatus, light_candle::LightCandle},
 };
@@ -42,7 +45,10 @@ impl IsQuest for OpenRustyLock {
         self.status = QuestStatus::Active;
     }
 
-    fn solve(&mut self, collected_items: &mut crate::item::collected_item::CollectedItems) {
+    fn solve(
+        &mut self,
+        collected_items: &mut crate::item::collected_item::CollectedItems,
+    ) -> Vec<StationaryItem> {
         todo!()
     }
 }

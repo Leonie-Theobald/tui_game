@@ -1,5 +1,8 @@
 use crate::{
-    item::collected_item::{CollectableItem, rusty_key::RustyKey},
+    item::{
+        collected_item::{CollectableItem, CollectedItems, rusty_key::RustyKey},
+        stationed_item::{StationaryItem, treasure_chest::TreasureChest},
+    },
     quest_log::quest::{IsQuest, Quest, QuestStatus, open_rusty_lock::OpenRustyLock},
 };
 
@@ -37,7 +40,7 @@ impl IsQuest for UnwrapPacket {
         self.status = QuestStatus::Active;
     }
 
-    fn solve(&mut self, collected_items: &mut crate::item::collected_item::CollectedItems) {
+    fn solve(&mut self, collected_items: &mut CollectedItems) -> Vec<StationaryItem> {
         // check that all collectable items necessary to solve quest are available
         if !self
             .list_necessary_collected_items()
@@ -46,18 +49,6 @@ impl IsQuest for UnwrapPacket {
         {
             panic!("Not all necessary collected items are available")
         }
-
-        // check that all stationary items necessary to solve quest are available
-        // let necessary_stationed_items = method_on_inner_quest!(
-        //     self.list[position_active_quest],
-        //     list_necessary_stationed_item
-        // );
-        // if !necessary_stationed_items
-        //     .iter()
-        //     .all(|necessary_item| stationary_items.contains(&necessary_item))
-        // {
-        //     return Err(());
-        // }
 
         // removed used items
         for used_item in self.list_necessary_collected_items() {
@@ -75,6 +66,7 @@ impl IsQuest for UnwrapPacket {
         // generate rewarded items
         collected_items.list.append(&mut self.list_reward_items());
 
-        // generate new quest(s)
+        // return new stationed items
+        vec![StationaryItem::TreasureChest(TreasureChest::initiate())]
     }
 }

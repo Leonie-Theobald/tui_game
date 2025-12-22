@@ -15,6 +15,7 @@ macro_rules! method_on_inner_quest {
             Quest::OpenRustyLock(inner) => inner.$method(),
             Quest::LightCandle(inner) => inner.$method(),
             Quest::UnwrapPacket(inner) => inner.$method(),
+            Quest::UnlockTreasureChest(inner) => inner.$method(),
         }
     };
 }
@@ -26,6 +27,7 @@ macro_rules! mut_method_on_inner_quest {
             Quest::OpenRustyLock(inner) => inner.$method(),
             Quest::LightCandle(inner) => inner.$method(),
             Quest::UnwrapPacket(inner) => inner.$method(),
+            Quest::UnlockTreasureChest(inner) => inner.$method(),
         }
     };
 }

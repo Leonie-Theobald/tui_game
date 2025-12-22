@@ -55,6 +55,9 @@ fn main() {
 └──────────────────────────────────────────────────────────────────────────────┘",
     );
 
+    println!("Stationed Items: {:?}", my_stationed_items);
+    println!("Collected Items: {:?}", my_collected_items);
+
     let mut stdout = stdout().into_raw_mode().unwrap();
     for k in stdin().keys() {
         match k.as_ref().unwrap() {
@@ -88,13 +91,13 @@ fn main() {
                 let linked_quest =
                     mut_method_on_inner_stationed_item!(first_accessible_item, get_linked_quest);
 
-                match linked_quest {
+                let mut new_stationed_items = match linked_quest {
                     Quest::OpenRustyLock(inner) => inner.solve(&mut my_collected_items),
                     Quest::LightCandle(inner) => inner.solve(&mut my_collected_items),
                     Quest::UnwrapPacket(inner) => inner.solve(&mut my_collected_items),
-                }
-                // mut_method_on_inner_quest!(linked_quest, change_to_active);
-                // my_quests.solve_quest(&mut my_collected_items);
+                    Quest::UnlockTreasureChest(inner) => inner.solve(&mut my_collected_items),
+                };
+                my_stationed_items.list.append(&mut new_stationed_items);
             }
             Key::Ctrl('c') => break,
             _ => {

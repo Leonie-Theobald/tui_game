@@ -1,7 +1,8 @@
 pub mod packet;
+pub mod treasure_chest;
 
 use crate::{
-    item::stationed_item::packet::Packet,
+    item::stationed_item::{packet::Packet, treasure_chest::TreasureChest},
     method_on_inner_stationed_item,
     quest_log::quest::Quest,
     tui::{Drawable, Vector},
@@ -72,6 +73,7 @@ pub trait Stationary {
 #[derive(Clone, Debug, PartialEq)]
 pub enum StationaryItem {
     Packet(Packet),
+    TreasureChest(TreasureChest),
 }
 
 #[macro_export]
@@ -79,6 +81,7 @@ macro_rules! method_on_inner_stationed_item {
     ($value:expr, $method:ident) => {
         match &$value {
             StationaryItem::Packet(inner) => inner.$method(),
+            StationaryItem::TreasureChest(inner) => inner.$method(),
         }
     };
 }
@@ -88,6 +91,7 @@ macro_rules! mut_method_on_inner_stationed_item {
     ($value:expr, $method:ident) => {
         match $value {
             StationaryItem::Packet(inner) => inner.$method(),
+            StationaryItem::TreasureChest(inner) => inner.$method(),
         }
     };
 }

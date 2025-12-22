@@ -1,13 +1,18 @@
 use crate::{
-    item::collected_item::{CollectableItem, CollectedItems},
+    item::{
+        collected_item::{CollectableItem, CollectedItems},
+        stationed_item::StationaryItem,
+    },
     method_on_inner_quest,
     quest_log::quest::{
-        light_candle::LightCandle, open_rusty_lock::OpenRustyLock, unwrap_packet::UnwrapPacket,
+        light_candle::LightCandle, open_rusty_lock::OpenRustyLock,
+        unlock_treasure_chest::UnlockTreasureChest, unwrap_packet::UnwrapPacket,
     },
 };
 
 pub mod light_candle;
 pub mod open_rusty_lock;
+pub mod unlock_treasure_chest;
 pub mod unwrap_packet;
 
 pub trait IsQuest {
@@ -18,7 +23,7 @@ pub trait IsQuest {
     fn list_follow_up_quests(&self) -> Vec<Quest>;
     fn change_to_closed(&mut self);
     fn change_to_active(&mut self);
-    fn solve(&mut self, collected_items: &mut CollectedItems);
+    fn solve(&mut self, collected_items: &mut CollectedItems) -> Vec<StationaryItem>;
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -26,6 +31,7 @@ pub enum Quest {
     OpenRustyLock(OpenRustyLock),
     LightCandle(LightCandle),
     UnwrapPacket(UnwrapPacket),
+    UnlockTreasureChest(UnlockTreasureChest),
 }
 
 impl std::fmt::Display for Quest {

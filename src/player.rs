@@ -43,6 +43,9 @@ impl Player {
         for stationed_item in &stationed_items.list {
             let blocked_pixels = match stationed_item {
                 StationaryItem::Packet(packet) => packet.list_blocking_coordinates(),
+                StationaryItem::TreasureChest(treasure_chest) => {
+                    treasure_chest.list_blocking_coordinates()
+                }
             };
             for blocked_pixel in blocked_pixels {
                 // assign placeholder blocking element

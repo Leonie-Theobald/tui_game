@@ -1,5 +1,8 @@
 use crate::{
-    item::collected_item::{CollectableItem, candle::Candle},
+    item::{
+        collected_item::{CollectableItem, candle::Candle},
+        stationed_item::StationaryItem,
+    },
     quest_log::quest::{IsQuest, Quest, QuestStatus},
 };
 
@@ -37,7 +40,10 @@ impl IsQuest for LightCandle {
         self.status = QuestStatus::Active;
     }
 
-    fn solve(&mut self, collected_items: &mut crate::item::collected_item::CollectedItems) {
+    fn solve(
+        &mut self,
+        collected_items: &mut crate::item::collected_item::CollectedItems,
+    ) -> Vec<StationaryItem> {
         todo!()
     }
 }
