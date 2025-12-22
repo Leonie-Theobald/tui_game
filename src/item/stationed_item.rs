@@ -44,12 +44,20 @@ impl StationedItems {
 pub trait Stationary {
     fn list_blocking_coordinates(&self) -> Vec<Vector>;
     fn get_linked_quest(&mut self) -> &mut Quest;
+    fn get_status(&self) -> &StationaryStatus;
+    fn change_status_to_not_available(&mut self);
 }
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum StationaryItem {
     Packet(Packet),
     TreasureChest(TreasureChest),
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub enum StationaryStatus {
+    Visible,
+    NotAvailable,
 }
 
 #[macro_export]
@@ -77,6 +85,10 @@ impl Drawable for StationedItems {
         let mut joined_items = String::new();
 
         for item in &self.list {
+            if method_on_inner_stationed_item!(item, get_status) != &StationaryStatus::Visible {
+                // only visible items should be drawn
+                continue;
+            }
             let drawn_item = method_on_inner_stationed_item!(item, draw);
             joined_items.push_str(&drawn_item);
         }

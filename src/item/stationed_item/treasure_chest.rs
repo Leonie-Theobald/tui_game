@@ -1,5 +1,8 @@
 use crate::{
-    item::{Item, stationed_item::Stationary},
+    item::{
+        Item,
+        stationed_item::{Stationary, StationaryStatus},
+    },
     quest::{Quest, QuestStatus, unlock_treasure_chest::UnlockTreasureChest},
     tui::{Drawable, Vector},
 };
@@ -12,6 +15,7 @@ const COORDINATES: Vector = Vector {
 #[derive(Clone, Debug, PartialEq)]
 pub struct TreasureChest {
     linked_quest: Quest,
+    status: StationaryStatus,
 }
 
 impl TreasureChest {
@@ -19,7 +23,10 @@ impl TreasureChest {
         let linked_quest = Quest::UnlockTreasureChest(UnlockTreasureChest {
             status: QuestStatus::Open,
         });
-        Self { linked_quest }
+        Self {
+            linked_quest,
+            status: StationaryStatus::Visible,
+        }
     }
 }
 
@@ -35,6 +42,10 @@ impl Item for TreasureChest {
 
 impl Stationary for TreasureChest {
     fn list_blocking_coordinates(&self) -> Vec<Vector> {
+        if self.status != StationaryStatus::Visible {
+            return Vec::new();
+        }
+
         let mut blocked_coordinate = Vec::new();
 
         // +-1 around the symbol is also blocked
@@ -54,6 +65,14 @@ impl Stationary for TreasureChest {
 
     fn get_linked_quest(&mut self) -> &mut Quest {
         &mut self.linked_quest
+    }
+
+    fn get_status(&self) -> &StationaryStatus {
+        &self.status
+    }
+
+    fn change_status_to_not_available(&mut self) {
+        self.status = StationaryStatus::NotAvailable;
     }
 }
 

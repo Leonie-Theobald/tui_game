@@ -73,7 +73,7 @@ fn main() {
             Key::Char('f') => {
                 let target_coordinates = my_player.get_facing_coordinates();
                 let mut accessible_items =
-                    my_stationed_items.accessible_stationary_items(target_coordinates);
+                    my_stationed_items.accessible_stationary_items(target_coordinates.clone());
                 let first_accessible_item = match accessible_items.first_mut() {
                     Some(item) => item,
                     None => {
@@ -91,9 +91,20 @@ fn main() {
                     continue;
                 }
 
+                // remove used stationary item and add new ones
                 let mut new_stationed_items =
                     method_on_inner_quest!(linked_quest, list_reward_stationary_items);
                 my_stationed_items.list.append(&mut new_stationed_items);
+                let mut accessible_items =
+                    my_stationed_items.accessible_stationary_items(target_coordinates);
+                match accessible_items.first_mut() {
+                    Some(item) => {
+                        mut_method_on_inner_stationed_item!(item, change_status_to_not_available)
+                    }
+                    None => {
+                        continue;
+                    }
+                };
             }
             Key::Ctrl('c') => break,
             _ => {
@@ -110,7 +121,7 @@ fn main() {
             my_player.draw(),
             my_collected_items.draw(),
             my_stationed_items.draw(),
-            termion::cursor::Hide,
+            termion::cursor::Hide
         )
         .unwrap();
         stdout.flush().unwrap();
