@@ -3,7 +3,7 @@ use crate::{
         collected_item::{CollectableItem, CollectedItems, rusty_key::RustyKey},
         stationed_item::{StationaryItem, treasure_chest::TreasureChest},
     },
-    quest_log::quest::{IsQuest, Quest, QuestStatus, open_rusty_lock::OpenRustyLock},
+    quest_log::quest::{IsQuest, QuestStatus},
 };
 
 #[derive(Clone, Debug, Default, PartialEq)]
@@ -20,24 +20,8 @@ impl IsQuest for UnwrapPacket {
         Vec::new()
     }
 
-    fn get_status(&self) -> &QuestStatus {
-        &self.status
-    }
-
     fn list_reward_items(&self) -> Vec<CollectableItem> {
         vec![CollectableItem::RustyKey(RustyKey)]
-    }
-
-    fn list_follow_up_quests(&self) -> Vec<Quest> {
-        vec![Quest::OpenRustyLock(OpenRustyLock::default())]
-    }
-
-    fn change_to_closed(&mut self) {
-        self.status = QuestStatus::Finished;
-    }
-
-    fn change_to_active(&mut self) {
-        self.status = QuestStatus::Active;
     }
 
     fn solve(&mut self, collected_items: &mut CollectedItems) -> Vec<StationaryItem> {
@@ -61,7 +45,7 @@ impl IsQuest for UnwrapPacket {
         }
 
         // quest is finished
-        self.change_to_closed();
+        self.status = QuestStatus::Finished;
 
         // generate rewarded items
         collected_items.list.append(&mut self.list_reward_items());

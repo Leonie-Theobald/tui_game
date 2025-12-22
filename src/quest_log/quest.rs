@@ -4,32 +4,21 @@ use crate::{
         stationed_item::StationaryItem,
     },
     method_on_inner_quest,
-    quest_log::quest::{
-        light_candle::LightCandle, open_rusty_lock::OpenRustyLock,
-        unlock_treasure_chest::UnlockTreasureChest, unwrap_packet::UnwrapPacket,
-    },
+    quest_log::quest::{unlock_treasure_chest::UnlockTreasureChest, unwrap_packet::UnwrapPacket},
 };
 
-pub mod light_candle;
-pub mod open_rusty_lock;
 pub mod unlock_treasure_chest;
 pub mod unwrap_packet;
 
 pub trait IsQuest {
     fn get_description(&self) -> &'static str;
     fn list_necessary_collected_items(&self) -> Vec<CollectableItem>;
-    fn get_status(&self) -> &QuestStatus;
     fn list_reward_items(&self) -> Vec<CollectableItem>;
-    fn list_follow_up_quests(&self) -> Vec<Quest>;
-    fn change_to_closed(&mut self);
-    fn change_to_active(&mut self);
     fn solve(&mut self, collected_items: &mut CollectedItems) -> Vec<StationaryItem>;
 }
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum Quest {
-    OpenRustyLock(OpenRustyLock),
-    LightCandle(LightCandle),
     UnwrapPacket(UnwrapPacket),
     UnlockTreasureChest(UnlockTreasureChest),
 }
@@ -44,6 +33,25 @@ impl std::fmt::Display for Quest {
 pub enum QuestStatus {
     #[default]
     Open,
-    Active,
     Finished,
+}
+
+#[macro_export]
+macro_rules! method_on_inner_quest {
+    ($value:expr, $method:ident) => {
+        match &$value {
+            Quest::UnwrapPacket(inner) => inner.$method(),
+            Quest::UnlockTreasureChest(inner) => inner.$method(),
+        }
+    };
+}
+
+#[macro_export]
+macro_rules! mut_method_on_inner_quest {
+    ($value:expr, $method:ident) => {
+        match $value {
+            Quest::UnwrapPacket(inner) => inner.$method(),
+            Quest::UnlockTreasureChest(inner) => inner.$method(),
+        }
+    };
 }

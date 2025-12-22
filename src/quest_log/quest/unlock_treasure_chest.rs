@@ -5,7 +5,7 @@ use crate::{
         },
         stationed_item::StationaryItem,
     },
-    quest_log::quest::{IsQuest, Quest, QuestStatus, light_candle::LightCandle},
+    quest_log::quest::{IsQuest, QuestStatus},
 };
 
 #[derive(Clone, Debug, Default, PartialEq)]
@@ -22,27 +22,11 @@ impl IsQuest for UnlockTreasureChest {
         vec![CollectableItem::RustyKey(RustyKey)]
     }
 
-    fn get_status(&self) -> &QuestStatus {
-        &self.status
-    }
-
     fn list_reward_items(&self) -> Vec<CollectableItem> {
         vec![
             CollectableItem::Candle(Candle),
             CollectableItem::TreasureMap(TreasureMap),
         ]
-    }
-
-    fn list_follow_up_quests(&self) -> Vec<Quest> {
-        vec![Quest::LightCandle(LightCandle::default())]
-    }
-
-    fn change_to_closed(&mut self) {
-        self.status = QuestStatus::Finished;
-    }
-
-    fn change_to_active(&mut self) {
-        self.status = QuestStatus::Active;
     }
 
     fn solve(
@@ -81,7 +65,7 @@ impl IsQuest for UnlockTreasureChest {
         }
 
         // quest is finished
-        self.change_to_closed();
+        self.status = QuestStatus::Finished;
 
         // generate rewarded items
         collected_items.list.append(&mut self.list_reward_items());

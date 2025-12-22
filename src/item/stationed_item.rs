@@ -39,30 +39,6 @@ impl StationedItems {
 
         accessible_stationed_items
     }
-
-    // TODO: Changed to Vec<&Quest>
-    pub fn get_all_linked_quests(&mut self, target_coordinates: Vector) -> Vec<&mut Quest> {
-        todo!()
-        // let mut accessible_items = self.accessible_stationary_items(target_coordinates);
-        // let linked_quest = method_on_inner_stationed_item!(first_accessible_item, get_linked_quest);
-        //
-        // Some(linked_quest)
-        // self.list
-        //     .iter()
-        //     .map(|stationed_item| {
-        //         method_on_inner_stationed_item!(stationed_item, get_linked_quest).clone()
-        //     })
-        //     .collect()
-    }
-
-    pub fn get_one_linked_quest(&mut self, target_coordinates: Vector) -> Option<&mut Quest> {
-        todo!()
-        // let mut accessible_items = self.accessible_stationary_items(target_coordinates);
-        // let first_accessible_item = &mut accessible_items[0];
-        // let linked_quest = method_on_inner_stationed_item!(first_accessible_item, get_linked_quest);
-        //
-        // Some(linked_quest)
-    }
 }
 
 pub trait Stationary {

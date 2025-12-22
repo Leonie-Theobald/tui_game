@@ -8,7 +8,6 @@ use crate::{
 
 #[derive(Clone, Debug, Default)]
 pub struct Player {
-    pub name: &'static str,
     pub coordinates: Vector,
     pub orientation: Orientation,
 }
@@ -16,17 +15,12 @@ pub struct Player {
 impl Player {
     pub fn initiate() -> Self {
         Self {
-            name: "Leonie",
             coordinates: Vector {
                 horizontal: 15,
                 vertical: 14,
             },
             orientation: Orientation::North,
         }
-    }
-
-    pub fn show_name(&self) -> &'static str {
-        self.name
     }
 
     pub fn move_in_direction(

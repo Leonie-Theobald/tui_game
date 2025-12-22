@@ -14,10 +14,7 @@ use crate::{
         stationed_item::{Stationary, StationaryItem, StationedItems},
     },
     player::Player,
-    quest_log::{
-        QuestLog,
-        quest::{IsQuest, Quest},
-    },
+    quest_log::quest::{IsQuest, Quest},
     tui::{Orientation, grid::Grid},
 };
 
@@ -25,7 +22,6 @@ fn main() {
     println!("INF: Game is initiated");
 
     let mut my_player = Player::initiate();
-    let mut my_quests = QuestLog::initiate();
     let mut my_collected_items = CollectedItems::initiate();
     let mut my_stationed_items = StationedItems::initiate();
     let grid = Grid::import_from_string(
@@ -74,26 +70,15 @@ fn main() {
                 my_player.move_in_direction(&grid, &my_stationed_items, Orientation::South)
             }
             Key::Char('e') => my_collected_items.toggle_visibility(),
-            Key::Char('r') => {
-                my_quests.select_new_active_quest();
-                let target_coordinates = my_player.get_facing_coordinates();
-                // let accessible_stationary_items =
-                //     my_stationed_items.accessible_stationary_items(target_coordinates);
-                my_quests
-                    .solve_quest(&mut my_collected_items)
-                    .expect("Couldn't solve quest");
-            }
             Key::Char('f') => {
                 let target_coordinates = my_player.get_facing_coordinates();
                 let mut accessible_items =
                     my_stationed_items.accessible_stationary_items(target_coordinates);
-                let mut first_accessible_item = accessible_items.first_mut().unwrap();
+                let first_accessible_item = accessible_items.first_mut().unwrap();
                 let linked_quest =
                     mut_method_on_inner_stationed_item!(first_accessible_item, get_linked_quest);
 
                 let mut new_stationed_items = match linked_quest {
-                    Quest::OpenRustyLock(inner) => inner.solve(&mut my_collected_items),
-                    Quest::LightCandle(inner) => inner.solve(&mut my_collected_items),
                     Quest::UnwrapPacket(inner) => inner.solve(&mut my_collected_items),
                     Quest::UnlockTreasureChest(inner) => inner.solve(&mut my_collected_items),
                 };
@@ -108,11 +93,10 @@ fn main() {
 
         write!(
             stdout,
-            "{}{}{}{}{}{}{}",
+            "{}{}{}{}{}{}",
             termion::clear::All,
             grid.draw(),
             my_player.draw(),
-            my_quests.draw(),
             my_collected_items.draw(),
             my_stationed_items.draw(),
             termion::cursor::Hide,
