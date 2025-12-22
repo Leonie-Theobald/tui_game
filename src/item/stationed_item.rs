@@ -33,7 +33,6 @@ impl StationedItems {
             {
                 // this stationed item is also placed at the coordinates that the player can access
                 accessible_stationed_items.push(stationed_item);
-                break;
             }
         }
 

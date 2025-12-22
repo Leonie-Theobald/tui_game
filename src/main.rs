@@ -10,12 +10,13 @@ use tui::Drawable;
 
 use crate::{
     item::{
+        Item,
         collected_item::CollectedItems,
         stationed_item::{Stationary, StationaryItem, StationedItems},
     },
     player::Player,
     quest::{IsQuest, Quest},
-    tui::{Orientation, grid::Grid},
+    tui::{Orientation, grid::Grid, pop_up::PopUp},
 };
 
 fn main() {
@@ -56,6 +57,18 @@ fn main() {
 
     let mut stdout = stdout().into_raw_mode().unwrap();
     for k in stdin().keys() {
+        write!(
+            stdout,
+            "{}{}{}{}{}{}",
+            termion::clear::All,
+            grid.draw(),
+            my_player.draw(),
+            my_collected_items.draw(),
+            my_stationed_items.draw(),
+            termion::cursor::Hide
+        )
+        .unwrap();
+        stdout.flush().unwrap();
         match k.as_ref().unwrap() {
             Key::Char('a') => {
                 my_player.move_in_direction(&grid, &my_stationed_items, Orientation::West)
@@ -74,20 +87,53 @@ fn main() {
                 let target_coordinates = my_player.get_facing_coordinates();
                 let mut accessible_items =
                     my_stationed_items.accessible_stationary_items(target_coordinates.clone());
-                let first_accessible_item = match accessible_items.first_mut() {
-                    Some(item) => item,
-                    None => {
-                        continue;
-                    }
+                let descriptions = accessible_items
+                    .iter()
+                    .map(|item| method_on_inner_stationed_item!(item, get_description))
+                    .collect();
+                let mut popup_stationed_item_selection = PopUp {
+                    options: descriptions,
+                    ..Default::default()
                 };
+
+                if let Err(_err) = popup_stationed_item_selection.get_user_selection() {
+                    write!(
+                        stdout,
+                        "{}{}{}{}{}{}",
+                        termion::clear::All,
+                        grid.draw(),
+                        my_player.draw(),
+                        my_collected_items.draw(),
+                        my_stationed_items.draw(),
+                        termion::cursor::Hide
+                    )
+                    .unwrap();
+                    stdout.flush().unwrap();
+                    continue;
+                };
+                let selected_accesible_item = accessible_items
+                    .get_mut(popup_stationed_item_selection.active_option_index)
+                    .expect("Just selected this option by popup");
                 let linked_quest =
-                    mut_method_on_inner_stationed_item!(first_accessible_item, get_linked_quest);
+                    mut_method_on_inner_stationed_item!(selected_accesible_item, get_linked_quest);
 
                 let result = match linked_quest {
                     Quest::UnwrapPacket(inner) => inner.try_solve(&mut my_collected_items),
                     Quest::UnlockTreasureChest(inner) => inner.try_solve(&mut my_collected_items),
                 };
                 if let Err(_err) = result {
+                    write!(
+                        stdout,
+                        "{}{}{}{}{}{}",
+                        termion::clear::All,
+                        grid.draw(),
+                        my_player.draw(),
+                        my_collected_items.draw(),
+                        my_stationed_items.draw(),
+                        termion::cursor::Hide
+                    )
+                    .unwrap();
+                    stdout.flush().unwrap();
                     continue;
                 }
 
