@@ -4,8 +4,8 @@ pub mod pop_up;
 pub enum TuiError {
     PositionOutOfBound,
     PositionBlocked,
-    NoSelectionOptions,
     NoSelection,
+    NoSelectionOptions,
 }
 
 pub trait Drawable {

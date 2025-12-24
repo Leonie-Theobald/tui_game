@@ -9,17 +9,31 @@ use std::{
 use termion::{color, event::Key, input::TermRead, raw::IntoRawMode};
 
 #[derive(Debug, Default, PartialEq)]
-pub enum ConfirmationButton {
-    Cancel,
+pub enum Button {
     #[default]
     Confirm,
+    Cancel,
 }
 
-#[derive(Debug, Default)]
+impl Display for Button {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut button_text = String::from("<");
+        button_text.push_str(match self {
+            Button::Confirm => "OK",
+            Button::Cancel => "Cancel",
+        });
+        button_text.push('>');
+
+        write!(f, "{}", button_text)
+    }
+}
+
+#[derive(Debug)]
 pub struct PopUp<T: Display> {
     pub options: Vec<T>,
     pub active_option_index: usize,
-    pub selected_confirmation_button: ConfirmationButton,
+    pub buttons: Vec<Button>,
+    pub active_button_index: usize,
 }
 
 impl<T: Display> PopUp<T> {
@@ -35,15 +49,26 @@ impl<T: Display> PopUp<T> {
         }
     }
 
-    pub fn get_user_selection(&mut self) -> Result<usize, TuiError> {
-        let mut stdout = stdout().into_raw_mode().unwrap();
+    fn select_next_button(&mut self) {
+        if self.active_button_index < self.buttons.len() - 1 {
+            self.active_button_index += 1
+        }
+    }
 
+    fn select_previous_button(&mut self) {
+        if self.active_button_index > 0 {
+            self.active_button_index -= 1
+        }
+    }
+
+    fn check_and_handle_empty(&self) -> Result<(), TuiError> {
+        let mut stdout = stdout().into_raw_mode().unwrap();
         if self.options.is_empty() {
             write!(
                 stdout,
                 "{}{}{}",
                 termion::clear::All,
-                self.show_empty_options(),
+                Self::show_empty_options(),
                 termion::cursor::Hide
             )
             .unwrap();
@@ -57,6 +82,12 @@ impl<T: Display> PopUp<T> {
             }
         }
 
+        Ok(())
+    }
+
+    fn draw_in_terminal(&self) {
+        let mut stdout = stdout().into_raw_mode().unwrap();
+
         // Draw initial state
         write!(
             stdout,
@@ -67,22 +98,30 @@ impl<T: Display> PopUp<T> {
         )
         .unwrap();
         stdout.flush().unwrap();
+    }
 
+    pub fn get_user_selection(&mut self) -> Result<usize, TuiError> {
+        self.check_and_handle_empty()?;
+        self.draw_in_terminal();
+
+        let mut stdout = stdout().into_raw_mode().unwrap();
         // react to user input
         for k in stdin().keys() {
             match k.as_ref().unwrap() {
-                Key::Up => {
-                    self.select_previous_option();
-                }
-                Key::Down => {
-                    self.select_next_option();
-                }
-                Key::Left => self.selected_confirmation_button = ConfirmationButton::Cancel,
-                Key::Right => self.selected_confirmation_button = ConfirmationButton::Confirm,
-                Key::Char('\n') => match self.selected_confirmation_button {
+                Key::Up => self.select_previous_option(),
+
+                Key::Down => self.select_next_option(),
+
+                Key::Left => self.select_previous_button(),
+                Key::Right => self.select_next_button(),
+                Key::Char('\n') => match self
+                    .buttons
+                    .get(self.active_button_index)
+                    .expect("Changed index only within available range")
+                {
                     // return respective user selection
-                    ConfirmationButton::Cancel => return Err(TuiError::NoSelection),
-                    ConfirmationButton::Confirm => return Ok(self.active_option_index),
+                    Button::Cancel => return Err(TuiError::NoSelection),
+                    Button::Confirm => return Ok(self.active_option_index),
                 },
                 // ignore all other key presses
                 _ => continue,
@@ -103,7 +142,7 @@ impl<T: Display> PopUp<T> {
         Ok(self.active_option_index)
     }
 
-    fn show_empty_options(&self) -> String {
+    fn show_empty_options() -> String {
         let no_options_line = format!(
             "{}{}{}{}{}{}{}",
             Self::draw_background(),
@@ -129,7 +168,7 @@ impl<T: Display> PopUp<T> {
     fn draw_background() -> String {
         let background_line = format!(
             "{}{}{}",
-            color::Bg(color::Blue),
+            termion::color::Bg(termion::color::Blue),
             " ".repeat(GRID_WIDTH - 2),
             color::Bg(color::Reset),
         );
@@ -155,7 +194,13 @@ impl<T: Display> Drawable for PopUp<T> {
             let line = {
                 // the selected option's background is different
                 if index == self.active_option_index {
-                    format!("{}{}", termion::cursor::Goto(4, 3 + index as u16), option)
+                    format!(
+                        "{}{}{}{}",
+                        termion::cursor::Goto(4, 3 + index as u16),
+                        termion::color::Bg(color::LightBlack),
+                        option,
+                        termion::color::Bg(color::Reset)
+                    )
                 } else {
                     format!(
                         "{}{}{}{}",
@@ -169,54 +214,53 @@ impl<T: Display> Drawable for PopUp<T> {
             joined_options.push_str(&line);
         }
 
-        // build confirmation buttons
-        // change background color with active selection of button
-        let cancel_button = {
-            if self.selected_confirmation_button == ConfirmationButton::Cancel {
+        // build buttons
+        let horizonal_spacing = if self.buttons.is_empty() {
+            // there is no button and therefore no spacing is needed
+            0
+        } else {
+            // eg three buttons:
+            // |    <B1>  <B2>  <B3>    |
+            // 2x margin + 3x button space = GRID_WIDTH
+            // => button_space = (GRID_WIDTH - 2x margin) / 3
+            (GRID_WIDTH - 8) / self.buttons.len()
+        };
+        let mut buttons_line = String::new();
+        for (index, button) in self.buttons.iter().enumerate() {
+            // change background color with active selection of button
+            let button_string = if index == self.active_button_index {
                 format!(
                     "{}{}{}{}",
-                    termion::cursor::Goto(4, (GRID_HEIGHT - 2) as u16),
+                    termion::cursor::Goto(
+                        (4 + index * horizonal_spacing) as u16,
+                        (GRID_HEIGHT - 2) as u16
+                    ),
                     termion::color::Bg(color::LightBlack),
-                    "<Cancel>",
+                    button,
                     termion::color::Bg(termion::color::Reset),
                 )
             } else {
                 format!(
                     "{}{}{}{}",
-                    termion::cursor::Goto(4, (GRID_HEIGHT - 2) as u16),
+                    termion::cursor::Goto(
+                        (4 + index * horizonal_spacing) as u16,
+                        (GRID_HEIGHT - 2) as u16
+                    ),
                     termion::color::Bg(color::Blue),
-                    "<Cancel>",
+                    button,
                     termion::color::Bg(termion::color::Reset),
                 )
-            }
-        };
-        let confirm_button = {
-            if self.selected_confirmation_button == ConfirmationButton::Confirm {
-                format!(
-                    "{}{}{}{}",
-                    termion::cursor::Goto((GRID_WIDTH - 8) as u16, (GRID_HEIGHT - 2) as u16),
-                    termion::color::Bg(color::LightBlack),
-                    "<Ok>",
-                    termion::color::Bg(termion::color::Reset),
-                )
-            } else {
-                format!(
-                    "{}{}{}{}",
-                    termion::cursor::Goto((GRID_WIDTH - 8) as u16, (GRID_HEIGHT - 2) as u16),
-                    termion::color::Bg(color::Blue),
-                    "<Ok>",
-                    termion::color::Bg(termion::color::Reset),
-                )
-            }
-        };
+            };
+
+            buttons_line.push_str(&button_string);
+        }
 
         // merge background and written quests
         format!(
-            "{}{}{}{}",
+            "{}{}{}",
             Self::draw_background(),
             joined_options,
-            cancel_button,
-            confirm_button
+            buttons_line,
         )
     }
 }

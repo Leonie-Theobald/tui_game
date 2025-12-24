@@ -16,7 +16,11 @@ use crate::{
     },
     player::Player,
     quest::{IsQuest, Quest},
-    tui::{Orientation, grid::Grid, pop_up::PopUp},
+    tui::{
+        Orientation,
+        grid::Grid,
+        pop_up::{Button, PopUp},
+    },
 };
 
 fn main() {
@@ -93,7 +97,9 @@ fn main() {
                     .collect();
                 let mut popup_stationed_item_selection = PopUp {
                     options: descriptions,
-                    ..Default::default()
+                    active_option_index: 0,
+                    buttons: vec![Button::Cancel, Button::Confirm],
+                    active_button_index: 0,
                 };
 
                 if let Err(_err) = popup_stationed_item_selection.get_user_selection() {
