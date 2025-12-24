@@ -29,14 +29,14 @@ impl Display for Button {
 }
 
 #[derive(Debug)]
-pub struct PopUp<T: Display> {
-    pub options: Vec<T>,
+pub struct PopUp<'a, T: Display> {
+    pub options: &'a Vec<T>,
     pub active_option_index: usize,
     pub buttons: Vec<Button>,
     pub active_button_index: usize,
 }
 
-impl<T: Display> PopUp<T> {
+impl<'a, T: Display> PopUp<'a, T> {
     fn select_next_option(&mut self) {
         if self.active_option_index < self.options.len() - 1 {
             self.active_option_index += 1
@@ -186,7 +186,7 @@ impl<T: Display> PopUp<T> {
     }
 }
 
-impl<T: Display> Drawable for PopUp<T> {
+impl<'a, T: Display> Drawable for PopUp<'a, T> {
     fn draw(&self) -> String {
         // build options
         let mut joined_options = String::new();

@@ -1,6 +1,7 @@
 pub mod grid;
 pub mod pop_up;
 
+#[derive(Debug)]
 pub enum TuiError {
     PositionOutOfBound,
     PositionBlocked,

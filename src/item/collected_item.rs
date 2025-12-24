@@ -24,10 +24,6 @@ impl CollectedItems {
             visible: false,
         }
     }
-
-    pub fn toggle_visibility(&mut self) {
-        self.visible = !self.visible;
-    }
 }
 
 #[derive(Clone, Debug, PartialEq)]

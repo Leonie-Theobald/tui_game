@@ -86,12 +86,23 @@ fn main() {
             Key::Char('s') => {
                 my_player.move_in_direction(&grid, &my_stationed_items, Orientation::South)
             }
-            Key::Char('e') => my_collected_items.toggle_visibility(),
+            Key::Char('e') => {
+                let mut popup_collected_item = PopUp {
+                    options: &my_collected_items.list,
+                    active_option_index: 0,
+                    buttons: vec![Button::Confirm],
+                    active_button_index: 0,
+                };
+                // we do not really need user's selection
+                // this is just available through the PopUp API
+                #[allow(unused_must_use)]
+                popup_collected_item.get_user_selection();
+            }
             Key::Char('f') => {
                 let target_coordinates = my_player.get_facing_coordinates();
                 let mut accessible_items =
                     my_stationed_items.accessible_stationary_items(target_coordinates.clone());
-                let descriptions = accessible_items
+                let descriptions = &accessible_items
                     .iter()
                     .map(|item| method_on_inner_stationed_item!(item, get_description))
                     .collect();
@@ -99,7 +110,7 @@ fn main() {
                     options: descriptions,
                     active_option_index: 0,
                     buttons: vec![Button::Cancel, Button::Confirm],
-                    active_button_index: 0,
+                    active_button_index: 1,
                 };
 
                 if let Err(_err) = popup_stationed_item_selection.get_user_selection() {
