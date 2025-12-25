@@ -2,10 +2,16 @@ pub mod packet;
 pub mod treasure_chest;
 
 use crate::{
-    item::stationed_item::{packet::Packet, treasure_chest::TreasureChest},
+    item::{
+        Item,
+        stationed_item::{packet::Packet, treasure_chest::TreasureChest},
+    },
     method_on_inner_stationed_item,
     quest::Quest,
-    tui::{Drawable, Vector},
+    tui::{
+        Drawable, TuiError, Vector,
+        pop_up::{Button, PopUp},
+    },
 };
 
 #[derive(Debug, PartialEq)]
@@ -22,14 +28,14 @@ impl StationedItems {
 
     pub fn accessible_stationary_items(
         &mut self,
-        target_coordinates: Vector,
+        target_coordinates: &Vector,
     ) -> Vec<&mut StationaryItem> {
         // go through each item and check whether any of its covered coordinates is the one
         // the player accesses right now
         let mut accessible_stationed_items = Vec::new();
         for stationed_item in &mut self.list {
             if method_on_inner_stationed_item!(stationed_item, list_blocking_coordinates)
-                .contains(&target_coordinates)
+                .contains(target_coordinates)
             {
                 // this stationed item is also placed at the coordinates that the player can access
                 accessible_stationed_items.push(stationed_item);
@@ -37,6 +43,30 @@ impl StationedItems {
         }
 
         accessible_stationed_items
+    }
+
+    pub fn user_selection_for_accessible_stationary_items(
+        &mut self,
+        target_coordinates: &Vector,
+    ) -> Result<&mut StationaryItem, TuiError> {
+        let accessible_items = self.accessible_stationary_items(target_coordinates);
+        let descriptions = &accessible_items
+            .iter()
+            .map(|item| method_on_inner_stationed_item!(item, get_description))
+            .collect();
+        let mut popup_stationed_item_selection = PopUp {
+            options: descriptions,
+            active_option_index: 0,
+            buttons: vec![Button::Cancel, Button::Confirm],
+            active_button_index: 1,
+        };
+
+        let selected_index = popup_stationed_item_selection.get_user_selection()?;
+
+        Ok(self
+            .list
+            .get_mut(selected_index)
+            .expect("Just selected this option by popup"))
     }
 }
 

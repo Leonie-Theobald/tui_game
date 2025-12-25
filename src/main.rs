@@ -10,7 +10,6 @@ use tui::Drawable;
 
 use crate::{
     item::{
-        Item,
         collected_item::CollectedItems,
         stationed_item::{Stationary, StationaryItem, StationedItems},
     },
@@ -93,47 +92,42 @@ fn main() {
                     buttons: vec![Button::Confirm],
                     active_button_index: 0,
                 };
-                // we do not really need user's selection
-                // this is just available through the PopUp API
-                #[allow(unused_must_use)]
+                #[expect(
+                    unused_must_use,
+                    reason = "We don't need user's selection here. 
+                    It is just the API to present the items to the user."
+                )]
                 popup_collected_item.get_user_selection();
             }
             Key::Char('f') => {
                 let target_coordinates = my_player.get_facing_coordinates();
-                let mut accessible_items =
-                    my_stationed_items.accessible_stationary_items(target_coordinates.clone());
-                let descriptions = &accessible_items
-                    .iter()
-                    .map(|item| method_on_inner_stationed_item!(item, get_description))
-                    .collect();
-                let mut popup_stationed_item_selection = PopUp {
-                    options: descriptions,
-                    active_option_index: 0,
-                    buttons: vec![Button::Cancel, Button::Confirm],
-                    active_button_index: 1,
+
+                // get user's input on what item should be chosen
+                let selected_stationary_item = match my_stationed_items
+                    .user_selection_for_accessible_stationary_items(&target_coordinates)
+                {
+                    Ok(item) => item,
+                    Err(_err) => {
+                        // return to normal game grid
+                        write!(
+                            stdout,
+                            "{}{}{}{}{}{}",
+                            termion::clear::All,
+                            grid.draw(),
+                            my_player.draw(),
+                            my_collected_items.draw(),
+                            my_stationed_items.draw(),
+                            termion::cursor::Hide
+                        )
+                        .unwrap();
+                        stdout.flush().unwrap();
+                        continue;
+                    }
                 };
 
-                if let Err(_err) = popup_stationed_item_selection.get_user_selection() {
-                    write!(
-                        stdout,
-                        "{}{}{}{}{}{}",
-                        termion::clear::All,
-                        grid.draw(),
-                        my_player.draw(),
-                        my_collected_items.draw(),
-                        my_stationed_items.draw(),
-                        termion::cursor::Hide
-                    )
-                    .unwrap();
-                    stdout.flush().unwrap();
-                    continue;
-                };
-                let selected_accesible_item = accessible_items
-                    .get_mut(popup_stationed_item_selection.active_option_index)
-                    .expect("Just selected this option by popup");
+                // get quest linked to the selected item
                 let linked_quest =
-                    mut_method_on_inner_stationed_item!(selected_accesible_item, get_linked_quest);
-
+                    mut_method_on_inner_stationed_item!(selected_stationary_item, get_linked_quest);
                 let result = match linked_quest {
                     Quest::UnwrapPacket(inner) => inner.try_solve(&mut my_collected_items),
                     Quest::UnlockTreasureChest(inner) => inner.try_solve(&mut my_collected_items),
@@ -159,7 +153,7 @@ fn main() {
                     method_on_inner_quest!(linked_quest, list_reward_stationary_items);
                 my_stationed_items.list.append(&mut new_stationed_items);
                 let mut accessible_items =
-                    my_stationed_items.accessible_stationary_items(target_coordinates);
+                    my_stationed_items.accessible_stationary_items(&target_coordinates);
                 match accessible_items.first_mut() {
                     Some(item) => {
                         mut_method_on_inner_stationed_item!(item, change_status_to_not_available)

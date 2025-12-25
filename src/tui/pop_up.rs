@@ -87,8 +87,6 @@ impl<'a, T: Display> PopUp<'a, T> {
 
     fn draw_in_terminal(&self) {
         let mut stdout = stdout().into_raw_mode().unwrap();
-
-        // Draw initial state
         write!(
             stdout,
             "{}{}{}",

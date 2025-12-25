@@ -1,20 +1,17 @@
-struct MyStruct(u8);
-
-fn outer_mut_struct(my_struct: &mut MyStruct) {
-    inner_struct(my_struct);
-    inner_mut_struct(my_struct);
-    inner_struct(my_struct);
+trait MyTrait {
+    fn value(&self) -> u8;
+    fn test_self_default(&self) -> u8 {
+        self.value()
+    }
 }
 
-fn inner_mut_struct(my_inner_mut_struct: &mut MyStruct) {
-    my_inner_mut_struct.0 = 4;
+struct MyStruct {
+    value: u8,
 }
 
-fn inner_struct(my_inner_struct: &MyStruct) {
-    println!("{:?}", my_inner_struct.0);
+impl MyTrait for MyStruct {
+    fn value(&self) -> u8 {
+        self.value
+    }
 }
-
-fn main() {
-    let mut my_struct = MyStruct(1);
-    outer_mut_struct(&mut my_struct);
-}
+fn main() {}
