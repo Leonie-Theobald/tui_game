@@ -1,3 +1,4 @@
+pub mod game;
 pub mod grid;
 pub mod pop_up;
 

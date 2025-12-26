@@ -6,8 +6,6 @@ mod tui;
 use std::io::{Write, stdin, stdout};
 use termion::{event::Key, input::TermRead, raw::IntoRawMode};
 
-use tui::Drawable;
-
 use crate::{
     item::{
         collected_item::CollectedItems,
@@ -17,38 +15,18 @@ use crate::{
     quest::{IsQuest, Quest},
     tui::{
         Orientation,
+        game::draw_game,
         grid::Grid,
         pop_up::{Button, PopUp},
     },
 };
 
-fn draw_game(
-    grid: &Grid,
-    my_player: &Player,
-    my_collected_items: &CollectedItems,
-    my_stationed_items: &StationedItems,
-) {
-    let mut stdout = stdout().into_raw_mode().unwrap();
-    write!(
-        stdout,
-        "{}{}{}{}{}{}",
-        termion::clear::All,
-        grid.draw(),
-        my_player.draw(),
-        my_collected_items.draw(),
-        my_stationed_items.draw(),
-        termion::cursor::Hide
-    )
-    .unwrap();
-    stdout.flush().unwrap();
-}
-
 fn main() {
+    // initialize
     let grid = Grid::initiate();
     let mut player = Player::initiate();
     let mut collected_items = CollectedItems::initiate();
     let mut stationed_items = StationedItems::initiate();
-
     draw_game(&grid, &player, &collected_items, &stationed_items);
 
     let mut stdout = stdout().into_raw_mode().unwrap();
