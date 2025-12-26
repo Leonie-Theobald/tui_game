@@ -13,12 +13,7 @@ use crate::{
     },
     player::Player,
     quest::{IsQuest, Quest},
-    tui::{
-        Orientation,
-        game::draw_game,
-        grid::Grid,
-        pop_up::{Button, PopUp},
-    },
+    tui::{Orientation, game::draw_game, grid::Grid},
 };
 
 fn main() {
@@ -40,20 +35,7 @@ fn main() {
             Key::Char('s') => player.move_in_direction(&grid, &stationed_items, Orientation::South),
 
             // overview of collected items
-            Key::Char('e') => {
-                let mut popup_collected_item = PopUp {
-                    options: &collected_items.list,
-                    active_option_index: 0,
-                    buttons: vec![Button::Confirm],
-                    active_button_index: 0,
-                };
-                #[expect(
-                    unused_must_use,
-                    reason = "We don't need user's selection here. 
-                    It is just the API to present the items to the user."
-                )]
-                popup_collected_item.get_user_selection();
-            }
+            Key::Char('e') => collected_items.show_all_in_popup(),
 
             // interact with available objects
             Key::Char('f') => {

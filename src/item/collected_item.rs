@@ -7,7 +7,10 @@ use crate::{
         Item,
         collected_item::{candle::Candle, rusty_key::RustyKey, treasure_map::TreasureMap},
     },
-    tui::Drawable,
+    tui::{
+        Drawable,
+        pop_up::{Button, PopUp},
+    },
 };
 use termion::color;
 
@@ -23,6 +26,21 @@ impl CollectedItems {
             list: Vec::new(),
             visible: false,
         }
+    }
+
+    pub fn show_all_in_popup(&self) {
+        let mut popup_collected_item = PopUp {
+            options: &self.list,
+            active_option_index: 0,
+            buttons: vec![Button::Confirm],
+            active_button_index: 0,
+        };
+        #[expect(
+            unused_must_use,
+            reason = "We don't need user's selection here. 
+                    It is just the API to present the items to the user."
+        )]
+        popup_collected_item.get_user_selection();
     }
 }
 
