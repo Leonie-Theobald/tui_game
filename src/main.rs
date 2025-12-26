@@ -44,40 +44,12 @@ fn draw_game(
 }
 
 fn main() {
-    println!("INF: Game is initiated");
-
+    let grid = Grid::initiate();
     let mut my_player = Player::initiate();
     let mut my_collected_items = CollectedItems::initiate();
     let mut my_stationed_items = StationedItems::initiate();
-    let grid = Grid::import_from_string(
-        "┌──────────────────────────────────────────────────────────────────────────────┐
-│                                                                              │
-│                                                                              │
-│         ┌───────────────────────────┬──────────────────────┐                 │
-│         │                           │                      │                 │
-│         │                           │                      │                 │
-│         │                                                  │                 │
-│         │                                                  │                 │
-│         │                                                  │                 │
-│         │                           │                      │                 │
-│         │                           │                      │                 │
-│         ├──────────   ───────┬──────┴────────   ───────────┤                 │
-│         │                    │                             │                 │
-│         │                    │                             │                 │
-│         │                    │                             │                 │
-│         │                                                  │                 │
-│         │                                                  │                 │
-│         │                                                  │                 │
-│         │                    │                             │                 │
-│         │                    │                             │                 │
-│         │                    │                             │                 │
-│         │                    │                             │                 │
-│         └────────────────────┴─────────────────────────────┘                 │
-└──────────────────────────────────────────────────────────────────────────────┘",
-    );
 
-    println!("Stationed Items: {:?}", my_stationed_items);
-    println!("Collected Items: {:?}", my_collected_items);
+    draw_game(&grid, &my_player, &my_collected_items, &my_stationed_items);
 
     let mut stdout = stdout().into_raw_mode().unwrap();
     for k in stdin().keys() {
