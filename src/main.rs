@@ -7,12 +7,8 @@ use std::io::{Write, stdin, stdout};
 use termion::{event::Key, input::TermRead, raw::IntoRawMode};
 
 use crate::{
-    item::{
-        collected_item::CollectedItems,
-        stationed_item::{Stationary, StationaryItem, StationedItems},
-    },
+    item::{collected_item::CollectedItems, stationed_item::StationedItems},
     player::Player,
-    quest::{IsQuest, Quest},
     tui::{Orientation, game::draw_game, grid::Grid},
 };
 
@@ -37,98 +33,9 @@ fn main() {
             // overview of collected items
             Key::Char('e') => collected_items.show_all_in_popup(),
 
-            // interact with available objects
+            // interact with available stationed items
             Key::Char('f') => {
-                let target_coordinates = player.get_facing_coordinates();
-
-                // get user's input on what item should be chosen
-                let selected_stationary_item = match stationed_items
-                    .user_selection_for_accessible_stationary_items(&target_coordinates)
-                {
-                    Ok(item) => item,
-                    Err(_err) => {
-                        // return to normal game grid
-                        draw_game(&grid, &player, &collected_items, &stationed_items);
-                        // write!(
-                        //     stdout,
-                        //     "{}{}{}{}{}{}",
-                        //     termion::clear::All,
-                        //     grid.draw(),
-                        //     my_player.draw(),
-                        //     my_collected_items.draw(),
-                        //     my_stationed_items.draw(),
-                        //     termion::cursor::Hide
-                        // )
-                        // .unwrap();
-                        // stdout.flush().unwrap();
-                        continue;
-                    }
-                };
-
-                // get quest linked to the selected item
-                let linked_quest =
-                    method_on_inner_stationed_item!(selected_stationary_item, get_linked_quest);
-                let result = match linked_quest {
-                    Quest::UnwrapPacket(inner) => {
-                        inner.check_if_solvable(&collected_items, &stationed_items)
-                    }
-                    Quest::UnlockTreasureChest(inner) => {
-                        inner.check_if_solvable(&collected_items, &stationed_items)
-                    }
-                };
-                match result {
-                    Err(_err) => {
-                        draw_game(&grid, &player, &collected_items, &stationed_items);
-                        // write!(
-                        //     stdout,
-                        //     "{}{}{}{}{}{}",
-                        //     termion::clear::All,
-                        //     grid.draw(),
-                        //     my_player.draw(),
-                        //     my_collected_items.draw(),
-                        //     my_stationed_items.draw(),
-                        //     termion::cursor::Hide
-                        // )
-                        // .unwrap();
-                        // stdout.flush().unwrap();
-                        continue;
-                    }
-                    Ok(mut reward_items) => {
-                        // remove collectable items used for this quest
-                        for used_item in reward_items.removed_collectable {
-                            let index = collected_items
-                                .list
-                                .iter()
-                                .position(|available_item| *available_item == used_item)
-                                .expect("Checked before that quest is solvable");
-                            collected_items.list.remove(index);
-                        }
-
-                        // remove the stationed item which quests was sovled
-                        // mut_method_on_inner_stationed_item!(
-                        //     selected_stationary_item,
-                        //     change_status_to_not_available
-                        // );
-                        for used_item in reward_items.removed_stationed {
-                            let index = stationed_items
-                                .list
-                                .iter()
-                                .position(|available_item| *available_item == used_item)
-                                .expect("Checked before that quest is solvable");
-                            stationed_items.list.remove(index);
-                        }
-
-                        // add new collectable items
-                        collected_items
-                            .list
-                            .append(&mut reward_items.added_collectable);
-
-                        // add new stationed items
-                        stationed_items
-                            .list
-                            .append(&mut reward_items.added_stationed);
-                    }
-                }
+                stationed_items.select_and_solve_linked_quest(&grid, &player, &mut collected_items)
             }
 
             // leave game

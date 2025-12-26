@@ -4,11 +4,15 @@ pub mod treasure_chest;
 use crate::{
     item::{
         Item,
+        collected_item::CollectedItems,
         stationed_item::{packet::Packet, treasure_chest::TreasureChest},
     },
-    quest::Quest,
+    player::Player,
+    quest::{IsQuest, Quest},
     tui::{
         Drawable, TuiError, Vector,
+        game::draw_game,
+        grid::Grid,
         pop_up::{Button, PopUp},
     },
 };
@@ -84,6 +88,68 @@ impl StationedItems {
             .get(selected_index)
             .expect("Just selected this option by popup")
             .clone())
+    }
+
+    pub fn select_and_solve_linked_quest(
+        &mut self,
+        grid: &Grid,
+        player: &Player,
+        collected_items: &mut CollectedItems,
+    ) {
+        let target_coordinates = player.get_facing_coordinates();
+
+        // get user's input on what item should be chosen
+        let selected_stationary_item =
+            match self.user_selection_for_accessible_stationary_items(&target_coordinates) {
+                Ok(item) => item,
+                Err(_err) => {
+                    // return to normal game grid
+                    draw_game(grid, player, collected_items, self);
+                    return;
+                }
+            };
+
+        // get quest linked to the selected item
+        let linked_quest =
+            method_on_inner_stationed_item!(selected_stationary_item, get_linked_quest);
+        let result = match linked_quest {
+            Quest::UnwrapPacket(inner) => inner.check_if_solvable(collected_items, self),
+            Quest::UnlockTreasureChest(inner) => inner.check_if_solvable(collected_items, self),
+        };
+        match result {
+            Err(_err) => {
+                draw_game(grid, player, collected_items, self);
+            }
+            Ok(mut reward_items) => {
+                // remove collectable items used for this quest
+                for used_item in reward_items.removed_collectable {
+                    let index = collected_items
+                        .list
+                        .iter()
+                        .position(|available_item| *available_item == used_item)
+                        .expect("Checked before that quest is solvable");
+                    collected_items.list.remove(index);
+                }
+
+                // remove the stationed item which quests was solved
+                for used_item in reward_items.removed_stationed {
+                    let index = self
+                        .list
+                        .iter()
+                        .position(|available_item| *available_item == used_item)
+                        .expect("Checked before that quest is solvable");
+                    self.list.remove(index);
+                }
+
+                // add new collectable items
+                collected_items
+                    .list
+                    .append(&mut reward_items.added_collectable);
+
+                // add new stationed items
+                self.list.append(&mut reward_items.added_stationed);
+            }
+        }
     }
 }
 
