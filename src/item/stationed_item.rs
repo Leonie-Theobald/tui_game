@@ -7,6 +7,7 @@ use crate::{
         collected_item::CollectedItems,
         stationed_item::{packet::Packet, treasure_chest::TreasureChest},
     },
+    method_on_inner_quest,
     player::Player,
     quest::{
         IsQuest, Quest, unlock_treasure_chest::UnlockTreasureChest, unwrap_packet::UnwrapPacket,
@@ -104,13 +105,7 @@ impl StationedItems {
         // get quest linked to the selected item
         let linked_quest =
             method_on_inner_stationed_item!(selected_stationary_item, get_linked_quest);
-        let result = match linked_quest {
-            Quest::UnwrapPacket(_inner) => UnwrapPacket::check_if_solvable(collected_items, self),
-            Quest::UnlockTreasureChest(_inner) => {
-                UnlockTreasureChest::check_if_solvable(collected_items, self)
-            }
-        };
-        match result {
+        match method_on_inner_quest!(linked_quest, check_if_solvable(collected_items, self)) {
             Err(_err) => {
                 draw_game(grid, player, collected_items, self);
             }

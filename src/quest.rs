@@ -79,10 +79,18 @@ pub enum QuestError {
 
 #[macro_export]
 macro_rules! method_on_inner_quest {
+    // call without parameters
     ($value:expr, $method:ident) => {
         match &$value {
             Quest::UnwrapPacket(_inner) => UnwrapPacket::$method(),
             Quest::UnlockTreasureChest(_inner) => UnlockTreasureChest::$method(),
+        }
+    };
+    // call with parameters
+    ($value:expr, $method:ident ($ ( $parameter:expr ),* $(,)? )) => {
+        match &$value {
+            Quest::UnwrapPacket(_inner) => UnwrapPacket::$method( $( $parameter ),* ),
+            Quest::UnlockTreasureChest(_inner) => UnlockTreasureChest::$method( $( $parameter ),*)
         }
     };
 }
