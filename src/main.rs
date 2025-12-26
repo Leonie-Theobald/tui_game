@@ -29,14 +29,17 @@ fn main() {
     let mut stationed_items = StationedItems::initiate();
     draw_game(&grid, &player, &collected_items, &stationed_items);
 
+    // start captioning single key inputs
     let mut stdout = stdout().into_raw_mode().unwrap();
     for k in stdin().keys() {
-        draw_game(&grid, &player, &collected_items, &stationed_items);
         match k.as_ref().unwrap() {
+            // player's movement
             Key::Char('a') => player.move_in_direction(&grid, &stationed_items, Orientation::West),
             Key::Char('w') => player.move_in_direction(&grid, &stationed_items, Orientation::North),
             Key::Char('d') => player.move_in_direction(&grid, &stationed_items, Orientation::East),
             Key::Char('s') => player.move_in_direction(&grid, &stationed_items, Orientation::South),
+
+            // overview of collected items
             Key::Char('e') => {
                 let mut popup_collected_item = PopUp {
                     options: &collected_items.list,
@@ -51,6 +54,8 @@ fn main() {
                 )]
                 popup_collected_item.get_user_selection();
             }
+
+            // interact with available objects
             Key::Char('f') => {
                 let target_coordinates = player.get_facing_coordinates();
 
@@ -143,11 +148,12 @@ fn main() {
                     }
                 }
             }
+
+            // leave game
             Key::Ctrl('c') => break,
-            _ => {
-                write!(stdout, "\r\nUnknown character... Exiting\r\n").unwrap();
-                break;
-            }
+
+            // ignore everything else
+            _ => continue,
         };
 
         draw_game(&grid, &player, &collected_items, &stationed_items);
