@@ -1,9 +1,6 @@
 use crate::{
-    item::{
-        Item,
-        stationed_item::{Stationary, StationaryStatus},
-    },
-    quest::{Quest, QuestStatus, unwrap_packet::UnwrapPacket},
+    item::{Item, stationed_item::Stationary},
+    quest::{Quest, unwrap_packet::UnwrapPacket},
     tui::{Drawable, Vector},
 };
 
@@ -15,18 +12,12 @@ const COORDINATES: Vector = Vector {
 #[derive(Clone, Debug, PartialEq)]
 pub struct Packet {
     linked_quest: Quest,
-    status: StationaryStatus,
 }
 
 impl Packet {
     pub fn initiate() -> Self {
-        let linked_quest = Quest::UnwrapPacket(UnwrapPacket {
-            status: QuestStatus::Open,
-        });
-        Self {
-            linked_quest,
-            status: StationaryStatus::Visible,
-        }
+        let linked_quest = Quest::UnwrapPacket(UnwrapPacket {});
+        Self { linked_quest }
     }
 }
 
@@ -42,10 +33,6 @@ impl Item for Packet {
 
 impl Stationary for Packet {
     fn list_blocking_coordinates(&self) -> Vec<Vector> {
-        if self.status != StationaryStatus::Visible {
-            return Vec::new();
-        }
-
         let mut blocked_coordinate = Vec::new();
 
         // +-1 around the symbol is also blocked
@@ -63,16 +50,8 @@ impl Stationary for Packet {
         blocked_coordinate
     }
 
-    fn get_linked_quest(&mut self) -> &mut Quest {
-        &mut self.linked_quest
-    }
-
-    fn get_status(&self) -> &StationaryStatus {
-        &self.status
-    }
-
-    fn change_status_to_not_available(&mut self) {
-        self.status = StationaryStatus::NotAvailable;
+    fn get_linked_quest(&self) -> &Quest {
+        &self.linked_quest
     }
 }
 

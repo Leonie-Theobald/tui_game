@@ -4,7 +4,8 @@ pub mod unwrap_packet;
 use crate::{
     item::{
         collected_item::{CollectableItem, CollectedItems},
-        stationed_item::StationaryItem,
+        reward_items::RewardItems,
+        stationed_item::{StationaryItem, StationedItems},
     },
     method_on_inner_quest,
     quest::{unlock_treasure_chest::UnlockTreasureChest, unwrap_packet::UnwrapPacket},
@@ -13,9 +14,14 @@ use crate::{
 pub trait IsQuest {
     fn get_description(&self) -> &'static str;
     fn list_necessary_collected_items(&self) -> Vec<CollectableItem>;
+    fn list_necessary_stationed_items(&self) -> Vec<StationaryItem>;
     fn list_reward_collectable_items(&self) -> Vec<CollectableItem>;
     fn list_reward_stationary_items(&self) -> Vec<StationaryItem>;
-    fn try_solve(&mut self, collected_items: &mut CollectedItems) -> Result<(), QuestError>;
+    fn check_if_solvable(
+        &self,
+        collected_items: &CollectedItems,
+        stationed_items: &StationedItems,
+    ) -> Result<RewardItems, QuestError>;
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -33,13 +39,7 @@ impl std::fmt::Display for Quest {
 #[derive(Debug)]
 pub enum QuestError {
     CollectableItemMissing,
-}
-
-#[derive(Clone, Debug, Default, PartialEq)]
-pub enum QuestStatus {
-    #[default]
-    Open,
-    Finished,
+    StationaryItemMissing,
 }
 
 #[macro_export]

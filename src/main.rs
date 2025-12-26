@@ -22,6 +22,27 @@ use crate::{
     },
 };
 
+fn draw_game(
+    grid: &Grid,
+    my_player: &Player,
+    my_collected_items: &CollectedItems,
+    my_stationed_items: &StationedItems,
+) {
+    let mut stdout = stdout().into_raw_mode().unwrap();
+    write!(
+        stdout,
+        "{}{}{}{}{}{}",
+        termion::clear::All,
+        grid.draw(),
+        my_player.draw(),
+        my_collected_items.draw(),
+        my_stationed_items.draw(),
+        termion::cursor::Hide
+    )
+    .unwrap();
+    stdout.flush().unwrap();
+}
+
 fn main() {
     println!("INF: Game is initiated");
 
@@ -60,18 +81,7 @@ fn main() {
 
     let mut stdout = stdout().into_raw_mode().unwrap();
     for k in stdin().keys() {
-        write!(
-            stdout,
-            "{}{}{}{}{}{}",
-            termion::clear::All,
-            grid.draw(),
-            my_player.draw(),
-            my_collected_items.draw(),
-            my_stationed_items.draw(),
-            termion::cursor::Hide
-        )
-        .unwrap();
-        stdout.flush().unwrap();
+        draw_game(&grid, &my_player, &my_collected_items, &my_stationed_items);
         match k.as_ref().unwrap() {
             Key::Char('a') => {
                 my_player.move_in_direction(&grid, &my_stationed_items, Orientation::West)
@@ -109,59 +119,87 @@ fn main() {
                     Ok(item) => item,
                     Err(_err) => {
                         // return to normal game grid
-                        write!(
-                            stdout,
-                            "{}{}{}{}{}{}",
-                            termion::clear::All,
-                            grid.draw(),
-                            my_player.draw(),
-                            my_collected_items.draw(),
-                            my_stationed_items.draw(),
-                            termion::cursor::Hide
-                        )
-                        .unwrap();
-                        stdout.flush().unwrap();
+                        draw_game(&grid, &my_player, &my_collected_items, &my_stationed_items);
+                        // write!(
+                        //     stdout,
+                        //     "{}{}{}{}{}{}",
+                        //     termion::clear::All,
+                        //     grid.draw(),
+                        //     my_player.draw(),
+                        //     my_collected_items.draw(),
+                        //     my_stationed_items.draw(),
+                        //     termion::cursor::Hide
+                        // )
+                        // .unwrap();
+                        // stdout.flush().unwrap();
                         continue;
                     }
                 };
 
                 // get quest linked to the selected item
                 let linked_quest =
-                    mut_method_on_inner_stationed_item!(selected_stationary_item, get_linked_quest);
+                    method_on_inner_stationed_item!(selected_stationary_item, get_linked_quest);
                 let result = match linked_quest {
-                    Quest::UnwrapPacket(inner) => inner.try_solve(&mut my_collected_items),
-                    Quest::UnlockTreasureChest(inner) => inner.try_solve(&mut my_collected_items),
-                };
-                if let Err(_err) = result {
-                    write!(
-                        stdout,
-                        "{}{}{}{}{}{}",
-                        termion::clear::All,
-                        grid.draw(),
-                        my_player.draw(),
-                        my_collected_items.draw(),
-                        my_stationed_items.draw(),
-                        termion::cursor::Hide
-                    )
-                    .unwrap();
-                    stdout.flush().unwrap();
-                    continue;
-                }
-
-                // remove used stationary item and add new ones
-                let mut new_stationed_items =
-                    method_on_inner_quest!(linked_quest, list_reward_stationary_items);
-                my_stationed_items.list.append(&mut new_stationed_items);
-                let mut accessible_items =
-                    my_stationed_items.accessible_stationary_items(&target_coordinates);
-                match accessible_items.first_mut() {
-                    Some(item) => {
-                        mut_method_on_inner_stationed_item!(item, change_status_to_not_available)
+                    Quest::UnwrapPacket(inner) => {
+                        inner.check_if_solvable(&my_collected_items, &my_stationed_items)
                     }
-                    None => {
+                    Quest::UnlockTreasureChest(inner) => {
+                        inner.check_if_solvable(&my_collected_items, &my_stationed_items)
+                    }
+                };
+                match result {
+                    Err(_err) => {
+                        draw_game(&grid, &my_player, &my_collected_items, &my_stationed_items);
+                        // write!(
+                        //     stdout,
+                        //     "{}{}{}{}{}{}",
+                        //     termion::clear::All,
+                        //     grid.draw(),
+                        //     my_player.draw(),
+                        //     my_collected_items.draw(),
+                        //     my_stationed_items.draw(),
+                        //     termion::cursor::Hide
+                        // )
+                        // .unwrap();
+                        // stdout.flush().unwrap();
                         continue;
                     }
-                };
+                    Ok(mut reward_items) => {
+                        // remove collectable items used for this quest
+                        for used_item in reward_items.removed_collectable {
+                            let index = my_collected_items
+                                .list
+                                .iter()
+                                .position(|available_item| *available_item == used_item)
+                                .expect("Checked before that quest is solvable");
+                            my_collected_items.list.remove(index);
+                        }
+
+                        // remove the stationed item which quests was sovled
+                        // mut_method_on_inner_stationed_item!(
+                        //     selected_stationary_item,
+                        //     change_status_to_not_available
+                        // );
+                        for used_item in reward_items.removed_stationed {
+                            let index = my_stationed_items
+                                .list
+                                .iter()
+                                .position(|available_item| *available_item == used_item)
+                                .expect("Checked before that quest is solvable");
+                            my_stationed_items.list.remove(index);
+                        }
+
+                        // add new collectable items
+                        my_collected_items
+                            .list
+                            .append(&mut reward_items.added_collectable);
+
+                        // add new stationed items
+                        my_stationed_items
+                            .list
+                            .append(&mut reward_items.added_stationed);
+                    }
+                }
             }
             Key::Ctrl('c') => break,
             _ => {
@@ -170,18 +208,7 @@ fn main() {
             }
         };
 
-        write!(
-            stdout,
-            "{}{}{}{}{}{}",
-            termion::clear::All,
-            grid.draw(),
-            my_player.draw(),
-            my_collected_items.draw(),
-            my_stationed_items.draw(),
-            termion::cursor::Hide
-        )
-        .unwrap();
-        stdout.flush().unwrap();
+        draw_game(&grid, &my_player, &my_collected_items, &my_stationed_items);
     }
     write!(
         stdout,
@@ -192,27 +219,4 @@ fn main() {
     )
     .unwrap();
     stdout.suspend_raw_mode().unwrap();
-    println!(
-        "stationed_items: {:?}\ncollected_items:{:?}\n",
-        my_stationed_items, my_collected_items
-    );
-
-    // println!(
-    //     "All your quests:\n{}",
-    //     my_player.show_all_quests()
-    // );
-    //
-    // my_player.select_new_active_quest();
-    //
-    // my_player.solve_quest().unwrap();
-    // println!("The first quest is solved\n");
-    //
-    // println!(
-    //     "Your quest list is updated:\n{}",
-    //     my_player.show_unsolved_quests()
-    // );
-    // println!(
-    //     "Your backup is updated:\n{}",
-    //     my_player.show_backpack()
-    // );
 }

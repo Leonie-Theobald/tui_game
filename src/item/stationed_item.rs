@@ -6,88 +6,12 @@ use crate::{
         Item,
         stationed_item::{packet::Packet, treasure_chest::TreasureChest},
     },
-    method_on_inner_stationed_item,
     quest::Quest,
     tui::{
         Drawable, TuiError, Vector,
         pop_up::{Button, PopUp},
     },
 };
-
-#[derive(Debug, PartialEq)]
-pub struct StationedItems {
-    pub list: Vec<StationaryItem>,
-}
-
-impl StationedItems {
-    pub fn initiate() -> Self {
-        Self {
-            list: vec![StationaryItem::Packet(Packet::initiate())],
-        }
-    }
-
-    pub fn accessible_stationary_items(
-        &mut self,
-        target_coordinates: &Vector,
-    ) -> Vec<&mut StationaryItem> {
-        // go through each item and check whether any of its covered coordinates is the one
-        // the player accesses right now
-        let mut accessible_stationed_items = Vec::new();
-        for stationed_item in &mut self.list {
-            if method_on_inner_stationed_item!(stationed_item, list_blocking_coordinates)
-                .contains(target_coordinates)
-            {
-                // this stationed item is also placed at the coordinates that the player can access
-                accessible_stationed_items.push(stationed_item);
-            }
-        }
-
-        accessible_stationed_items
-    }
-
-    pub fn user_selection_for_accessible_stationary_items(
-        &mut self,
-        target_coordinates: &Vector,
-    ) -> Result<&mut StationaryItem, TuiError> {
-        let accessible_items = self.accessible_stationary_items(target_coordinates);
-        let descriptions = &accessible_items
-            .iter()
-            .map(|item| method_on_inner_stationed_item!(item, get_description))
-            .collect();
-        let mut popup_stationed_item_selection = PopUp {
-            options: descriptions,
-            active_option_index: 0,
-            buttons: vec![Button::Cancel, Button::Confirm],
-            active_button_index: 1,
-        };
-
-        let selected_index = popup_stationed_item_selection.get_user_selection()?;
-
-        Ok(self
-            .list
-            .get_mut(selected_index)
-            .expect("Just selected this option by popup"))
-    }
-}
-
-pub trait Stationary {
-    fn list_blocking_coordinates(&self) -> Vec<Vector>;
-    fn get_linked_quest(&mut self) -> &mut Quest;
-    fn get_status(&self) -> &StationaryStatus;
-    fn change_status_to_not_available(&mut self);
-}
-
-#[derive(Clone, Debug, PartialEq)]
-pub enum StationaryItem {
-    Packet(Packet),
-    TreasureChest(TreasureChest),
-}
-
-#[derive(Clone, Debug, PartialEq)]
-pub enum StationaryStatus {
-    Visible,
-    NotAvailable,
-}
 
 #[macro_export]
 macro_rules! method_on_inner_stationed_item {
@@ -109,15 +33,76 @@ macro_rules! mut_method_on_inner_stationed_item {
     };
 }
 
+#[derive(Debug, PartialEq)]
+pub struct StationedItems {
+    pub list: Vec<StationaryItem>,
+}
+
+impl StationedItems {
+    pub fn initiate() -> Self {
+        Self {
+            list: vec![StationaryItem::Packet(Packet::initiate())],
+        }
+    }
+
+    pub fn accessible_stationary_items(&self, target_coordinates: &Vector) -> Vec<StationaryItem> {
+        // go through each item and check whether any of its covered coordinates is the one
+        // the player accesses right now
+        let mut accessible_stationed_items = Vec::new();
+        for stationed_item in &self.list {
+            if method_on_inner_stationed_item!(stationed_item, list_blocking_coordinates)
+                .contains(target_coordinates)
+            {
+                // this stationed item is also placed at the coordinates that the player can access
+                accessible_stationed_items.push(stationed_item.clone());
+            }
+        }
+
+        accessible_stationed_items
+    }
+
+    pub fn user_selection_for_accessible_stationary_items(
+        &self,
+        target_coordinates: &Vector,
+    ) -> Result<StationaryItem, TuiError> {
+        let accessible_items = self.accessible_stationary_items(target_coordinates);
+        let descriptions = &accessible_items
+            .iter()
+            .map(|item| method_on_inner_stationed_item!(item, get_description))
+            .collect();
+        let mut popup_stationed_item_selection = PopUp {
+            options: descriptions,
+            active_option_index: 0,
+            buttons: vec![Button::Cancel, Button::Confirm],
+            active_button_index: 1,
+        };
+
+        let selected_index = popup_stationed_item_selection.get_user_selection()?;
+
+        Ok(self
+            .list
+            .get(selected_index)
+            .expect("Just selected this option by popup")
+            .clone())
+    }
+}
+
+pub trait Stationary {
+    fn list_blocking_coordinates(&self) -> Vec<Vector>;
+    fn get_linked_quest(&self) -> &Quest;
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub enum StationaryItem {
+    Packet(Packet),
+    TreasureChest(TreasureChest),
+}
+
 impl Drawable for StationedItems {
     fn draw(&self) -> String {
         let mut joined_items = String::new();
 
         for item in &self.list {
-            if method_on_inner_stationed_item!(item, get_status) != &StationaryStatus::Visible {
-                // only visible items should be drawn
-                continue;
-            }
             let drawn_item = method_on_inner_stationed_item!(item, draw);
             joined_items.push_str(&drawn_item);
         }
