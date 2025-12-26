@@ -8,7 +8,9 @@ use crate::{
         stationed_item::{packet::Packet, treasure_chest::TreasureChest},
     },
     player::Player,
-    quest::{IsQuest, Quest},
+    quest::{
+        IsQuest, Quest, unlock_treasure_chest::UnlockTreasureChest, unwrap_packet::UnwrapPacket,
+    },
     tui::{
         Drawable, TuiError, Vector,
         game::draw_game,
@@ -113,8 +115,10 @@ impl StationedItems {
         let linked_quest =
             method_on_inner_stationed_item!(selected_stationary_item, get_linked_quest);
         let result = match linked_quest {
-            Quest::UnwrapPacket(inner) => inner.check_if_solvable(collected_items, self),
-            Quest::UnlockTreasureChest(inner) => inner.check_if_solvable(collected_items, self),
+            Quest::UnwrapPacket(_inner) => UnwrapPacket::check_if_solvable(collected_items, self),
+            Quest::UnlockTreasureChest(_inner) => {
+                UnlockTreasureChest::check_if_solvable(collected_items, self)
+            }
         };
         match result {
             Err(_err) => {

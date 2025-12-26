@@ -20,7 +20,7 @@ fn main() {
     let mut stationed_items = StationedItems::initiate();
     draw_game(&grid, &player, &collected_items, &stationed_items);
 
-    // start captioning single key inputs
+    // start captioning single key inputs in raw mode (single presses instead of waiting for \n)
     let mut stdout = stdout().into_raw_mode().unwrap();
     for k in stdin().keys() {
         match k.as_ref().unwrap() {
@@ -47,6 +47,8 @@ fn main() {
 
         draw_game(&grid, &player, &collected_items, &stationed_items);
     }
+
+    // clean up terminal and go back to normal mode
     write!(
         stdout,
         "{}{}{}",
