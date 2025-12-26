@@ -29,16 +29,6 @@ macro_rules! method_on_inner_stationed_item {
     };
 }
 
-#[macro_export]
-macro_rules! mut_method_on_inner_stationed_item {
-    ($value:expr, $method:ident) => {
-        match $value {
-            StationaryItem::Packet(inner) => inner.$method(),
-            StationaryItem::TreasureChest(inner) => inner.$method(),
-        }
-    };
-}
-
 #[derive(Debug, PartialEq)]
 pub struct StationedItems {
     pub list: Vec<StationaryItem>,

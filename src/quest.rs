@@ -86,13 +86,3 @@ macro_rules! method_on_inner_quest {
         }
     };
 }
-
-#[macro_export]
-macro_rules! mut_method_on_inner_quest {
-    ($value:expr, $method:ident) => {
-        match $value {
-            Quest::UnwrapPacket(inner) => inner.$method(),
-            Quest::UnlockTreasureChest(inner) => inner.$method(),
-        }
-    };
-}

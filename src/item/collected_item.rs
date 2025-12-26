@@ -63,13 +63,6 @@ macro_rules! method_on_inner_collected_item {
 
 impl std::fmt::Display for CollectableItem {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        //     let inner_item = self.get_inner_item();
-        //     writeln!(
-        //         f,
-        //         "{} - {}",
-        //         inner_item.get_name(),
-        //         inner_item.get_description()
-        //     )
         let name = method_on_inner_collected_item!(self, get_name);
         let description = method_on_inner_collected_item!(self, get_description);
 
