@@ -59,7 +59,7 @@ impl Player {
         match self.orientation {
             Orientation::North => target_coordinates.vertical -= 1,
             Orientation::East => target_coordinates.horizontal += 1,
-            Orientation::South => target_coordinates.vertical -= 1,
+            Orientation::South => target_coordinates.vertical += 1,
             Orientation::West => target_coordinates.horizontal -= 1,
         };
 
