@@ -16,7 +16,7 @@ pub struct TreasureChest {
 
 impl TreasureChest {
     pub fn initiate() -> Self {
-        let linked_quest = Quest::UnlockTreasureChest(UnlockTreasureChest {});
+        let linked_quest = Quest::UnlockTreasureChest(UnlockTreasureChest);
         Self { linked_quest }
     }
 }

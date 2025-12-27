@@ -3,6 +3,7 @@ use termion::color;
 
 use crate::{
     item::stationed_item::{Stationary, StationaryItem, StationedItems},
+    method_on_inner_stationed_item,
     tui::{Drawable, Orientation, Vector, grid::Grid},
 };
 
@@ -35,12 +36,8 @@ impl Player {
         // merge blocking fields of stationed items
         let mut merged_grid = grid.clone();
         for stationed_item in &stationed_items.list {
-            let blocked_pixels = match stationed_item {
-                StationaryItem::Packet(packet) => packet.list_blocking_coordinates(),
-                StationaryItem::TreasureChest(treasure_chest) => {
-                    treasure_chest.list_blocking_coordinates()
-                }
-            };
+            let blocked_pixels =
+                method_on_inner_stationed_item!(stationed_item, list_blocking_coordinates);
             for blocked_pixel in blocked_pixels {
                 // assign placeholder blocking element
                 merged_grid.pixels[blocked_pixel.vertical][blocked_pixel.horizontal] = 'x';

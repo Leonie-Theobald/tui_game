@@ -1,3 +1,4 @@
+pub mod open_door;
 pub mod unlock_treasure_chest;
 pub mod unwrap_packet;
 
@@ -8,7 +9,10 @@ use crate::{
         stationed_item::{StationaryItem, StationedItems},
     },
     method_on_inner_quest,
-    quest::{unlock_treasure_chest::UnlockTreasureChest, unwrap_packet::UnwrapPacket},
+    quest::{
+        open_door::OpenDoor, unlock_treasure_chest::UnlockTreasureChest,
+        unwrap_packet::UnwrapPacket,
+    },
 };
 
 pub trait IsQuest {
@@ -63,6 +67,7 @@ pub trait IsQuest {
 pub enum Quest {
     UnwrapPacket(UnwrapPacket),
     UnlockTreasureChest(UnlockTreasureChest),
+    OpenDoor(OpenDoor),
 }
 
 impl std::fmt::Display for Quest {
@@ -84,13 +89,15 @@ macro_rules! method_on_inner_quest {
         match &$value {
             Quest::UnwrapPacket(_inner) => UnwrapPacket::$method(),
             Quest::UnlockTreasureChest(_inner) => UnlockTreasureChest::$method(),
+            Quest::OpenDoor(_inner) => OpenDoor::$method(),
         }
     };
     // call with parameters
     ($value:expr, $method:ident ($ ( $parameter:expr ),* $(,)? )) => {
         match &$value {
             Quest::UnwrapPacket(_inner) => UnwrapPacket::$method( $( $parameter ),* ),
-            Quest::UnlockTreasureChest(_inner) => UnlockTreasureChest::$method( $( $parameter ),*)
+            Quest::UnlockTreasureChest(_inner) => UnlockTreasureChest::$method( $( $parameter ),*),
+            Quest::OpenDoor(_inner) => OpenDoor::$method( $( $parameter ),* ), //OpenDoor::$method( $( $parameter ),*),
         }
     };
 }

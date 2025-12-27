@@ -1,3 +1,4 @@
+pub mod blocked_room;
 pub mod packet;
 pub mod treasure_chest;
 
@@ -5,12 +6,15 @@ use crate::{
     item::{
         Item,
         collected_item::CollectedItems,
-        stationed_item::{packet::Packet, treasure_chest::TreasureChest},
+        stationed_item::{
+            blocked_room::BlockedRoom, packet::Packet, treasure_chest::TreasureChest,
+        },
     },
     method_on_inner_quest,
     player::Player,
     quest::{
-        IsQuest, Quest, unlock_treasure_chest::UnlockTreasureChest, unwrap_packet::UnwrapPacket,
+        IsQuest, Quest, open_door::OpenDoor, unlock_treasure_chest::UnlockTreasureChest,
+        unwrap_packet::UnwrapPacket,
     },
     tui::{
         Drawable, TuiError, Vector,
@@ -26,6 +30,7 @@ macro_rules! method_on_inner_stationed_item {
         match &$value {
             StationaryItem::Packet(inner) => inner.$method(),
             StationaryItem::TreasureChest(inner) => inner.$method(),
+            StationaryItem::BlockedRoom(inner) => inner.$method(),
         }
     };
 }
@@ -38,7 +43,10 @@ pub struct StationedItems {
 impl StationedItems {
     pub fn initiate() -> Self {
         Self {
-            list: vec![StationaryItem::Packet(Packet::initiate())],
+            list: vec![
+                StationaryItem::Packet(Packet::initiate()),
+                StationaryItem::BlockedRoom(BlockedRoom::initiate()),
+            ],
         }
     }
 
@@ -76,8 +84,7 @@ impl StationedItems {
 
         let selected_index = popup_stationed_item_selection.get_user_selection()?;
 
-        Ok(self
-            .list
+        Ok(accessible_items
             .get(selected_index)
             .expect("Just selected this option by popup")
             .clone())
@@ -151,6 +158,7 @@ pub trait Stationary {
 pub enum StationaryItem {
     Packet(Packet),
     TreasureChest(TreasureChest),
+    BlockedRoom(BlockedRoom),
 }
 
 impl Drawable for StationedItems {

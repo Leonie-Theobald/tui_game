@@ -16,7 +16,7 @@ pub struct Packet {
 
 impl Packet {
     pub fn initiate() -> Self {
-        let linked_quest = Quest::UnwrapPacket(UnwrapPacket {});
+        let linked_quest = Quest::UnwrapPacket(UnwrapPacket);
         Self { linked_quest }
     }
 }
