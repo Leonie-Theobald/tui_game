@@ -1,3 +1,6 @@
+#[cfg(test)]
+mod tests;
+
 use std::fmt::Debug;
 use termion::color;
 
@@ -7,7 +10,7 @@ use crate::{
     tui::{Drawable, Orientation, Vector, grid::Grid},
 };
 
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, Default, PartialEq)]
 pub struct Player {
     pub coordinates: Vector,
     pub orientation: Orientation,

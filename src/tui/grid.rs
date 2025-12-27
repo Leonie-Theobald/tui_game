@@ -9,7 +9,7 @@ pub struct Grid {
 }
 
 impl Grid {
-    fn empty() -> Self {
+    pub fn empty() -> Self {
         Self {
             pixels: [[' '; GRID_WIDTH]; GRID_HEIGHT],
         }
