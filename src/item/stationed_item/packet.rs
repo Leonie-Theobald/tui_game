@@ -27,7 +27,7 @@ impl Item for Packet {
     }
 
     fn get_description(&self) -> &'static str {
-        "A small packet wrapped in paper lying on the ground."
+        "A small packet wrapped in paper lying on the ground. Take a look inside!"
     }
 }
 

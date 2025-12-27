@@ -1,7 +1,7 @@
 use crate::{
     item::{
         collected_item::{CollectableItem, rusty_key::RustyKey},
-        stationed_item::{StationaryItem, packet::Packet, treasure_chest::TreasureChest},
+        stationed_item::{StationaryItem, packet::Packet},
     },
     quest::IsQuest,
 };
@@ -27,6 +27,6 @@ impl IsQuest for UnwrapPacket {
     }
 
     fn list_reward_stationary_items() -> Vec<StationaryItem> {
-        vec![StationaryItem::TreasureChest(TreasureChest::initiate())]
+        Vec::new()
     }
 }

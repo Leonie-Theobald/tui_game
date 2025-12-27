@@ -5,8 +5,8 @@ use crate::{
 };
 
 const COORDINATES: Vector = Vector {
-    horizontal: 15,
-    vertical: 6,
+    horizontal: 45,
+    vertical: 16,
 };
 
 #[derive(Clone, Debug, PartialEq)]
@@ -27,7 +27,7 @@ impl Item for TreasureChest {
     }
 
     fn get_description(&self) -> &'static str {
-        "A chest with mysterious symbols on it."
+        "Open this treasure chest with a key."
     }
 }
 

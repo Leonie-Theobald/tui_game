@@ -1,4 +1,5 @@
 pub mod blocked_room;
+pub mod lost_chest_key;
 pub mod packet;
 pub mod treasure_chest;
 
@@ -7,14 +8,15 @@ use crate::{
         Item,
         collected_item::CollectedItems,
         stationed_item::{
-            blocked_room::BlockedRoom, packet::Packet, treasure_chest::TreasureChest,
+            blocked_room::BlockedRoom, lost_chest_key::LostChestKey, packet::Packet,
+            treasure_chest::TreasureChest,
         },
     },
     method_on_inner_quest,
     player::Player,
     quest::{
-        IsQuest, Quest, open_door::OpenDoor, unlock_treasure_chest::UnlockTreasureChest,
-        unwrap_packet::UnwrapPacket,
+        IsQuest, Quest, collect_chest_key::CollectChestKey, open_door::OpenDoor,
+        unlock_treasure_chest::UnlockTreasureChest, unwrap_packet::UnwrapPacket,
     },
     tui::{
         Drawable, TuiError, Vector,
@@ -31,6 +33,7 @@ macro_rules! method_on_inner_stationed_item {
             StationaryItem::Packet(inner) => inner.$method(),
             StationaryItem::TreasureChest(inner) => inner.$method(),
             StationaryItem::BlockedRoom(inner) => inner.$method(),
+            StationaryItem::LostChestKey(inner) => inner.$method(),
         }
     };
 }
@@ -159,6 +162,7 @@ pub enum StationaryItem {
     Packet(Packet),
     TreasureChest(TreasureChest),
     BlockedRoom(BlockedRoom),
+    LostChestKey(LostChestKey),
 }
 
 impl Drawable for StationedItems {

@@ -1,7 +1,10 @@
 use crate::{
     item::{
         collected_item::{CollectableItem, rusty_key::RustyKey},
-        stationed_item::{StationaryItem, blocked_room::BlockedRoom},
+        stationed_item::{
+            StationaryItem, blocked_room::BlockedRoom, lost_chest_key::LostChestKey,
+            treasure_chest::TreasureChest,
+        },
     },
     quest::IsQuest,
 };
@@ -27,6 +30,9 @@ impl IsQuest for OpenDoor {
     }
 
     fn list_reward_stationary_items() -> Vec<StationaryItem> {
-        Vec::new()
+        vec![
+            StationaryItem::TreasureChest(TreasureChest::initiate()),
+            StationaryItem::LostChestKey(LostChestKey::initiate()),
+        ]
     }
 }

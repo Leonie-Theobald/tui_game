@@ -1,9 +1,9 @@
 use crate::{
     item::{
         collected_item::{
-            CollectableItem, candle::Candle, rusty_key::RustyKey, treasure_map::TreasureMap,
+            CollectableItem, candle::Candle, chest_key::ChestKey, treasure_map::TreasureMap,
         },
-        stationed_item::StationaryItem,
+        stationed_item::{StationaryItem, treasure_chest::TreasureChest},
     },
     quest::IsQuest,
 };
@@ -17,11 +17,11 @@ impl IsQuest for UnlockTreasureChest {
     }
 
     fn list_necessary_collected_items() -> Vec<CollectableItem> {
-        vec![CollectableItem::RustyKey(RustyKey)]
+        vec![CollectableItem::ChestKey(ChestKey)]
     }
 
     fn list_necessary_stationed_items() -> Vec<StationaryItem> {
-        todo!()
+        vec![StationaryItem::TreasureChest(TreasureChest::initiate())]
     }
 
     fn list_reward_collectable_items() -> Vec<CollectableItem> {

@@ -1,11 +1,14 @@
 pub mod candle;
+pub mod chest_key;
 pub mod rusty_key;
 pub mod treasure_map;
 
 use crate::{
     item::{
         Item,
-        collected_item::{candle::Candle, rusty_key::RustyKey, treasure_map::TreasureMap},
+        collected_item::{
+            candle::Candle, chest_key::ChestKey, rusty_key::RustyKey, treasure_map::TreasureMap,
+        },
     },
     tui::{
         Drawable,
@@ -49,6 +52,7 @@ pub enum CollectableItem {
     RustyKey(RustyKey),
     Candle(Candle),
     TreasureMap(TreasureMap),
+    ChestKey(ChestKey),
 }
 
 macro_rules! method_on_inner_collected_item {
@@ -57,6 +61,7 @@ macro_rules! method_on_inner_collected_item {
             CollectableItem::RustyKey(inner) => inner.$method(),
             CollectableItem::Candle(inner) => inner.$method(),
             CollectableItem::TreasureMap(inner) => inner.$method(),
+            CollectableItem::ChestKey(inner) => inner.$method(),
         }
     };
 }
