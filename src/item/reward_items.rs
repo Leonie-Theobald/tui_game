@@ -1,6 +1,6 @@
 use crate::item::{collected_item::CollectableItem, stationed_item::StationaryItem};
 
-#[derive(Default)]
+#[derive(Debug, Default, PartialEq)]
 pub struct RewardItems {
     pub added_collectable: Vec<CollectableItem>,
     pub added_stationed: Vec<StationaryItem>,

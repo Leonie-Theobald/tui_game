@@ -1,5 +1,7 @@
 pub mod collect_chest_key;
 pub mod open_door;
+#[cfg(test)]
+mod tests;
 pub mod unlock_treasure_chest;
 pub mod unwrap_packet;
 
@@ -78,7 +80,7 @@ impl std::fmt::Display for Quest {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum QuestError {
     CollectableItemMissing,
     StationaryItemMissing,
@@ -101,7 +103,7 @@ macro_rules! method_on_inner_quest {
             Quest::UnwrapPacket(_inner) => UnwrapPacket::$method( $( $parameter ),* ),
             Quest::UnlockTreasureChest(_inner) => UnlockTreasureChest::$method( $( $parameter ),*),
             Quest::OpenDoor(_inner) => OpenDoor::$method( $( $parameter ),* ),
-            Quest::CollectChestKey(_inner) => CollectChestKey::$method( $( $parameter ),* ),
+            Quest::CollectChestKey(_inner) => OpenDoor::$method( $( $parameter ),* ),
         }
     };
 }
