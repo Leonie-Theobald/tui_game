@@ -34,10 +34,7 @@ impl IsQuest for TestQuest {
 
 #[test]
 fn try_solve_but_collectable_item_missing() {
-    let collected_items = CollectedItems {
-        list: Vec::new(),
-        visible: false,
-    };
+    let collected_items = CollectedItems { list: Vec::new() };
     let stationed_items = StationedItems {
         list: vec![StationaryItem::TreasureChest(TreasureChest::initiate())],
     };
@@ -52,7 +49,6 @@ fn try_solve_but_collectable_item_missing() {
 fn try_solve_but_stationed_item_missing() {
     let collected_items = CollectedItems {
         list: vec![CollectableItem::RustyKey(RustyKey)],
-        visible: false,
     };
     let stationed_items = StationedItems { list: Vec::new() };
 
@@ -66,7 +62,6 @@ fn try_solve_but_stationed_item_missing() {
 fn solve_quest() {
     let collected_items = CollectedItems {
         list: vec![CollectableItem::RustyKey(RustyKey)],
-        visible: false,
     };
     let stationed_items = StationedItems {
         list: vec![StationaryItem::TreasureChest(TreasureChest::initiate())],

@@ -20,15 +20,11 @@ use termion::color;
 #[derive(Debug, PartialEq)]
 pub struct CollectedItems {
     pub list: Vec<CollectableItem>,
-    pub visible: bool,
 }
 
 impl CollectedItems {
     pub fn initiate() -> Self {
-        Self {
-            list: Vec::new(),
-            visible: false,
-        }
+        Self { list: Vec::new() }
     }
 
     pub fn show_all_in_popup(&self) {
@@ -77,9 +73,6 @@ impl std::fmt::Display for CollectableItem {
 
 impl Drawable for CollectedItems {
     fn draw(&self) -> String {
-        if !self.visible {
-            return String::new();
-        }
         // format each item line and find out longest item line
         let mut length_longest_item_line = 0;
         let mut joined_items = String::new();
