@@ -103,7 +103,7 @@ macro_rules! method_on_inner_quest {
             Quest::UnwrapPacket(_inner) => UnwrapPacket::$method( $( $parameter ),* ),
             Quest::UnlockTreasureChest(_inner) => UnlockTreasureChest::$method( $( $parameter ),*),
             Quest::OpenDoor(_inner) => OpenDoor::$method( $( $parameter ),* ),
-            Quest::CollectChestKey(_inner) => OpenDoor::$method( $( $parameter ),* ),
+            Quest::CollectChestKey(_inner) => CollectChestKey::$method( $( $parameter ),* ),
         }
     };
 }

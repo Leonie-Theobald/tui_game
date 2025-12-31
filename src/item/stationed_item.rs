@@ -15,8 +15,8 @@ use crate::{
     method_on_inner_quest,
     player::Player,
     quest::{
-        IsQuest, Quest, open_door::OpenDoor, unlock_treasure_chest::UnlockTreasureChest,
-        unwrap_packet::UnwrapPacket,
+        IsQuest, Quest, collect_chest_key::CollectChestKey, open_door::OpenDoor,
+        unlock_treasure_chest::UnlockTreasureChest, unwrap_packet::UnwrapPacket,
     },
     tui::{
         Drawable, TuiError, Vector,
