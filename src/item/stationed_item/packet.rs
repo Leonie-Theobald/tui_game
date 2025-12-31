@@ -1,10 +1,10 @@
+use inquire::InquireError;
+use inquire_derive::Selectable;
+
 use crate::{
-    item::{
-        Item,
-        stationed_item::{Stationary, interaction::Interaction},
-    },
+    item::{Item, stationed_item::Stationary},
     quest::{Quest, unwrap_packet::UnwrapPacket},
-    tui::{Drawable, Vector, pop_up::PopUp},
+    tui::{Drawable, Vector, pop_up::InfoPopUp},
 };
 
 const COORDINATES: Vector = Vector {
@@ -15,37 +15,53 @@ const COORDINATES: Vector = Vector {
 #[derive(Clone, Debug, PartialEq)]
 pub struct Packet {
     linked_quest: Quest,
-    interactions: Vec<Interaction>,
+}
+
+#[derive(Debug, Copy, Clone, Selectable, PartialEq)]
+enum PacketInteraction {
+    Shake,
+    Stomp,
+    Open,
+}
+
+impl std::fmt::Display for PacketInteraction {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let interaction = match self {
+            PacketInteraction::Shake => "Shake the packet.",
+            PacketInteraction::Stomp => "Stomp on the packet.",
+            PacketInteraction::Open => "Open the packet.",
+        };
+
+        write!(f, "{}", interaction)
+    }
 }
 
 impl Packet {
     pub fn initiate() -> Self {
         let linked_quest = Quest::UnwrapPacket(UnwrapPacket);
-        let interactions = Vec::new();
-        Self {
-            linked_quest,
-            interactions,
-        }
+        Self { linked_quest }
     }
 
     pub fn try_interaction(&mut self) {
-        let options = vec![
-            "Shake the packet.",
-            "Stomp on the packet.",
-            "Open the packet.",
-        ];
+        let selected_interaction =
+            match PacketInteraction::select("What do you want to try?").prompt() {
+                Ok(selection) => selection,
+                Err(InquireError::OperationCanceled) | Err(InquireError::OperationInterrupted) => {
+                    return;
+                }
+                Err(err) => panic!("Error shouldn't occur: {:?}", err),
+            };
 
-        let pop_up = PopUp { options };
-
-        let selected_option = match pop_up.get_user_selection() {
-            Err(_err) => return,
-            Ok(index) => index,
+        let info_prompt = match selected_interaction {
+            PacketInteraction::Shake => "Something is rattling in the box.",
+            PacketInteraction::Stomp => "Now the packet is flat. Well done...",
+            PacketInteraction::Open => "Hurray! You found something.",
         };
 
-        let info_pop_up = PopUp {
-            options: vec![selected_option],
-        };
-        info_pop_up.get_user_selection().unwrap();
+        InfoPopUp {
+            message: String::from(info_prompt),
+        }
+        .show_to_user();
     }
 }
 

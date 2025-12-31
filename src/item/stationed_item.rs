@@ -1,5 +1,4 @@
 pub mod blocked_room;
-pub mod interaction;
 pub mod lost_chest_key;
 pub mod packet;
 pub mod treasure_chest;

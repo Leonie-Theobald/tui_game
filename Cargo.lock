@@ -121,6 +121,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "inquire-derive"
+version = "0.9.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "807533895ea669bc861ac63c56fb6cff6e4ed049dff1550c39298c9864ffa561"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
 name = "libc"
 version = "0.2.178"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -226,6 +237,7 @@ name = "room"
 version = "0.1.0"
 dependencies = [
  "inquire",
+ "inquire-derive",
  "termion",
 ]
 
