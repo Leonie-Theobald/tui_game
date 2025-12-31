@@ -7,7 +7,10 @@ use std::io::{Write, stdin, stdout};
 use termion::{event::Key, input::TermRead, raw::IntoRawMode};
 
 use crate::{
-    item::{collected_item::CollectedItems, stationed_item::StationedItems},
+    item::{
+        collected_item::CollectedItems,
+        stationed_item::{StationedItems, packet::Packet},
+    },
     player::Player,
     tui::{Orientation, game::draw_game, grid::Grid},
 };
@@ -18,7 +21,7 @@ fn main() {
     let mut player = Player::initiate();
     let mut collected_items = CollectedItems::initiate();
     let mut stationed_items = StationedItems::initiate();
-    draw_game(&grid, &player, &collected_items, &stationed_items);
+    draw_game(&grid, &player, &stationed_items);
 
     // start captioning single key inputs in raw mode (single presses instead of waiting for \n)
     let mut stdout = stdout().into_raw_mode().unwrap();
@@ -38,6 +41,12 @@ fn main() {
                 stationed_items.select_and_solve_linked_quest(&grid, &player, &mut collected_items)
             }
 
+            // test interaction with packet
+            Key::Char('i') => {
+                let mut packet = Packet::initiate();
+                packet.try_interaction();
+            }
+
             // leave game
             Key::Ctrl('c') => break,
 
@@ -45,7 +54,7 @@ fn main() {
             _ => continue,
         };
 
-        draw_game(&grid, &player, &collected_items, &stationed_items);
+        draw_game(&grid, &player, &stationed_items);
     }
 
     // clean up terminal and go back to normal mode

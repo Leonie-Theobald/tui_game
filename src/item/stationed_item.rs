@@ -1,4 +1,5 @@
 pub mod blocked_room;
+pub mod interaction;
 pub mod lost_chest_key;
 pub mod packet;
 pub mod treasure_chest;
@@ -18,12 +19,7 @@ use crate::{
         IsQuest, Quest, collect_chest_key::CollectChestKey, open_door::OpenDoor,
         unlock_treasure_chest::UnlockTreasureChest, unwrap_packet::UnwrapPacket,
     },
-    tui::{
-        Drawable, TuiError, Vector,
-        game::draw_game,
-        grid::Grid,
-        pop_up::{Button, PopUp},
-    },
+    tui::{Drawable, TuiError, Vector, game::draw_game, grid::Grid, pop_up::PopUp},
 };
 
 #[macro_export]
@@ -77,20 +73,24 @@ impl StationedItems {
         let descriptions = &accessible_items
             .iter()
             .map(|item| method_on_inner_stationed_item!(item, get_description))
-            .collect();
-        let mut popup_stationed_item_selection = PopUp {
-            options: descriptions,
-            active_option_index: 0,
-            buttons: vec![Button::Cancel, Button::Confirm],
-            active_button_index: 1,
+            .collect::<Vec<_>>();
+        let popup_stationed_item_selection = PopUp {
+            options: descriptions.clone(),
         };
 
-        let selected_index = popup_stationed_item_selection.get_user_selection()?;
+        let selected_description = popup_stationed_item_selection.get_user_selection()?;
+        let selected_item = accessible_items
+            .into_iter()
+            .filter(|item| {
+                let description = method_on_inner_stationed_item!(item, get_description);
+                description == selected_description
+            })
+            .collect::<Vec<_>>()
+            .first()
+            .expect("User just selected this item based on descriptions")
+            .clone();
 
-        Ok(accessible_items
-            .get(selected_index)
-            .expect("Just selected this option by popup")
-            .clone())
+        Ok(selected_item)
     }
 
     pub fn select_and_solve_linked_quest(
@@ -107,7 +107,7 @@ impl StationedItems {
                 Ok(item) => item,
                 Err(_err) => {
                     // return to normal game grid
-                    draw_game(grid, player, collected_items, self);
+                    draw_game(grid, player, self);
                     return;
                 }
             };
@@ -117,7 +117,7 @@ impl StationedItems {
             method_on_inner_stationed_item!(selected_stationary_item, get_linked_quest);
         match method_on_inner_quest!(linked_quest, check_if_solvable(collected_items, self)) {
             Err(_err) => {
-                draw_game(grid, player, collected_items, self);
+                draw_game(grid, player, self);
             }
             Ok(mut reward_items) => {
                 // remove collectable items used for this quest

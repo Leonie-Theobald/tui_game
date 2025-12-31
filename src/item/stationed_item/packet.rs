@@ -1,7 +1,10 @@
 use crate::{
-    item::{Item, stationed_item::Stationary},
+    item::{
+        Item,
+        stationed_item::{Stationary, interaction::Interaction},
+    },
     quest::{Quest, unwrap_packet::UnwrapPacket},
-    tui::{Drawable, Vector},
+    tui::{Drawable, Vector, pop_up::PopUp},
 };
 
 const COORDINATES: Vector = Vector {
@@ -12,12 +15,37 @@ const COORDINATES: Vector = Vector {
 #[derive(Clone, Debug, PartialEq)]
 pub struct Packet {
     linked_quest: Quest,
+    interactions: Vec<Interaction>,
 }
 
 impl Packet {
     pub fn initiate() -> Self {
         let linked_quest = Quest::UnwrapPacket(UnwrapPacket);
-        Self { linked_quest }
+        let interactions = Vec::new();
+        Self {
+            linked_quest,
+            interactions,
+        }
+    }
+
+    pub fn try_interaction(&mut self) {
+        let options = vec![
+            "Shake the packet.",
+            "Stomp on the packet.",
+            "Open the packet.",
+        ];
+
+        let pop_up = PopUp { options };
+
+        let selected_option = match pop_up.get_user_selection() {
+            Err(_err) => return,
+            Ok(index) => index,
+        };
+
+        let info_pop_up = PopUp {
+            options: vec![selected_option],
+        };
+        info_pop_up.get_user_selection().unwrap();
     }
 }
 
