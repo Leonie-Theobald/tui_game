@@ -2,7 +2,11 @@ use inquire::InquireError;
 use inquire_derive::Selectable;
 
 use crate::{
-    item::{Item, stationed_item::Stationary},
+    item::{
+        Item,
+        collected_item::{CollectableItem, CollectedItems, rusty_key::RustyKey},
+        stationed_item::Stationary,
+    },
     quest::{Quest, unwrap_packet::UnwrapPacket},
     tui::{Drawable, Vector, pop_up::InfoPopUp},
 };
@@ -14,6 +18,7 @@ const COORDINATES: Vector = Vector {
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct Packet {
+    opened: bool,
     linked_quest: Quest,
 }
 
@@ -39,29 +44,10 @@ impl std::fmt::Display for PacketInteraction {
 impl Packet {
     pub fn initiate() -> Self {
         let linked_quest = Quest::UnwrapPacket(UnwrapPacket);
-        Self { linked_quest }
-    }
-
-    pub fn try_interaction(&mut self) {
-        let selected_interaction =
-            match PacketInteraction::select("What do you want to try?").prompt() {
-                Ok(selection) => selection,
-                Err(InquireError::OperationCanceled) | Err(InquireError::OperationInterrupted) => {
-                    return;
-                }
-                Err(err) => panic!("Error shouldn't occur: {:?}", err),
-            };
-
-        let info_prompt = match selected_interaction {
-            PacketInteraction::Shake => "Something is rattling in the box.",
-            PacketInteraction::Stomp => "Now the packet is flat. Well done...",
-            PacketInteraction::Open => "Hurray! You found something.",
-        };
-
-        InfoPopUp {
-            message: String::from(info_prompt),
+        Self {
+            opened: false,
+            linked_quest,
         }
-        .show_to_user();
     }
 }
 
@@ -76,6 +62,38 @@ impl Item for Packet {
 }
 
 impl Stationary for Packet {
+    fn interact(&mut self, collected_items: &mut CollectedItems) {
+        let selected_interaction =
+            match PacketInteraction::select("What do you want to try?").prompt() {
+                Ok(selection) => selection,
+                Err(InquireError::OperationCanceled) | Err(InquireError::OperationInterrupted) => {
+                    return;
+                }
+                Err(err) => panic!("Error shouldn't occur: {:?}", err),
+            };
+
+        let info_prompt = match selected_interaction {
+            PacketInteraction::Shake => "Something is rattling in the box.",
+            PacketInteraction::Stomp => "Now the packet is flat. Well done...",
+            PacketInteraction::Open => {
+                if self.opened {
+                    "Package has already been opened."
+                } else {
+                    collected_items
+                        .list
+                        .push(CollectableItem::RustyKey(RustyKey));
+                    self.opened = true;
+                    "Hurray! You found something."
+                }
+            }
+        };
+
+        InfoPopUp {
+            message: String::from(info_prompt),
+        }
+        .show_to_user();
+    }
+
     fn list_blocking_coordinates(&self) -> Vec<Vector> {
         let mut blocked_coordinate = Vec::new();
 
@@ -101,7 +119,7 @@ impl Stationary for Packet {
 
 impl Drawable for Packet {
     fn draw(&self) -> String {
-        let symbol = "📦";
+        let symbol = if self.opened { "X" } else { "📦" };
 
         format!(
             "{}{}",

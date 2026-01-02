@@ -53,6 +53,10 @@ impl Stationary for TreasureChest {
     fn get_linked_quest(&self) -> &Quest {
         &self.linked_quest
     }
+
+    fn interact(&mut self, collected_items: &mut crate::item::collected_item::CollectedItems) {
+        todo!()
+    }
 }
 
 impl Drawable for TreasureChest {

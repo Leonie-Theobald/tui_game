@@ -3,6 +3,10 @@ pub mod lost_chest_key;
 pub mod packet;
 pub mod treasure_chest;
 
+use std::io::{Write, stdout};
+
+use termion::raw::IntoRawMode;
+
 use crate::{
     item::{
         Item,
@@ -18,17 +22,53 @@ use crate::{
         IsQuest, Quest, collect_chest_key::CollectChestKey, open_door::OpenDoor,
         unlock_treasure_chest::UnlockTreasureChest, unwrap_packet::UnwrapPacket,
     },
-    tui::{Drawable, TuiError, Vector, game::draw_game, grid::Grid, pop_up::PopUp},
+    tui::{
+        Drawable, TuiError, Vector,
+        game::draw_game,
+        grid::Grid,
+        pop_up::{InfoPopUp, PopUp},
+    },
 };
 
 #[macro_export]
 macro_rules! method_on_inner_stationed_item {
+    // call without parameters
     ($value:expr, $method:ident) => {
         match &$value {
             StationaryItem::Packet(inner) => inner.$method(),
             StationaryItem::TreasureChest(inner) => inner.$method(),
             StationaryItem::BlockedRoom(inner) => inner.$method(),
             StationaryItem::LostChestKey(inner) => inner.$method(),
+        }
+    };
+    // call with parameters
+    ($value:expr, $method:ident ($ ( $parameter:expr ),* $(,)? )) => {
+        match &$value {
+            StationaryItem::Packet(inner) => inner.$method( $( $parameter ),* ),
+            StationaryItem::TreasureChest(inner) => inner.$method( $( $parameter ),*),
+            StationaryItem::BlockedRoom(inner) => inner.$method( $( $parameter ),* ),
+            StationaryItem::LostChestKey(inner) => inner.$method( $( $parameter ),* ),
+        }
+    };
+}
+
+macro_rules! mut_method_on_inner_stationed_item {
+    // call without parameters
+    ($value:expr, $method:ident) => {
+        match &mut $value {
+            StationaryItem::Packet(inner) => inner.$method(),
+            StationaryItem::TreasureChest(inner) => inner.$method(),
+            StationaryItem::BlockedRoom(inner) => inner.$method(),
+            StationaryItem::LostChestKey(inner) => inner.$method(),
+        }
+    };
+    // call with parameters
+    ($value:expr, $method:ident ($ ( $parameter:expr ),* $(,)? )) => {
+        match &mut $value {
+            StationaryItem::Packet(inner) => inner.$method( $( $parameter ),* ),
+            StationaryItem::TreasureChest(inner) => inner.$method( $( $parameter ),*),
+            StationaryItem::BlockedRoom(inner) => inner.$method( $( $parameter ),* ),
+            StationaryItem::LostChestKey(inner) => inner.$method( $( $parameter ),* ),
         }
     };
 }
@@ -64,6 +104,24 @@ impl StationedItems {
         accessible_stationed_items
     }
 
+    pub fn accessible_stationary_item(
+        &mut self,
+        target_coordinates: &Vector,
+    ) -> Option<&mut StationaryItem> {
+        // go through each item and check whether any of its covered coordinates is the one
+        // the player accesses right now
+        for stationed_item in &mut self.list {
+            if method_on_inner_stationed_item!(stationed_item, list_blocking_coordinates)
+                .contains(target_coordinates)
+            {
+                // this stationed item is also placed at the coordinates that the player can access
+                return Some(stationed_item);
+            }
+        }
+
+        None
+    }
+
     pub fn user_selection_for_accessible_stationary_items(
         &self,
         target_coordinates: &Vector,
@@ -90,6 +148,51 @@ impl StationedItems {
             .clone();
 
         Ok(selected_item)
+    }
+
+    pub fn interact(&mut self, player: &Player, collected_items: &mut CollectedItems) {
+        // find accessible item
+        let target_coordinates = player.get_facing_coordinates();
+        let mut accessible_item = match self.accessible_stationary_item(&target_coordinates) {
+            None => {
+                InfoPopUp {
+                    message: String::from("No items available for interaction."),
+                }
+                .show_to_user();
+                return;
+            }
+            Some(item) => item,
+        };
+        // if accessible_items.len() > 1 {
+        //     panic!("There should always be only one Stationary item per pixel.")
+        // }
+
+        // prepare terminal
+        let mut stdout = stdout().into_raw_mode().unwrap();
+        write!(
+            stdout,
+            "{}{}{}",
+            termion::clear::All,
+            termion::cursor::Goto(1, 1),
+            termion::cursor::Hide
+        )
+        .unwrap();
+        stdout.flush().unwrap();
+
+        // get user's choice for interaction
+        // let mut selected_stationary_item = match accessible_items.first_mut() {
+        //     None => {
+        //         InfoPopUp {
+        //             message: String::from("No items available for interaction."),
+        //         }
+        //         .show_to_user();
+        //         return;
+        //     }
+        //     Some(item) => item,
+        // };
+
+        // get interactions linked to the selected item
+        mut_method_on_inner_stationed_item!(accessible_item, interact(collected_items));
     }
 
     pub fn select_and_solve_linked_quest(
@@ -154,6 +257,7 @@ impl StationedItems {
 pub trait Stationary {
     fn list_blocking_coordinates(&self) -> Vec<Vector>;
     fn get_linked_quest(&self) -> &Quest;
+    fn interact(&mut self, collected_items: &mut CollectedItems);
 }
 
 #[derive(Clone, Debug, PartialEq)]

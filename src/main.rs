@@ -7,10 +7,7 @@ use std::io::{Write, stdin, stdout};
 use termion::{event::Key, input::TermRead, raw::IntoRawMode};
 
 use crate::{
-    item::{
-        collected_item::CollectedItems,
-        stationed_item::{StationedItems, packet::Packet},
-    },
+    item::{collected_item::CollectedItems, stationed_item::StationedItems},
     player::Player,
     tui::{Orientation, game::draw_game, grid::Grid},
 };
@@ -43,8 +40,7 @@ fn main() {
 
             // test interaction with packet
             Key::Char('i') => {
-                let mut packet = Packet::initiate();
-                packet.try_interaction();
+                stationed_items.interact(&player, &mut collected_items);
             }
 
             // leave game
