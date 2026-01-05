@@ -61,29 +61,21 @@ impl Stationary for Packet {
             .collect();
         let pop_up = PopUp { options: prompts };
         let selected_interaction = match pop_up.get_user_selection() {
-            Ok(selected_prompt) => *self
+            Ok(selected_prompt) => self
                 .linked_interactions
-                .iter()
+                .clone()
+                .into_iter()
                 .filter(|interaction| interaction.get_inner().get_prompt() == selected_prompt)
                 .collect::<Vec<_>>()
                 .first()
-                .expect("Just had the user selection"),
+                .expect("Just had the user selection")
+                .clone(),
             Err(_err) => return,
         };
 
-        let info_prompt = match selected_interaction
+        let info_prompt = selected_interaction
             .get_inner()
-            .interact(self, collected_items)
-        {
-            Ok(success_prompt) => {
-                if matches!(selected_interaction, Interaction::OpenPacket(_)) {
-                    self.opened = true;
-                }
-                success_prompt
-            }
-            Err(failure_prompt) => failure_prompt,
-        };
-
+            .interact(self, collected_items);
         InfoPopUp {
             message: info_prompt,
         }
@@ -118,6 +110,10 @@ impl Stationary for Packet {
         } else {
             InteractionStatus::Open
         }
+    }
+
+    fn set_interaction_status_to_finished(&mut self) {
+        self.opened = true;
     }
 }
 

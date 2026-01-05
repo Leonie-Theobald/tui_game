@@ -260,6 +260,7 @@ pub trait Stationary {
     fn get_linked_quest(&self) -> &Quest;
     fn interact(&mut self, collected_items: &mut CollectedItems);
     fn get_interaction_status(&self) -> InteractionStatus;
+    fn set_interaction_status_to_finished(&mut self);
 }
 
 #[derive(Clone, Debug, PartialEq)]

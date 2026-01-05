@@ -13,9 +13,9 @@ pub trait Interactable {
 
     fn interact(
         &self,
-        linked_stationary_item: &dyn Stationary,
+        linked_stationary_item: &mut dyn Stationary,
         collected_items: &mut CollectedItems,
-    ) -> Result<String, String>;
+    ) -> String;
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -50,17 +50,18 @@ impl Interactable for OpenPacket {
 
     fn interact(
         &self,
-        linked_stationary_item: &dyn Stationary,
+        linked_stationary_item: &mut dyn Stationary,
         collected_items: &mut CollectedItems,
-    ) -> Result<String, String> {
+    ) -> String {
         match linked_stationary_item.get_interaction_status() {
             InteractionStatus::Open => {
                 collected_items
                     .list
                     .push(CollectableItem::RustyKey(RustyKey));
-                Ok(String::from("Hurray! You found something."))
+                linked_stationary_item.set_interaction_status_to_finished();
+                String::from("Hurray! You found something.")
             }
-            InteractionStatus::Finished => Ok(String::from("The packet has already been opened.")),
+            InteractionStatus::Finished => String::from("The packet has already been opened."),
         }
     }
 }
@@ -74,10 +75,10 @@ impl Interactable for StompPacket {
 
     fn interact(
         &self,
-        _linked_stationary_item: &dyn Stationary,
+        _linked_stationary_item: &mut dyn Stationary,
         _collected_items: &mut CollectedItems,
-    ) -> Result<String, String> {
-        Ok(String::from("Now the packet is flat. Well done..."))
+    ) -> String {
+        String::from("Now the packet is flat. Well done...")
     }
 }
 
@@ -90,12 +91,12 @@ impl Interactable for ShakePacket {
 
     fn interact(
         &self,
-        linked_stationary_item: &dyn Stationary,
+        linked_stationary_item: &mut dyn Stationary,
         _collected_items: &mut CollectedItems,
-    ) -> Result<String, String> {
+    ) -> String {
         match linked_stationary_item.get_interaction_status() {
-            InteractionStatus::Open => Ok(String::from("Something is rattling in the box.")),
-            InteractionStatus::Finished => Ok(String::from("Nothing to hear.")),
+            InteractionStatus::Open => String::from("Something is rattling in the box."),
+            InteractionStatus::Finished => String::from("Nothing to hear."),
         }
     }
 }

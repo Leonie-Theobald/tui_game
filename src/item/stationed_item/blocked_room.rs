@@ -142,6 +142,10 @@ impl Stationary for BlockedRoom {
     fn get_interaction_status(&self) -> super::interaction::InteractionStatus {
         todo!()
     }
+
+    fn set_interaction_status_to_finished(&mut self) {
+        todo!()
+    }
 }
 
 impl Drawable for BlockedRoom {

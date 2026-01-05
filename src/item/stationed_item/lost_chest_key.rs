@@ -65,6 +65,10 @@ impl Stationary for LostChestKey {
     fn get_interaction_status(&self) -> InteractionStatus {
         todo!()
     }
+
+    fn set_interaction_status_to_finished(&mut self) {
+        todo!()
+    }
 }
 
 impl Drawable for LostChestKey {
