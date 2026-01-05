@@ -1,14 +1,17 @@
-use inquire::InquireError;
-use inquire_derive::Selectable;
-
 use crate::{
     item::{
         Item,
-        collected_item::{CollectableItem, CollectedItems, rusty_key::RustyKey},
-        stationed_item::Stationary,
+        collected_item::CollectedItems,
+        stationed_item::{
+            Stationary,
+            interaction::{Interaction, InteractionStatus, OpenPacket, ShakePacket, StompPacket},
+        },
     },
     quest::{Quest, unwrap_packet::UnwrapPacket},
-    tui::{Drawable, Vector, pop_up::InfoPopUp},
+    tui::{
+        Drawable, Vector,
+        pop_up::{InfoPopUp, PopUp},
+    },
 };
 
 const COORDINATES: Vector = Vector {
@@ -20,33 +23,21 @@ const COORDINATES: Vector = Vector {
 pub struct Packet {
     opened: bool,
     linked_quest: Quest,
-}
-
-#[derive(Debug, Copy, Clone, Selectable, PartialEq)]
-enum PacketInteraction {
-    Shake,
-    Stomp,
-    Open,
-}
-
-impl std::fmt::Display for PacketInteraction {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let interaction = match self {
-            PacketInteraction::Shake => "Shake the packet.",
-            PacketInteraction::Stomp => "Stomp on the packet.",
-            PacketInteraction::Open => "Open the packet.",
-        };
-
-        write!(f, "{}", interaction)
-    }
+    linked_interactions: Vec<Interaction>,
 }
 
 impl Packet {
     pub fn initiate() -> Self {
         let linked_quest = Quest::UnwrapPacket(UnwrapPacket);
+
         Self {
             opened: false,
             linked_quest,
+            linked_interactions: vec![
+                Interaction::OpenPacket(OpenPacket {}),
+                Interaction::StompPacket(StompPacket {}),
+                Interaction::ShakePacket(ShakePacket {}),
+            ],
         }
     }
 }
@@ -63,33 +54,38 @@ impl Item for Packet {
 
 impl Stationary for Packet {
     fn interact(&mut self, collected_items: &mut CollectedItems) {
-        let selected_interaction =
-            match PacketInteraction::select("What do you want to try?").prompt() {
-                Ok(selection) => selection,
-                Err(InquireError::OperationCanceled) | Err(InquireError::OperationInterrupted) => {
-                    return;
-                }
-                Err(err) => panic!("Error shouldn't occur: {:?}", err),
-            };
+        let prompts = self
+            .linked_interactions
+            .iter()
+            .map(|interaction| interaction.get_inner().get_prompt())
+            .collect();
+        let pop_up = PopUp { options: prompts };
+        let selected_interaction = match pop_up.get_user_selection() {
+            Ok(selected_prompt) => *self
+                .linked_interactions
+                .iter()
+                .filter(|interaction| interaction.get_inner().get_prompt() == selected_prompt)
+                .collect::<Vec<_>>()
+                .first()
+                .expect("Just had the user selection"),
+            Err(_err) => return,
+        };
 
-        let info_prompt = match selected_interaction {
-            PacketInteraction::Shake => "Something is rattling in the box.",
-            PacketInteraction::Stomp => "Now the packet is flat. Well done...",
-            PacketInteraction::Open => {
-                if self.opened {
-                    "Package has already been opened."
-                } else {
-                    collected_items
-                        .list
-                        .push(CollectableItem::RustyKey(RustyKey));
+        let info_prompt = match selected_interaction
+            .get_inner()
+            .interact(self, collected_items)
+        {
+            Ok(success_prompt) => {
+                if matches!(selected_interaction, Interaction::OpenPacket(_)) {
                     self.opened = true;
-                    "Hurray! You found something."
                 }
+                success_prompt
             }
+            Err(failure_prompt) => failure_prompt,
         };
 
         InfoPopUp {
-            message: String::from(info_prompt),
+            message: info_prompt,
         }
         .show_to_user();
     }
@@ -114,6 +110,14 @@ impl Stationary for Packet {
 
     fn get_linked_quest(&self) -> &Quest {
         &self.linked_quest
+    }
+
+    fn get_interaction_status(&self) -> InteractionStatus {
+        if self.opened {
+            InteractionStatus::Finished
+        } else {
+            InteractionStatus::Open
+        }
     }
 }
 

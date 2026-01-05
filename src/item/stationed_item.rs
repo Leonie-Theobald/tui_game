@@ -1,4 +1,5 @@
 pub mod blocked_room;
+pub mod interaction;
 pub mod lost_chest_key;
 pub mod packet;
 pub mod treasure_chest;
@@ -12,8 +13,8 @@ use crate::{
         Item,
         collected_item::CollectedItems,
         stationed_item::{
-            blocked_room::BlockedRoom, lost_chest_key::LostChestKey, packet::Packet,
-            treasure_chest::TreasureChest,
+            blocked_room::BlockedRoom, interaction::InteractionStatus,
+            lost_chest_key::LostChestKey, packet::Packet, treasure_chest::TreasureChest,
         },
     },
     method_on_inner_quest,
@@ -258,6 +259,7 @@ pub trait Stationary {
     fn list_blocking_coordinates(&self) -> Vec<Vector>;
     fn get_linked_quest(&self) -> &Quest;
     fn interact(&mut self, collected_items: &mut CollectedItems);
+    fn get_interaction_status(&self) -> InteractionStatus;
 }
 
 #[derive(Clone, Debug, PartialEq)]

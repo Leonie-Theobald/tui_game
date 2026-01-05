@@ -138,6 +138,10 @@ impl Stationary for BlockedRoom {
     fn get_linked_quest(&self) -> &Quest {
         &self.linked_quest
     }
+
+    fn get_interaction_status(&self) -> super::interaction::InteractionStatus {
+        todo!()
+    }
 }
 
 impl Drawable for BlockedRoom {

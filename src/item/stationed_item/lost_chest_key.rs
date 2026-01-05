@@ -1,5 +1,9 @@
 use crate::{
-    item::{Item, stationed_item::Stationary},
+    item::{
+        Item,
+        collected_item::CollectedItems,
+        stationed_item::{Stationary, interaction::InteractionStatus},
+    },
     quest::{Quest, collect_chest_key::CollectChestKey},
     tui::{Drawable, Vector},
 };
@@ -54,7 +58,11 @@ impl Stationary for LostChestKey {
         &self.linked_quest
     }
 
-    fn interact(&mut self, collected_items: &mut crate::item::collected_item::CollectedItems) {
+    fn interact(&mut self, _collected_items: &mut CollectedItems) {
+        todo!()
+    }
+
+    fn get_interaction_status(&self) -> InteractionStatus {
         todo!()
     }
 }
