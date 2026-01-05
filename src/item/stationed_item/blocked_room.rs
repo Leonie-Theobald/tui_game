@@ -5,7 +5,7 @@ use crate::{
     item::{
         Item,
         collected_item::{CollectableItem, CollectedItems, rusty_key::RustyKey},
-        stationed_item::Stationary,
+        stationed_item::{Stationary, interaction::Interaction},
     },
     quest::{Quest, open_door::OpenDoor},
     tui::{Drawable, Vector, pop_up::InfoPopUp},
@@ -133,6 +133,10 @@ impl Stationary for BlockedRoom {
         }
 
         blocked_coordinate
+    }
+
+    fn get_linked_interactions(&self) -> &Vec<Interaction> {
+        todo!()
     }
 
     fn get_linked_quest(&self) -> &Quest {

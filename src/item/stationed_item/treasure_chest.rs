@@ -2,7 +2,10 @@ use crate::{
     item::{
         Item,
         collected_item::CollectedItems,
-        stationed_item::{Stationary, interaction::InteractionStatus},
+        stationed_item::{
+            Stationary,
+            interaction::{Interaction, InteractionStatus},
+        },
     },
     quest::{Quest, unlock_treasure_chest::UnlockTreasureChest},
     tui::{Drawable, Vector},
@@ -56,6 +59,10 @@ impl Stationary for TreasureChest {
 
     fn get_linked_quest(&self) -> &Quest {
         &self.linked_quest
+    }
+
+    fn get_linked_interactions(&self) -> &Vec<Interaction> {
+        todo!()
     }
 
     fn interact(&mut self, _collected_items: &mut CollectedItems) {

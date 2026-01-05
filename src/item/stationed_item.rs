@@ -13,8 +13,11 @@ use crate::{
         Item,
         collected_item::CollectedItems,
         stationed_item::{
-            blocked_room::BlockedRoom, interaction::InteractionStatus,
-            lost_chest_key::LostChestKey, packet::Packet, treasure_chest::TreasureChest,
+            blocked_room::BlockedRoom,
+            interaction::{Interaction, InteractionStatus},
+            lost_chest_key::LostChestKey,
+            packet::Packet,
+            treasure_chest::TreasureChest,
         },
     },
     method_on_inner_quest,
@@ -258,7 +261,38 @@ impl StationedItems {
 pub trait Stationary {
     fn list_blocking_coordinates(&self) -> Vec<Vector>;
     fn get_linked_quest(&self) -> &Quest;
-    fn interact(&mut self, collected_items: &mut CollectedItems);
+    fn get_linked_interactions(&self) -> &Vec<Interaction>;
+    fn interact(&mut self, collected_items: &mut CollectedItems)
+    where
+        Self: std::marker::Sized,
+    {
+        let prompts = self
+            .get_linked_interactions()
+            .iter()
+            .map(|interaction| interaction.get_inner().get_prompt())
+            .collect();
+        let pop_up = PopUp { options: prompts };
+        let selected_interaction = match pop_up.get_user_selection() {
+            Ok(selected_prompt) => self
+                .get_linked_interactions()
+                .clone()
+                .into_iter()
+                .filter(|interaction| interaction.get_inner().get_prompt() == selected_prompt)
+                .collect::<Vec<_>>()
+                .first()
+                .expect("Just had the user selection")
+                .clone(),
+            Err(_err) => return,
+        };
+
+        let info_prompt = selected_interaction
+            .get_inner()
+            .interact(self, collected_items);
+        InfoPopUp {
+            message: info_prompt,
+        }
+        .show_to_user();
+    }
     fn get_interaction_status(&self) -> InteractionStatus;
     fn set_interaction_status_to_finished(&mut self);
 }

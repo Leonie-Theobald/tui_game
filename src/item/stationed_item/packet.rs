@@ -1,17 +1,13 @@
 use crate::{
     item::{
         Item,
-        collected_item::CollectedItems,
         stationed_item::{
             Stationary,
             interaction::{Interaction, InteractionStatus, OpenPacket, ShakePacket, StompPacket},
         },
     },
     quest::{Quest, unwrap_packet::UnwrapPacket},
-    tui::{
-        Drawable, Vector,
-        pop_up::{InfoPopUp, PopUp},
-    },
+    tui::{Drawable, Vector},
 };
 
 const COORDINATES: Vector = Vector {
@@ -53,35 +49,6 @@ impl Item for Packet {
 }
 
 impl Stationary for Packet {
-    fn interact(&mut self, collected_items: &mut CollectedItems) {
-        let prompts = self
-            .linked_interactions
-            .iter()
-            .map(|interaction| interaction.get_inner().get_prompt())
-            .collect();
-        let pop_up = PopUp { options: prompts };
-        let selected_interaction = match pop_up.get_user_selection() {
-            Ok(selected_prompt) => self
-                .linked_interactions
-                .clone()
-                .into_iter()
-                .filter(|interaction| interaction.get_inner().get_prompt() == selected_prompt)
-                .collect::<Vec<_>>()
-                .first()
-                .expect("Just had the user selection")
-                .clone(),
-            Err(_err) => return,
-        };
-
-        let info_prompt = selected_interaction
-            .get_inner()
-            .interact(self, collected_items);
-        InfoPopUp {
-            message: info_prompt,
-        }
-        .show_to_user();
-    }
-
     fn list_blocking_coordinates(&self) -> Vec<Vector> {
         let mut blocked_coordinate = Vec::new();
 
@@ -102,6 +69,10 @@ impl Stationary for Packet {
 
     fn get_linked_quest(&self) -> &Quest {
         &self.linked_quest
+    }
+
+    fn get_linked_interactions(&self) -> &Vec<Interaction> {
+        &self.linked_interactions
     }
 
     fn get_interaction_status(&self) -> InteractionStatus {
