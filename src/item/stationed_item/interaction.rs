@@ -23,6 +23,9 @@ pub enum Interaction {
     OpenPacket(OpenPacket),
     StompPacket(StompPacket),
     ShakePacket(ShakePacket),
+    BangDoor(BangDoor),
+    BreakDownDoor(BreakDownDoor),
+    UnlockWithKey(UnlockWithKey),
 }
 
 impl std::fmt::Display for Interaction {
@@ -37,6 +40,9 @@ impl Interaction {
             Interaction::OpenPacket(open_packet) => open_packet,
             Interaction::StompPacket(stomp_packet) => stomp_packet,
             Interaction::ShakePacket(shake_packet) => shake_packet,
+            Interaction::BangDoor(bang_door) => bang_door,
+            Interaction::BreakDownDoor(break_down_door) => break_down_door,
+            Interaction::UnlockWithKey(unlock_with_key) => unlock_with_key,
         }
     }
 }
@@ -98,5 +104,71 @@ impl Interactable for ShakePacket {
             InteractionStatus::Open => String::from("Something is rattling in the box."),
             InteractionStatus::Finished => String::from("Nothing to hear."),
         }
+    }
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub struct BangDoor;
+impl Interactable for BangDoor {
+    fn get_prompt(&self) -> String {
+        String::from("Loudly bang on the door")
+    }
+
+    fn interact(
+        &self,
+        _linked_stationary_item: &mut dyn Stationary,
+        _collected_items: &mut CollectedItems,
+    ) -> String {
+        String::from("Nobody opens")
+    }
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub struct BreakDownDoor;
+impl Interactable for BreakDownDoor {
+    fn get_prompt(&self) -> String {
+        String::from("Break down door with raw force")
+    }
+
+    fn interact(
+        &self,
+        _linked_stationary_item: &mut dyn Stationary,
+        _collected_items: &mut CollectedItems,
+    ) -> String {
+        String::from("This is a massive steel door. No chance")
+    }
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub struct UnlockWithKey;
+impl Interactable for UnlockWithKey {
+    fn get_prompt(&self) -> String {
+        String::from("Use key to open door")
+    }
+
+    fn interact(
+        &self,
+        linked_stationary_item: &mut dyn Stationary,
+        collected_items: &mut CollectedItems,
+    ) -> String {
+        if !collected_items
+            .list
+            .contains(&CollectableItem::RustyKey(RustyKey))
+        {
+            return String::from("You have no key to open the door.");
+        }
+
+        // remove key
+        let index = collected_items
+            .list
+            .iter()
+            .position(|available_item| *available_item == CollectableItem::RustyKey(RustyKey))
+            .expect("Checked before that item is available");
+        collected_items.list.remove(index);
+
+        // finish interaction status
+        linked_stationary_item.set_interaction_status_to_finished();
+
+        String::from("This was the correct key to use.")
     }
 }

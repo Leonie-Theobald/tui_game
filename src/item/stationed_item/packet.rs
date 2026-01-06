@@ -25,15 +25,16 @@ pub struct Packet {
 impl Packet {
     pub fn initiate() -> Self {
         let linked_quest = Quest::UnwrapPacket(UnwrapPacket);
+        let linked_interactions = vec![
+            Interaction::OpenPacket(OpenPacket {}),
+            Interaction::StompPacket(StompPacket {}),
+            Interaction::ShakePacket(ShakePacket {}),
+        ];
 
         Self {
             opened: false,
             linked_quest,
-            linked_interactions: vec![
-                Interaction::OpenPacket(OpenPacket {}),
-                Interaction::StompPacket(StompPacket {}),
-                Interaction::ShakePacket(ShakePacket {}),
-            ],
+            linked_interactions,
         }
     }
 }

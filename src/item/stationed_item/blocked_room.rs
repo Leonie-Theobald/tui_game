@@ -1,14 +1,13 @@
-use inquire::InquireError;
-use inquire_derive::Selectable;
-
 use crate::{
     item::{
         Item,
-        collected_item::{CollectableItem, CollectedItems, rusty_key::RustyKey},
-        stationed_item::{Stationary, interaction::Interaction},
+        stationed_item::{
+            Stationary,
+            interaction::{BangDoor, BreakDownDoor, Interaction, InteractionStatus, UnlockWithKey},
+        },
     },
     quest::{Quest, open_door::OpenDoor},
-    tui::{Drawable, Vector, pop_up::InfoPopUp},
+    tui::{Drawable, Vector},
 };
 
 const COORDINATES: Vector = Vector {
@@ -19,6 +18,7 @@ const COORDINATES: Vector = Vector {
 #[derive(Clone, Debug, PartialEq)]
 pub struct BlockedRoom {
     linked_quest: Quest,
+    linked_interactions: Vec<Interaction>,
     opened: bool,
     dimensions: Vector,
 }
@@ -30,8 +30,15 @@ impl BlockedRoom {
             horizontal: 29,
             vertical: 10,
         };
+        let linked_interactions = vec![
+            Interaction::BangDoor(BangDoor {}),
+            Interaction::BreakDownDoor(BreakDownDoor {}),
+            Interaction::UnlockWithKey(UnlockWithKey {}),
+        ];
+
         Self {
             linked_quest,
+            linked_interactions,
             dimensions,
             opened: false,
         }
@@ -48,70 +55,7 @@ impl Item for BlockedRoom {
     }
 }
 
-#[derive(Debug, Copy, Clone, Selectable, PartialEq)]
-pub enum BlockedRoomInteraction {
-    BangDoor,
-    UnlockWithKey,
-    BreakDownDoor,
-}
-
-impl std::fmt::Display for BlockedRoomInteraction {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let interaction = match self {
-            BlockedRoomInteraction::BangDoor => "Loudly bang on door.",
-            BlockedRoomInteraction::UnlockWithKey => "Use key to open door.",
-            BlockedRoomInteraction::BreakDownDoor => "Break down door with raw force",
-        };
-
-        write!(f, "{}", interaction)
-    }
-}
-
 impl Stationary for BlockedRoom {
-    fn interact(&mut self, collected_items: &mut CollectedItems) {
-        let selected_interaction =
-            match BlockedRoomInteraction::select("What do you want to try?").prompt() {
-                Ok(selection) => selection,
-                Err(InquireError::OperationCanceled) | Err(InquireError::OperationInterrupted) => {
-                    return;
-                }
-                Err(err) => panic!("Error shouldn't occur: {:?}", err),
-            };
-
-        let info_prompt = match selected_interaction {
-            BlockedRoomInteraction::BangDoor => "Nobody opens.",
-            BlockedRoomInteraction::BreakDownDoor => "This is a massive steel door. No chance.",
-            BlockedRoomInteraction::UnlockWithKey => {
-                if self.opened {
-                    "Door is already open. Please enter."
-                } else if !collected_items
-                    .list
-                    .contains(&CollectableItem::RustyKey(RustyKey))
-                {
-                    "You have no key to open the door."
-                } else {
-                    // remove key
-                    let index = collected_items
-                        .list
-                        .iter()
-                        .position(|available_item| {
-                            *available_item == CollectableItem::RustyKey(RustyKey)
-                        })
-                        .expect("Checked before that item is available");
-                    collected_items.list.remove(index);
-
-                    self.opened = true;
-
-                    "This was the correct key to use."
-                }
-            }
-        };
-
-        InfoPopUp {
-            message: String::from(info_prompt),
-        }
-        .show_to_user();
-    }
     fn list_blocking_coordinates(&self) -> Vec<Vector> {
         if self.opened {
             return Vec::new();
@@ -135,20 +79,24 @@ impl Stationary for BlockedRoom {
         blocked_coordinate
     }
 
-    fn get_linked_interactions(&self) -> &Vec<Interaction> {
-        todo!()
-    }
-
     fn get_linked_quest(&self) -> &Quest {
         &self.linked_quest
     }
 
-    fn get_interaction_status(&self) -> super::interaction::InteractionStatus {
-        todo!()
+    fn get_linked_interactions(&self) -> &Vec<Interaction> {
+        &self.linked_interactions
+    }
+
+    fn get_interaction_status(&self) -> InteractionStatus {
+        if self.opened {
+            InteractionStatus::Finished
+        } else {
+            InteractionStatus::Open
+        }
     }
 
     fn set_interaction_status_to_finished(&mut self) {
-        todo!()
+        self.opened = true;
     }
 }
 
