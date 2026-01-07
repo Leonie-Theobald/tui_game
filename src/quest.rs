@@ -8,7 +8,6 @@ pub mod unwrap_packet;
 use crate::{
     item::{
         collected_item::{CollectableItem, CollectedItems},
-        reward_items::RewardItems,
         stationed_item::{StationaryItem, StationedItems},
     },
     method_on_inner_quest,

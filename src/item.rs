@@ -1,5 +1,4 @@
 pub mod collected_item;
-pub mod reward_items;
 pub mod stationed_item;
 
 pub trait Item {

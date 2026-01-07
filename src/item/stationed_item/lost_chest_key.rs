@@ -7,7 +7,6 @@ use crate::{
             interaction::{Interaction, InteractionStatus},
         },
     },
-    quest::{Quest, collect_chest_key::CollectChestKey},
     tui::{Drawable, Vector},
 };
 
@@ -17,14 +16,11 @@ const COORDINATES: Vector = Vector {
 };
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct LostChestKey {
-    linked_quest: Quest,
-}
+pub struct LostChestKey {}
 
 impl LostChestKey {
     pub fn initiate() -> Self {
-        let linked_quest = Quest::CollectChestKey(CollectChestKey);
-        Self { linked_quest }
+        Self {}
     }
 }
 
@@ -55,10 +51,6 @@ impl Stationary for LostChestKey {
         }
 
         blocked_coordinate
-    }
-
-    fn get_linked_quest(&self) -> &Quest {
-        &self.linked_quest
     }
 
     fn get_linked_interactions(&self) -> &Vec<Interaction> {

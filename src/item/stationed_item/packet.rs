@@ -6,7 +6,6 @@ use crate::{
             interaction::{Interaction, InteractionStatus, OpenPacket, ShakePacket, StompPacket},
         },
     },
-    quest::{Quest, unwrap_packet::UnwrapPacket},
     tui::{Drawable, Vector},
 };
 
@@ -18,13 +17,11 @@ const COORDINATES: Vector = Vector {
 #[derive(Clone, Debug, PartialEq)]
 pub struct Packet {
     opened: bool,
-    linked_quest: Quest,
     linked_interactions: Vec<Interaction>,
 }
 
 impl Packet {
     pub fn initiate() -> Self {
-        let linked_quest = Quest::UnwrapPacket(UnwrapPacket);
         let linked_interactions = vec![
             Interaction::OpenPacket(OpenPacket {}),
             Interaction::StompPacket(StompPacket {}),
@@ -33,7 +30,6 @@ impl Packet {
 
         Self {
             opened: false,
-            linked_quest,
             linked_interactions,
         }
     }
@@ -66,10 +62,6 @@ impl Stationary for Packet {
         }
 
         blocked_coordinate
-    }
-
-    fn get_linked_quest(&self) -> &Quest {
-        &self.linked_quest
     }
 
     fn get_linked_interactions(&self) -> &Vec<Interaction> {

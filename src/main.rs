@@ -1,7 +1,6 @@
 mod item;
 mod mission;
 mod player;
-mod quest;
 mod tui;
 
 use std::io::{Write, stdin, stdout};
@@ -38,11 +37,6 @@ fn main() {
 
             // overview of collected items
             Key::Char('e') => collected_items.show_all_in_popup(),
-
-            // interact with available stationed items
-            Key::Char('f') => {
-                stationed_items.select_and_solve_linked_quest(&grid, &player, &mut collected_items)
-            }
 
             // interact with available stationed items
             Key::Char('i') => {

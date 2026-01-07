@@ -6,7 +6,6 @@ use crate::{
             interaction::{BangDoor, BreakDownDoor, Interaction, InteractionStatus, UnlockWithKey},
         },
     },
-    quest::{Quest, open_door::OpenDoor},
     tui::{Drawable, Vector},
 };
 
@@ -17,7 +16,6 @@ const COORDINATES: Vector = Vector {
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct BlockedRoom {
-    linked_quest: Quest,
     linked_interactions: Vec<Interaction>,
     pub opened: bool,
     dimensions: Vector,
@@ -25,7 +23,6 @@ pub struct BlockedRoom {
 
 impl BlockedRoom {
     pub fn initiate() -> Self {
-        let linked_quest = Quest::OpenDoor(OpenDoor);
         let dimensions = Vector {
             horizontal: 29,
             vertical: 10,
@@ -37,7 +34,6 @@ impl BlockedRoom {
         ];
 
         Self {
-            linked_quest,
             linked_interactions,
             dimensions,
             opened: false,
@@ -77,10 +73,6 @@ impl Stationary for BlockedRoom {
         }
 
         blocked_coordinate
-    }
-
-    fn get_linked_quest(&self) -> &Quest {
-        &self.linked_quest
     }
 
     fn get_linked_interactions(&self) -> &Vec<Interaction> {
