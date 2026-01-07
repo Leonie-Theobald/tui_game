@@ -45,15 +45,18 @@ fn main() {
 
             // show missions
             Key::Char('m') => {
-                let chained_mission_descriptions = missions.iter().fold(
-                    String::new(),
-                    |mut chained_mission_descriptions, mission| {
-                        chained_mission_descriptions
-                            .push_str(&mission.get_inner().get_description());
-                        chained_mission_descriptions.push_str("\r\n");
-                        chained_mission_descriptions
-                    },
-                );
+                let chained_mission_descriptions = missions
+                    .iter()
+                    .filter(|mission| !mission.get_inner().is_finished())
+                    .fold(
+                        String::new(),
+                        |mut chained_mission_descriptions, mission| {
+                            chained_mission_descriptions
+                                .push_str(&mission.get_inner().get_description());
+                            chained_mission_descriptions.push_str("\r\n");
+                            chained_mission_descriptions
+                        },
+                    );
                 let info_prompt = InfoPopUp {
                     message: chained_mission_descriptions,
                 };

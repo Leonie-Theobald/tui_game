@@ -1,5 +1,5 @@
 use crate::item::{
-    collected_item::CollectedItems,
+    collected_item::{CollectableItem, CollectedItems, treasure_map::TreasureMap},
     stationed_item::{
         StationaryItem, StationedItems, blocked_room::BlockedRoom, lost_chest_key::LostChestKey,
         treasure_chest::TreasureChest,
@@ -43,6 +43,7 @@ impl Mission {
 
 pub trait IsMission {
     fn get_description(&self) -> String;
+    fn is_finished(&self) -> bool;
     fn set_to_finished(&mut self);
     fn check_prerequisites_fulfilled(
         &self,
@@ -62,6 +63,10 @@ pub struct UnlockRoom {
 impl IsMission for UnlockRoom {
     fn get_description(&self) -> String {
         String::from("Remove room blockage")
+    }
+
+    fn is_finished(&self) -> bool {
+        self.finished
     }
 
     fn set_to_finished(&mut self) {
@@ -95,29 +100,36 @@ impl IsMission for UnlockRoom {
     }
 }
 
-pub struct FindMap;
+pub struct FindMap {
+    pub finished: bool,
+}
 impl IsMission for FindMap {
     fn get_description(&self) -> String {
         String::from("Find the hidden map")
     }
 
+    fn is_finished(&self) -> bool {
+        self.finished
+    }
+
     fn set_to_finished(&mut self) {
-        todo!()
+        self.finished = true;
     }
 
     fn check_prerequisites_fulfilled(
         &self,
         collected_items: &CollectedItems,
-        stationary_items: &StationedItems,
+        _stationary_items: &StationedItems,
     ) -> bool {
-        false
+        collected_items
+            .list
+            .contains(&CollectableItem::TreasureMap(TreasureMap))
     }
 
     fn update_game(
         &self,
-        collected_items: &mut CollectedItems,
-        stationary_items: &mut StationedItems,
+        _collected_items: &mut CollectedItems,
+        _stationary_items: &mut StationedItems,
     ) {
-        todo!()
     }
 }
