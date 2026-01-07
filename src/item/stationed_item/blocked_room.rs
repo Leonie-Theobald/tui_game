@@ -19,7 +19,7 @@ const COORDINATES: Vector = Vector {
 pub struct BlockedRoom {
     linked_quest: Quest,
     linked_interactions: Vec<Interaction>,
-    opened: bool,
+    pub opened: bool,
     dimensions: Vector,
 }
 

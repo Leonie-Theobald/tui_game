@@ -1,4 +1,5 @@
 mod item;
+mod mission;
 mod player;
 mod quest;
 mod tui;
@@ -8,8 +9,9 @@ use termion::{event::Key, input::TermRead, raw::IntoRawMode};
 
 use crate::{
     item::{collected_item::CollectedItems, stationed_item::StationedItems},
+    mission::{FindMap, Mission, UnlockRoom},
     player::Player,
-    tui::{Orientation, game::draw_game, grid::Grid},
+    tui::{Orientation, game::draw_game, grid::Grid, pop_up::InfoPopUp},
 };
 
 fn main() {
@@ -18,6 +20,10 @@ fn main() {
     let mut player = Player::initiate();
     let mut collected_items = CollectedItems::initiate();
     let mut stationed_items = StationedItems::initiate();
+    let mut missions = vec![
+        Mission::UnlockRoom(UnlockRoom { finished: false }),
+        Mission::FindMap(FindMap),
+    ];
     draw_game(&grid, &player, &stationed_items);
 
     // start captioning single key inputs in raw mode (single presses instead of waiting for \n)
@@ -38,9 +44,26 @@ fn main() {
                 stationed_items.select_and_solve_linked_quest(&grid, &player, &mut collected_items)
             }
 
-            // test interaction with packet
+            // interact with available stationed items
             Key::Char('i') => {
                 stationed_items.interact(&player, &mut collected_items);
+            }
+
+            // show missions
+            Key::Char('m') => {
+                let chained_mission_descriptions = missions.iter().fold(
+                    String::new(),
+                    |mut chained_mission_descriptions, mission| {
+                        chained_mission_descriptions
+                            .push_str(&mission.get_inner().get_description());
+                        chained_mission_descriptions.push_str("\r\n");
+                        chained_mission_descriptions
+                    },
+                );
+                let info_prompt = InfoPopUp {
+                    message: chained_mission_descriptions,
+                };
+                info_prompt.show_to_user();
             }
 
             // leave game
@@ -50,6 +73,7 @@ fn main() {
             _ => continue,
         };
 
+        Mission::check_missions(&mut missions, &mut collected_items, &mut stationed_items);
         draw_game(&grid, &player, &stationed_items);
     }
 
