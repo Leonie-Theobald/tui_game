@@ -6,7 +6,7 @@ use crate::{
     method_on_inner_collected_item,
     mission::Mission,
     player::Player,
-    tui::grid::GRID_HEIGHT,
+    tui::grid::{GRID_HEIGHT, GRID_WIDTH},
 };
 
 pub fn draw_status_bar(
@@ -37,6 +37,17 @@ pub fn draw_status_bar(
     };
     let joined_mission_line = format!("{:2} {}", mission_count, mission_text);
 
+    // show exit game key binding
+    let exit_text = "Exit: <CTRL+C>";
+    let exit_text_line = format!(
+        "{}{}",
+        termion::cursor::Goto(
+            (GRID_WIDTH - exit_text.len()) as u16,
+            (GRID_HEIGHT + 2) as u16
+        ),
+        exit_text
+    );
+
     // display symbols of currently collected items
     let joined_collected_items =
         collected_items
@@ -50,11 +61,12 @@ pub fn draw_status_bar(
 
     // bring everything together
     format!(
-        "{} {} {} {} {}",
+        "{} {} {} {} {}{}",
         termion::cursor::Goto(1, (GRID_HEIGHT + 1) as u16),
         joined_collected_items,
         termion::cursor::Goto(1, (GRID_HEIGHT + 2) as u16),
         joined_interaction_line,
         joined_mission_line,
+        exit_text_line,
     )
 }
