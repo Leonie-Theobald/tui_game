@@ -3,6 +3,7 @@ use termion::raw::IntoRawMode;
 
 use crate::{
     item::{collected_item::CollectedItems, stationed_item::StationedItems},
+    mission::Mission,
     player::Player,
     tui::{Drawable, grid::Grid, status_bar},
 };
@@ -12,6 +13,7 @@ pub fn draw_game(
     player: &Player,
     collected_items: &CollectedItems,
     stationed_items: &StationedItems,
+    missions: &[Mission],
 ) {
     let mut stdout = stdout().into_raw_mode().unwrap();
     write!(
@@ -21,7 +23,7 @@ pub fn draw_game(
         grid.draw(),
         player.draw(),
         stationed_items.draw(),
-        status_bar::draw_status_bar(collected_items),
+        status_bar::draw_status_bar(stationed_items, collected_items, player, missions),
         termion::cursor::Hide
     )
     .unwrap();

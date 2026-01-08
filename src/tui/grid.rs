@@ -1,7 +1,7 @@
 use crate::tui::{Drawable, Orientation, TuiError, Vector};
 
 pub const GRID_WIDTH: usize = 80;
-pub const GRID_HEIGHT: usize = 23;
+pub const GRID_HEIGHT: usize = 22;
 
 #[derive(Clone, Debug)]
 pub struct Grid {
@@ -93,7 +93,6 @@ impl Grid {
 │         │                    │                             │                 │
 │         │                                                  │                 │
 │         │                                                  │                 │
-│         │                    │                             │                 │
 │         │                    │                             │                 │
 │         │                    │                             │                 │
 │         └────────────────────┴─────────────────────────────┘                 │

@@ -84,7 +84,7 @@ impl StationedItems {
         }
     }
 
-    pub fn accessible_stationary_item(
+    pub fn accessible_stationary_item_mut(
         &mut self,
         target_coordinates: &Vector,
     ) -> Option<&mut StationaryItem> {
@@ -102,10 +102,35 @@ impl StationedItems {
         None
     }
 
+    pub fn accessible_stationary_item(
+        &self,
+        target_coordinates: &Vector,
+    ) -> Option<&StationaryItem> {
+        // go through each item and check whether any of its covered coordinates is the one
+        // the player accesses right now
+        for stationed_item in &self.list {
+            if method_on_inner_stationed_item!(stationed_item, list_blocking_coordinates)
+                .contains(target_coordinates)
+            {
+                // this stationed item is also placed at the coordinates that the player can access
+                return Some(stationed_item);
+            }
+        }
+
+        None
+    }
+
+    pub fn count_possible_interactions(&self, target_coordinates: &Vector) -> usize {
+        match self.accessible_stationary_item(target_coordinates) {
+            None => 0,
+            Some(item) => method_on_inner_stationed_item!(item, get_linked_interactions).len(),
+        }
+    }
+
     pub fn interact(&mut self, player: &Player, collected_items: &mut CollectedItems) {
         // find accessible item
         let target_coordinates = player.get_facing_coordinates();
-        let mut accessible_item = match self.accessible_stationary_item(&target_coordinates) {
+        let mut accessible_item = match self.accessible_stationary_item_mut(&target_coordinates) {
             None => {
                 InfoPopUp {
                     message: String::from("No items available for interaction."),
