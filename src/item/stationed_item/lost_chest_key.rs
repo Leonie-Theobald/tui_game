@@ -1,10 +1,9 @@
 use crate::{
     item::{
         Item,
-        collected_item::CollectedItems,
         stationed_item::{
             Stationary,
-            interaction::{Interaction, InteractionStatus},
+            interaction::{Interaction, InteractionStatus, PickUpChestKey},
         },
     },
     tui::{Drawable, Vector},
@@ -16,11 +15,18 @@ const COORDINATES: Vector = Vector {
 };
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct LostChestKey {}
+pub struct LostChestKey {
+    found: bool,
+    linked_interactions: Vec<Interaction>,
+}
 
 impl LostChestKey {
     pub fn initiate() -> Self {
-        Self {}
+        let linked_interactions = vec![Interaction::PickUpChestKey(PickUpChestKey {})];
+        Self {
+            found: false,
+            linked_interactions,
+        }
     }
 }
 
@@ -54,25 +60,25 @@ impl Stationary for LostChestKey {
     }
 
     fn get_linked_interactions(&self) -> &Vec<Interaction> {
-        todo!()
-    }
-
-    fn interact(&mut self, _collected_items: &mut CollectedItems) {
-        todo!()
+        &self.linked_interactions
     }
 
     fn get_interaction_status(&self) -> InteractionStatus {
-        todo!()
+        if self.found {
+            InteractionStatus::Finished
+        } else {
+            InteractionStatus::Open
+        }
     }
 
     fn set_interaction_status_to_finished(&mut self) {
-        todo!()
+        self.found = true;
     }
 }
 
 impl Drawable for LostChestKey {
     fn draw(&self) -> String {
-        let symbol = "🗝️";
+        let symbol = if self.found { "X" } else { "🗝️" };
 
         format!(
             "{}{}",

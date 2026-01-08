@@ -3,7 +3,9 @@ use crate::{
         Item,
         stationed_item::{
             Stationary,
-            interaction::{BangDoor, BreakDownDoor, Interaction, InteractionStatus, UnlockWithKey},
+            interaction::{
+                BangDoor, BreakDownDoor, Interaction, InteractionStatus, UnlockDoorWithKey,
+            },
         },
     },
     tui::{Drawable, Vector},
@@ -30,7 +32,7 @@ impl BlockedRoom {
         let linked_interactions = vec![
             Interaction::BangDoor(BangDoor {}),
             Interaction::BreakDownDoor(BreakDownDoor {}),
-            Interaction::UnlockWithKey(UnlockWithKey {}),
+            Interaction::UnlockDoorWithKey(UnlockDoorWithKey {}),
         ];
 
         Self {

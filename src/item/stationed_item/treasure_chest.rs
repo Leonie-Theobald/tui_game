@@ -1,10 +1,9 @@
 use crate::{
     item::{
         Item,
-        collected_item::CollectedItems,
         stationed_item::{
             Stationary,
-            interaction::{Interaction, InteractionStatus},
+            interaction::{Interaction, InteractionStatus, UnlockTreasureChest},
         },
     },
     tui::{Drawable, Vector},
@@ -16,11 +15,19 @@ const COORDINATES: Vector = Vector {
 };
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct TreasureChest {}
+pub struct TreasureChest {
+    opened: bool,
+    linked_interactions: Vec<Interaction>,
+}
 
 impl TreasureChest {
     pub fn initiate() -> Self {
-        Self {}
+        let linked_interactions = vec![Interaction::UnlockTreasureChest(UnlockTreasureChest {})];
+
+        Self {
+            opened: false,
+            linked_interactions,
+        }
     }
 }
 
@@ -54,25 +61,25 @@ impl Stationary for TreasureChest {
     }
 
     fn get_linked_interactions(&self) -> &Vec<Interaction> {
-        todo!()
-    }
-
-    fn interact(&mut self, _collected_items: &mut CollectedItems) {
-        todo!()
+        &self.linked_interactions
     }
 
     fn get_interaction_status(&self) -> InteractionStatus {
-        todo!()
+        if self.opened {
+            InteractionStatus::Finished
+        } else {
+            InteractionStatus::Open
+        }
     }
 
     fn set_interaction_status_to_finished(&mut self) {
-        todo!()
+        self.opened = true;
     }
 }
 
 impl Drawable for TreasureChest {
     fn draw(&self) -> String {
-        let symbol = "🧳";
+        let symbol = if self.opened { "X" } else { "🧳" };
 
         format!(
             "{}{}",

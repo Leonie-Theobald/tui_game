@@ -21,7 +21,7 @@ fn main() {
     let mut stationed_items = StationedItems::initiate();
     let mut missions = vec![
         Mission::UnlockRoom(UnlockRoom { finished: false }),
-        Mission::FindMap(FindMap),
+        Mission::FindMap(FindMap { finished: false }),
     ];
     draw_game(&grid, &player, &stationed_items);
 

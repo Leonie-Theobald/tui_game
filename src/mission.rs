@@ -33,7 +33,9 @@ impl Mission {
     ) {
         for mission in missions {
             let inner_mission = mission.get_inner_mut();
-            if inner_mission.check_prerequisites_fulfilled(collected_items, stationed_items) {
+            if !inner_mission.is_finished()
+                && inner_mission.check_prerequisites_fulfilled(collected_items, stationed_items)
+            {
                 inner_mission.set_to_finished();
                 inner_mission.update_game(collected_items, stationed_items);
             }

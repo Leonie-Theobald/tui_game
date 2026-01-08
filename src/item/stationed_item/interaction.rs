@@ -1,5 +1,8 @@
 use crate::item::{
-    collected_item::{CollectableItem, CollectedItems, rusty_key::RustyKey},
+    collected_item::{
+        CollectableItem, CollectedItems, candle::Candle, chest_key::ChestKey, rusty_key::RustyKey,
+        treasure_map::TreasureMap,
+    },
     stationed_item::Stationary,
 };
 
@@ -25,7 +28,9 @@ pub enum Interaction {
     ShakePacket(ShakePacket),
     BangDoor(BangDoor),
     BreakDownDoor(BreakDownDoor),
-    UnlockWithKey(UnlockWithKey),
+    UnlockDoorWithKey(UnlockDoorWithKey),
+    PickUpChestKey(PickUpChestKey),
+    UnlockTreasureChest(UnlockTreasureChest),
 }
 
 impl std::fmt::Display for Interaction {
@@ -42,7 +47,9 @@ impl Interaction {
             Interaction::ShakePacket(shake_packet) => shake_packet,
             Interaction::BangDoor(bang_door) => bang_door,
             Interaction::BreakDownDoor(break_down_door) => break_down_door,
-            Interaction::UnlockWithKey(unlock_with_key) => unlock_with_key,
+            Interaction::UnlockDoorWithKey(unlock_door_with_key) => unlock_door_with_key,
+            Interaction::PickUpChestKey(pick_up_chest_key) => pick_up_chest_key,
+            Interaction::UnlockTreasureChest(unlock_treasure_chest) => unlock_treasure_chest,
         }
     }
 }
@@ -140,8 +147,8 @@ impl Interactable for BreakDownDoor {
 }
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct UnlockWithKey;
-impl Interactable for UnlockWithKey {
+pub struct UnlockDoorWithKey;
+impl Interactable for UnlockDoorWithKey {
     fn get_prompt(&self) -> String {
         String::from("Use key to open door")
     }
@@ -165,6 +172,71 @@ impl Interactable for UnlockWithKey {
             .position(|available_item| *available_item == CollectableItem::RustyKey(RustyKey))
             .expect("Checked before that item is available");
         collected_items.list.remove(index);
+
+        // finish interaction status
+        linked_stationary_item.set_interaction_status_to_finished();
+
+        String::from("This was the correct key to use.")
+    }
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub struct PickUpChestKey;
+impl Interactable for PickUpChestKey {
+    fn get_prompt(&self) -> String {
+        String::from("Take the lost key")
+    }
+
+    fn interact(
+        &self,
+        linked_stationary_item: &mut dyn Stationary,
+        collected_items: &mut CollectedItems,
+    ) -> String {
+        match linked_stationary_item.get_interaction_status() {
+            InteractionStatus::Open => {
+                collected_items
+                    .list
+                    .push(CollectableItem::ChestKey(ChestKey));
+                linked_stationary_item.set_interaction_status_to_finished();
+                String::from("Hurray! You found something.")
+            }
+            InteractionStatus::Finished => String::from("Nothing there"),
+        }
+    }
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub struct UnlockTreasureChest;
+impl Interactable for UnlockTreasureChest {
+    fn get_prompt(&self) -> String {
+        String::from("Use key to open chest")
+    }
+
+    fn interact(
+        &self,
+        linked_stationary_item: &mut dyn Stationary,
+        collected_items: &mut CollectedItems,
+    ) -> String {
+        if !collected_items
+            .list
+            .contains(&CollectableItem::ChestKey(ChestKey))
+        {
+            return String::from("You have no key to open the treasure chest.");
+        }
+
+        // remove key
+        let index = collected_items
+            .list
+            .iter()
+            .position(|available_item| *available_item == CollectableItem::ChestKey(ChestKey))
+            .expect("Checked before that item is available");
+        collected_items.list.remove(index);
+
+        // add collectable items
+        collected_items.list.push(CollectableItem::Candle(Candle));
+        collected_items
+            .list
+            .push(CollectableItem::TreasureMap(TreasureMap));
 
         // finish interaction status
         linked_stationary_item.set_interaction_status_to_finished();
