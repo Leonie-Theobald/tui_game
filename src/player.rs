@@ -1,16 +1,16 @@
 #[cfg(test)]
 mod tests;
 
-use std::fmt::Debug;
-use termion::color;
-
 use crate::{
     item::stationed_item::{Stationary, StationaryItem, StationedItems},
     method_on_inner_stationed_item,
     tui::{Drawable, Orientation, Vector, grid::Grid},
 };
+use serde::{Deserialize, Serialize};
+use std::fmt::Debug;
+use termion::color;
 
-#[derive(Clone, Debug, Default, PartialEq)]
+#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
 pub struct Player {
     pub coordinates: Vector,
     pub orientation: Orientation,

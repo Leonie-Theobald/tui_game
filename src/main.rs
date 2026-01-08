@@ -1,6 +1,7 @@
 mod item;
 mod mission;
 mod player;
+mod quick_save;
 mod tui;
 
 use std::io::{Write, stdin, stdout};
@@ -10,6 +11,7 @@ use crate::{
     item::{collected_item::CollectedItems, stationed_item::StationedItems},
     mission::Mission,
     player::Player,
+    quick_save::QuickSave,
     tui::{Orientation, game::draw_game, grid::Grid, pop_up::InfoPopUp},
 };
 
@@ -67,7 +69,16 @@ fn main() {
             }
 
             // leave game
-            Key::Ctrl('c') => break,
+            Key::Ctrl('c') => {
+                QuickSave::from_current_game_state(
+                    player,
+                    collected_items,
+                    stationed_items,
+                    missions,
+                )
+                .save_to_file();
+                break;
+            }
 
             // ignore everything else
             _ => continue,

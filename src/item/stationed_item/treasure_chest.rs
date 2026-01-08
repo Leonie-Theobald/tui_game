@@ -8,13 +8,14 @@ use crate::{
     },
     tui::{Drawable, Vector},
 };
+use serde::{Deserialize, Serialize};
 
 const COORDINATES: Vector = Vector {
     horizontal: 45,
     vertical: 16,
 };
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct TreasureChest {
     opened: bool,
     linked_interactions: Vec<Interaction>,

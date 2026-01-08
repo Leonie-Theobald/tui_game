@@ -1,11 +1,14 @@
 mod find_map;
 mod unlock_room;
 
+use serde::{Deserialize, Serialize};
+
 use crate::{
     item::{collected_item::CollectedItems, stationed_item::StationedItems},
     mission::{find_map::FindMap, unlock_room::UnlockRoom},
 };
 
+#[derive(Serialize, Deserialize)]
 pub enum Mission {
     UnlockRoom(UnlockRoom),
     FindMap(FindMap),

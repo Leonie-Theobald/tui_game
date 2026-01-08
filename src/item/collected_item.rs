@@ -3,6 +3,8 @@ pub mod chest_key;
 pub mod rusty_key;
 pub mod treasure_map;
 
+use serde::{Deserialize, Serialize};
+
 use crate::{
     item::{
         Item,
@@ -13,7 +15,7 @@ use crate::{
     tui::pop_up::PopUp,
 };
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct CollectedItems {
     pub list: Vec<CollectableItem>,
 }
@@ -36,7 +38,7 @@ impl CollectedItems {
     }
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub enum CollectableItem {
     RustyKey(RustyKey),
     Candle(Candle),

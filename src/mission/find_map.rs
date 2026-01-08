@@ -1,3 +1,5 @@
+use serde::{Deserialize, Serialize};
+
 use crate::{
     item::{
         collected_item::{CollectableItem, CollectedItems, treasure_map::TreasureMap},
@@ -6,6 +8,7 @@ use crate::{
     mission::IsMission,
 };
 
+#[derive(Serialize, Deserialize)]
 pub struct FindMap {
     pub finished: bool,
 }

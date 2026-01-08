@@ -5,6 +5,7 @@ use crate::item::{
     },
     stationed_item::Stationary,
 };
+use serde::{Deserialize, Serialize};
 
 pub enum InteractionStatus {
     Open,
@@ -21,7 +22,7 @@ pub trait Interactable {
     ) -> String;
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub enum Interaction {
     OpenPacket(OpenPacket),
     StompPacket(StompPacket),
@@ -54,7 +55,7 @@ impl Interaction {
     }
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct OpenPacket;
 impl Interactable for OpenPacket {
     fn get_prompt(&self) -> String {
@@ -79,7 +80,7 @@ impl Interactable for OpenPacket {
     }
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct StompPacket;
 impl Interactable for StompPacket {
     fn get_prompt(&self) -> String {
@@ -95,7 +96,7 @@ impl Interactable for StompPacket {
     }
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct ShakePacket;
 impl Interactable for ShakePacket {
     fn get_prompt(&self) -> String {
@@ -114,7 +115,7 @@ impl Interactable for ShakePacket {
     }
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct BangDoor;
 impl Interactable for BangDoor {
     fn get_prompt(&self) -> String {
@@ -130,7 +131,7 @@ impl Interactable for BangDoor {
     }
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct BreakDownDoor;
 impl Interactable for BreakDownDoor {
     fn get_prompt(&self) -> String {
@@ -146,7 +147,7 @@ impl Interactable for BreakDownDoor {
     }
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct UnlockDoorWithKey;
 impl Interactable for UnlockDoorWithKey {
     fn get_prompt(&self) -> String {
@@ -180,7 +181,7 @@ impl Interactable for UnlockDoorWithKey {
     }
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct PickUpChestKey;
 impl Interactable for PickUpChestKey {
     fn get_prompt(&self) -> String {
@@ -205,7 +206,7 @@ impl Interactable for PickUpChestKey {
     }
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct UnlockTreasureChest;
 impl Interactable for UnlockTreasureChest {
     fn get_prompt(&self) -> String {

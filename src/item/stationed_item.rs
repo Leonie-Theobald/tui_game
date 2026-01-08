@@ -6,6 +6,7 @@ pub mod treasure_chest;
 
 use std::io::{Write, stdout};
 
+use serde::{Deserialize, Serialize};
 use termion::raw::IntoRawMode;
 
 use crate::{
@@ -69,7 +70,7 @@ macro_rules! mut_method_on_inner_stationed_item {
     };
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct StationedItems {
     pub list: Vec<StationaryItem>,
 }
@@ -196,7 +197,7 @@ pub trait Stationary {
     fn set_interaction_status_to_finished(&mut self);
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub enum StationaryItem {
     Packet(Packet),
     TreasureChest(TreasureChest),

@@ -1,3 +1,5 @@
+use serde::{Deserialize, Serialize};
+
 use crate::{
     item::{
         collected_item::CollectedItems,
@@ -9,6 +11,7 @@ use crate::{
     mission::IsMission,
 };
 
+#[derive(Serialize, Deserialize)]
 pub struct UnlockRoom {
     pub finished: bool,
 }

@@ -1,3 +1,5 @@
+use serde::{Deserialize, Serialize};
+
 use crate::{
     item::{
         Item,
@@ -16,7 +18,7 @@ const COORDINATES: Vector = Vector {
     vertical: 12,
 };
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct BlockedRoom {
     linked_interactions: Vec<Interaction>,
     pub opened: bool,
