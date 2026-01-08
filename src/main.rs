@@ -20,7 +20,7 @@ fn main() {
     let mut collected_items = CollectedItems::initiate();
     let mut stationed_items = StationedItems::initiate();
     let mut missions = Mission::initiate();
-    draw_game(&grid, &player, &stationed_items);
+    draw_game(&grid, &player, &collected_items, &stationed_items);
 
     // start captioning single key inputs in raw mode (single presses instead of waiting for \n)
     let mut stdout = stdout().into_raw_mode().unwrap();
@@ -68,7 +68,7 @@ fn main() {
         };
 
         Mission::check_missions(&mut missions, &mut collected_items, &mut stationed_items);
-        draw_game(&grid, &player, &stationed_items);
+        draw_game(&grid, &player, &collected_items, &stationed_items);
     }
 
     // clean up terminal and go back to normal mode

@@ -27,7 +27,7 @@ impl BlockedRoom {
     pub fn initiate() -> Self {
         let dimensions = Vector {
             horizontal: 29,
-            vertical: 10,
+            vertical: 9,
         };
         let linked_interactions = vec![
             Interaction::BangDoor(BangDoor {}),

@@ -1,4 +1,4 @@
-use crate::item::Item;
+use crate::item::{Item, collected_item::Collectable};
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct RustyKey;
@@ -10,5 +10,11 @@ impl Item for RustyKey {
 
     fn get_description(&self) -> &'static str {
         "An old, rusty key with a mysterious engraving."
+    }
+}
+
+impl Collectable for RustyKey {
+    fn get_symbol(&self) -> String {
+        String::from("🔑")
     }
 }

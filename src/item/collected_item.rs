@@ -44,6 +44,7 @@ pub enum CollectableItem {
     ChestKey(ChestKey),
 }
 
+#[macro_export]
 macro_rules! method_on_inner_collected_item {
     ($value:expr, $method:ident) => {
         match $value {
@@ -62,4 +63,8 @@ impl std::fmt::Display for CollectableItem {
 
         writeln!(f, "{} - {}", name, description)
     }
+}
+
+pub trait Collectable: Item {
+    fn get_symbol(&self) -> String;
 }
