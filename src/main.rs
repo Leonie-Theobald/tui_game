@@ -12,16 +12,32 @@ use crate::{
     mission::Mission,
     player::Player,
     quick_save::QuickSave,
-    tui::{Orientation, game::draw_game, grid::Grid, pop_up::InfoPopUp},
+    tui::{
+        Orientation,
+        game::draw_game,
+        grid::Grid,
+        pop_up::{InfoPopUp, PopUp},
+    },
 };
 
 fn main() {
-    // initialize
+    // restore or initialize new game
+    let loading_game_prompt = PopUp {
+        options: vec!["Load existing game", "Start new game"],
+    };
+    let (mut player, mut collected_items, mut stationed_items, mut missions) = {
+        match loading_game_prompt.get_user_selection() {
+            Ok("Load existing game") => QuickSave::load_from_file().disassemble_to_game_state(),
+            // for new game or aborted selection
+            _ => (
+                Player::initiate(),
+                CollectedItems::initiate(),
+                StationedItems::initiate(),
+                Mission::initiate(),
+            ),
+        }
+    };
     let grid = Grid::initiate();
-    let mut player = Player::initiate();
-    let mut collected_items = CollectedItems::initiate();
-    let mut stationed_items = StationedItems::initiate();
-    let mut missions = Mission::initiate();
     draw_game(
         &grid,
         &player,
