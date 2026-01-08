@@ -8,7 +8,7 @@ use termion::{event::Key, input::TermRead, raw::IntoRawMode};
 
 use crate::{
     item::{collected_item::CollectedItems, stationed_item::StationedItems},
-    mission::{FindMap, Mission, UnlockRoom},
+    mission::Mission,
     player::Player,
     tui::{Orientation, game::draw_game, grid::Grid, pop_up::InfoPopUp},
 };
@@ -19,10 +19,7 @@ fn main() {
     let mut player = Player::initiate();
     let mut collected_items = CollectedItems::initiate();
     let mut stationed_items = StationedItems::initiate();
-    let mut missions = vec![
-        Mission::UnlockRoom(UnlockRoom { finished: false }),
-        Mission::FindMap(FindMap { finished: false }),
-    ];
+    let mut missions = Mission::initiate();
     draw_game(&grid, &player, &stationed_items);
 
     // start captioning single key inputs in raw mode (single presses instead of waiting for \n)
