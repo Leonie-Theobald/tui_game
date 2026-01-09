@@ -40,6 +40,10 @@ impl Item for TreasureChest {
     fn get_description(&self) -> &'static str {
         "Open this treasure chest with a key."
     }
+
+    fn get_detail_view(&self) -> String {
+        todo!()
+    }
 }
 
 impl Stationary for TreasureChest {

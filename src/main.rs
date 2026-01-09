@@ -1,3 +1,4 @@
+mod inspection;
 mod item;
 mod mission;
 mod player;
@@ -8,7 +9,11 @@ use std::io::{Write, stdin, stdout};
 use termion::{event::Key, input::TermRead, raw::IntoRawMode};
 
 use crate::{
-    item::{collected_item::CollectedItems, stationed_item::StationedItems},
+    item::{
+        Item,
+        collected_item::CollectedItems,
+        stationed_item::{StationedItems, packet::Packet},
+    },
     mission::Mission,
     player::Player,
     quick_save::QuickSave,
@@ -82,6 +87,12 @@ fn main() {
                     message: chained_mission_descriptions,
                 };
                 info_prompt.show_to_user();
+            }
+
+            // test inspection view of packet
+            Key::Char('l') => {
+                let inspection = Packet::initiate().get_inspection();
+                inspection.start_inspection();
             }
 
             // leave game

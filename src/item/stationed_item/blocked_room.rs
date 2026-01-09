@@ -53,6 +53,10 @@ impl Item for BlockedRoom {
     fn get_description(&self) -> &'static str {
         "This door is locked. Try again with a key."
     }
+
+    fn get_detail_view(&self) -> String {
+        todo!()
+    }
 }
 
 impl Stationary for BlockedRoom {

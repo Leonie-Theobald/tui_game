@@ -40,6 +40,10 @@ impl Item for LostChestKey {
     fn get_description(&self) -> &'static str {
         "Somebody lost this key. It belongs to a treasure chest"
     }
+
+    fn get_detail_view(&self) -> String {
+        todo!()
+    }
 }
 
 impl Stationary for LostChestKey {

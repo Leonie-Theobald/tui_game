@@ -12,6 +12,10 @@ impl Item for TreasureMap {
     fn get_description(&self) -> &'static str {
         "An illegible map with several red X on it."
     }
+
+    fn get_detail_view(&self) -> String {
+        todo!()
+    }
 }
 
 impl Collectable for TreasureMap {

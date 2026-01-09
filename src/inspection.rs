@@ -1,0 +1,53 @@
+use std::io::{Write, stdin, stdout};
+
+use termion::{event::Key, input::TermRead, raw::IntoRawMode};
+
+use crate::tui::grid::GRID_HEIGHT;
+
+pub struct Inspection {
+    pub name: String,
+    pub description: String,
+    pub detail_view: String,
+}
+
+impl Inspection {
+    fn get_tui_compatible_detailed_view(&self) -> String {
+        self.detail_view.replace('\n', "\r\n")
+    }
+
+    pub fn start_inspection(&self) {
+        let title_line = format!(
+            "{}{} - {}",
+            termion::cursor::Goto(1, 1),
+            self.name,
+            self.description
+        );
+
+        let key_binding_info_line = format!(
+            "{}<b>ack",
+            termion::cursor::Goto(1, (GRID_HEIGHT + 2) as u16)
+        );
+
+        // draw the inspection view on screen
+        let mut stdout = stdout().into_raw_mode().unwrap();
+        write!(
+            stdout,
+            "{}{}{}{}{}",
+            termion::clear::All,
+            title_line,
+            self.get_tui_compatible_detailed_view(),
+            key_binding_info_line,
+            termion::cursor::Hide
+        )
+        .unwrap();
+        stdout.flush().unwrap();
+
+        // wait for key press to return
+        for k in stdin().keys() {
+            match k.as_ref().unwrap() {
+                Key::Char('b') => return,
+                _ => continue,
+            }
+        }
+    }
+}

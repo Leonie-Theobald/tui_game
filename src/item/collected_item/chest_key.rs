@@ -12,6 +12,10 @@ impl Item for ChestKey {
     fn get_description(&self) -> &'static str {
         "This key belongs to a treasure chest."
     }
+
+    fn get_detail_view(&self) -> String {
+        todo!()
+    }
 }
 
 impl Collectable for ChestKey {

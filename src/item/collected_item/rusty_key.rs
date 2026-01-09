@@ -12,6 +12,10 @@ impl Item for RustyKey {
     fn get_description(&self) -> &'static str {
         "An old, rusty key with a mysterious engraving."
     }
+
+    fn get_detail_view(&self) -> String {
+        todo!()
+    }
 }
 
 impl Collectable for RustyKey {

@@ -45,6 +45,29 @@ impl Item for Packet {
     fn get_description(&self) -> &'static str {
         "A small packet wrapped in paper lying on the ground. Take a look inside!"
     }
+
+    fn get_detail_view(&self) -> String {
+        String::from(
+            "
+
+
+
+
+                      ____________________________
+                     /___________________________/|
+                    /___________________________/ |
+                   |                           |  |
+                   |       SEALED PACKAGE      |  |
+                   |                           |  |
+                   |        ███████████        |  |
+                   |        █  PACKET █        |  |
+                   |        ███████████        |  |
+                   |                           |  |
+                   |      HANDLE WITH CARE     |  /
+                   |                           | /
+                   |___________________________|/",
+        )
+    }
 }
 
 impl Stationary for Packet {
