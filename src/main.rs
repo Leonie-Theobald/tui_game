@@ -9,11 +9,7 @@ use std::io::{Write, stdin, stdout};
 use termion::{event::Key, input::TermRead, raw::IntoRawMode};
 
 use crate::{
-    item::{
-        Item,
-        collected_item::CollectedItems,
-        stationed_item::{StationedItems, packet::Packet},
-    },
+    item::{Item, collected_item::CollectedItems, stationed_item::StationedItems},
     mission::Mission,
     player::Player,
     quick_save::QuickSave,
@@ -91,7 +87,7 @@ fn main() {
 
             // test inspection view of packet
             Key::Char('l') => {
-                let inspection = Packet::initiate().get_inspection();
+                let inspection = item::collected_item::rusty_key::RustyKey.get_inspection();
 
                 inspection.start_inspection();
             }
