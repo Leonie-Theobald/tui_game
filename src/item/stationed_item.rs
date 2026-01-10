@@ -11,6 +11,7 @@ use termion::raw::IntoRawMode;
 
 use crate::{
     item::{
+        Item,
         collected_item::CollectedItems,
         stationed_item::{
             blocked_room::BlockedRoom,
@@ -124,7 +125,8 @@ impl StationedItems {
     pub fn count_possible_interactions(&self, target_coordinates: &Vector) -> usize {
         match self.accessible_stationary_item(target_coordinates) {
             None => 0,
-            Some(item) => method_on_inner_stationed_item!(item, get_linked_interactions).len(),
+            // +1 because each stationary item has an inspect interaction by default
+            Some(item) => method_on_inner_stationed_item!(item, get_linked_interactions).len() + 1,
         }
     }
 
@@ -159,20 +161,28 @@ impl StationedItems {
     }
 }
 
-pub trait Stationary {
+pub trait Stationary: Item {
     fn list_blocking_coordinates(&self) -> Vec<Vector>;
     fn get_linked_interactions(&self) -> &Vec<Interaction>;
     fn interact(&mut self, collected_items: &mut CollectedItems)
     where
         Self: std::marker::Sized,
     {
-        let prompts = self
+        let mut prompts = self
             .get_linked_interactions()
             .iter()
             .map(|interaction| interaction.get_inner().get_prompt())
-            .collect();
+            .collect::<Vec<_>>();
+        prompts.push(String::from("Inspect closer"));
+
         let pop_up = PopUp { options: prompts };
         let selected_interaction = match pop_up.get_user_selection() {
+            Ok(selected_prompt) if selected_prompt == "Inspect closer" => {
+                let inspection = self.get_inspection();
+                inspection.start_inspection();
+                self.interact(collected_items);
+                return;
+            }
             Ok(selected_prompt) => self
                 .get_linked_interactions()
                 .clone()
