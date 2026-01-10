@@ -92,6 +92,7 @@ fn main() {
             // test inspection view of packet
             Key::Char('l') => {
                 let inspection = Packet::initiate().get_inspection();
+
                 inspection.start_inspection();
             }
 
