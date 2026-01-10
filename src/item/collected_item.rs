@@ -15,6 +15,18 @@ use crate::{
     tui::pop_up::PopUp,
 };
 
+#[macro_export]
+macro_rules! method_on_inner_collected_item {
+    ($value:expr, $method:ident) => {
+        match $value {
+            CollectableItem::RustyKey(inner) => inner.$method(),
+            CollectableItem::Candle(inner) => inner.$method(),
+            CollectableItem::TreasureMap(inner) => inner.$method(),
+            CollectableItem::ChestKey(inner) => inner.$method(),
+        }
+    };
+}
+
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct CollectedItems {
     pub list: Vec<CollectableItem>,
@@ -29,12 +41,11 @@ impl CollectedItems {
         let popup_collected_item = PopUp {
             options: self.list.clone(),
         };
-        #[expect(
-            unused_must_use,
-            reason = "We don't need user's selection here. 
-                    It is just the API to present the items to the user."
-        )]
-        popup_collected_item.get_user_selection();
+        if let Ok(selected_item) = popup_collected_item.get_user_selection() {
+            let inspection = method_on_inner_collected_item!(selected_item, get_inspection);
+            inspection.start_inspection();
+            self.show_all_in_popup();
+        }
     }
 }
 
@@ -44,18 +55,6 @@ pub enum CollectableItem {
     Candle(Candle),
     TreasureMap(TreasureMap),
     ChestKey(ChestKey),
-}
-
-#[macro_export]
-macro_rules! method_on_inner_collected_item {
-    ($value:expr, $method:ident) => {
-        match $value {
-            CollectableItem::RustyKey(inner) => inner.$method(),
-            CollectableItem::Candle(inner) => inner.$method(),
-            CollectableItem::TreasureMap(inner) => inner.$method(),
-            CollectableItem::ChestKey(inner) => inner.$method(),
-        }
-    };
 }
 
 impl std::fmt::Display for CollectableItem {
