@@ -25,6 +25,11 @@ pub fn draw_status_bar(
     };
     let joined_interaction_line = format!("{:2} {}", interaction_count, interaction_text);
 
+    // show how many collected items are available
+    let collected_items_count = collected_items.list.len();
+    let collection_text = String::from("<c>ollected ");
+    let joined_collection_line = format!("{:2} {}", collected_items_count, collection_text);
+
     // show how many missions are open
     let mission_count = missions
         .iter()
@@ -38,7 +43,7 @@ pub fn draw_status_bar(
     let joined_mission_line = format!("{:2} {}", mission_count, mission_text);
 
     // show exit game key binding
-    let exit_text = "Exit: <CTRL+C>";
+    let exit_text = "Exit: <ESC>";
     let exit_text_line = format!(
         "{}{}",
         termion::cursor::Goto(
@@ -61,12 +66,13 @@ pub fn draw_status_bar(
 
     // bring everything together
     format!(
-        "{} {} {} {} {}{}",
+        "{} {} {} {} {} {}{}",
         termion::cursor::Goto(1, (GRID_HEIGHT + 1) as u16),
         joined_collected_items,
         termion::cursor::Goto(1, (GRID_HEIGHT + 2) as u16),
         joined_interaction_line,
         joined_mission_line,
+        joined_collection_line,
         exit_text_line,
     )
 }

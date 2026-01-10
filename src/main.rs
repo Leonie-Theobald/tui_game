@@ -58,7 +58,7 @@ fn main() {
             Key::Char('s') => player.move_in_direction(&grid, &stationed_items, Orientation::South),
 
             // overview of collected items
-            Key::Char('e') => collected_items.show_all_in_popup(),
+            Key::Char('c') => collected_items.show_all_in_popup(),
 
             // interact with available stationed items
             Key::Char('i') => {
@@ -93,7 +93,7 @@ fn main() {
             }
 
             // leave game
-            Key::Ctrl('c') => {
+            Key::Esc => {
                 QuickSave::from_current_game_state(
                     player,
                     collected_items,
