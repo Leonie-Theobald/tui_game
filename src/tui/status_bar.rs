@@ -19,9 +19,9 @@ pub fn draw_status_bar(
     let target_coordinates = player.get_facing_coordinates();
     let interaction_count = stationed_items.count_possible_interactions(&target_coordinates);
     let interaction_text = if interaction_count == 1 {
-        String::from("<i>nteraction ")
+        String::from("int<e>raction ")
     } else {
-        String::from("<i>nteractions")
+        String::from("int<e>ractions")
     };
     let joined_interaction_line = format!("{:2} {}", interaction_count, interaction_text);
 

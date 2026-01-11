@@ -55,7 +55,7 @@ fn main() {
             Key::Char('c') => collected_items.show_all_in_popup(),
 
             // interact with available stationed items
-            Key::Char('i') => {
+            Key::Char('e') => {
                 stationed_items.interact(&player, &mut collected_items);
             }
 
