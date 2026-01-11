@@ -9,16 +9,11 @@ use std::io::{Write, stdin, stdout};
 use termion::{event::Key, input::TermRead, raw::IntoRawMode};
 
 use crate::{
-    item::{Item, collected_item::CollectedItems, stationed_item::StationedItems},
+    item::{collected_item::CollectedItems, stationed_item::StationedItems},
     player::Player,
     quest::Quest,
     quick_save::QuickSave,
-    tui::{
-        Orientation,
-        game::draw_game,
-        grid::Grid,
-        pop_up::{InfoPopUp, PopUp},
-    },
+    tui::{Orientation, game::draw_game, grid::Grid, pop_up::PopUp},
 };
 
 fn main() {
@@ -60,27 +55,7 @@ fn main() {
             }
 
             // show quests
-            Key::Char('q') => {
-                let chained_quest_descriptions = quests
-                    .iter()
-                    .filter(|quest| !quest.get_inner().is_finished())
-                    .fold(String::new(), |mut chained_quest_descriptions, quest| {
-                        chained_quest_descriptions.push_str(&quest.get_inner().get_description());
-                        chained_quest_descriptions.push_str("\r\n");
-                        chained_quest_descriptions
-                    });
-                let info_prompt = InfoPopUp {
-                    message: chained_quest_descriptions,
-                };
-                info_prompt.show_to_user();
-            }
-
-            // test inspection view of packet
-            Key::Char('l') => {
-                let inspection = item::collected_item::rusty_key::RustyKey.get_inspection();
-
-                inspection.start_inspection();
-            }
+            Key::Char('q') => Quest::show_open_quests(&quests),
 
             // leave game
             Key::Esc => {

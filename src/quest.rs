@@ -6,6 +6,7 @@ use serde::{Deserialize, Serialize};
 use crate::{
     item::{collected_item::CollectedItems, stationed_item::StationedItems},
     quest::{find_map::FindMap, unlock_room::UnlockRoom},
+    tui::pop_up::InfoPopUp,
 };
 
 #[derive(Serialize, Deserialize)]
@@ -33,6 +34,21 @@ impl Quest {
             Quest::UnlockRoom(unlock_room) => unlock_room,
             Quest::FindMap(find_map) => find_map,
         }
+    }
+
+    pub fn show_open_quests(quests: &[Quest]) {
+        let chained_quest_descriptions = quests
+            .iter()
+            .filter(|quest| !quest.get_inner().is_finished())
+            .fold(String::new(), |mut chained_quest_descriptions, quest| {
+                chained_quest_descriptions.push_str(&quest.get_inner().get_description());
+                chained_quest_descriptions.push_str("\r\n");
+                chained_quest_descriptions
+            });
+        let info_prompt = InfoPopUp {
+            message: chained_quest_descriptions,
+        };
+        info_prompt.show_to_user();
     }
 
     pub fn check_quests(
