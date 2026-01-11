@@ -1,4 +1,3 @@
-pub mod game;
 pub mod grid;
 pub mod pop_up;
 pub mod status_bar;

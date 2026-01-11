@@ -1,3 +1,4 @@
+mod game;
 mod inspection;
 mod item;
 mod player;
@@ -9,30 +10,14 @@ use std::io::{Write, stdin, stdout};
 use termion::{event::Key, input::TermRead, raw::IntoRawMode};
 
 use crate::{
-    item::{collected_item::CollectedItems, stationed_item::StationedItems},
-    player::Player,
+    game::{draw_game, save_and_leave_game, start_game},
     quest::Quest,
-    quick_save::QuickSave,
-    tui::{Orientation, game::draw_game, grid::Grid, pop_up::PopUp},
+    tui::{Orientation, grid::Grid},
 };
 
 fn main() {
     // restore or initialize new game
-    let loading_game_prompt = PopUp {
-        options: vec!["Load existing game", "Start new game"],
-    };
-    let (mut player, mut collected_items, mut stationed_items, mut quests) = {
-        match loading_game_prompt.get_user_selection() {
-            Ok("Load existing game") => QuickSave::load_from_file().disassemble_to_game_state(),
-            // for new game or aborted selection
-            _ => (
-                Player::initiate(),
-                CollectedItems::initiate(),
-                StationedItems::initiate(),
-                Quest::initiate(),
-            ),
-        }
-    };
+    let (mut player, mut collected_items, mut stationed_items, mut quests) = start_game();
     let grid = Grid::initiate();
     draw_game(&grid, &player, &collected_items, &stationed_items, &quests);
 
@@ -59,13 +44,7 @@ fn main() {
 
             // leave game
             Key::Esc => {
-                QuickSave::from_current_game_state(
-                    player,
-                    collected_items,
-                    stationed_items,
-                    quests,
-                )
-                .save_to_file();
+                save_and_leave_game(player, collected_items, stationed_items, quests);
                 break;
             }
 
