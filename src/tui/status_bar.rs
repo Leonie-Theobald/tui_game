@@ -4,8 +4,8 @@ use crate::{
         stationed_item::StationedItems,
     },
     method_on_inner_collected_item,
-    mission::Mission,
     player::Player,
+    quest::Quest,
     tui::grid::{GRID_HEIGHT, GRID_WIDTH},
 };
 
@@ -13,7 +13,7 @@ pub fn draw_status_bar(
     stationed_items: &StationedItems,
     collected_items: &CollectedItems,
     player: &Player,
-    missions: &[Mission],
+    quests: &[Quest],
 ) -> String {
     // show how many interactions are possible
     let target_coordinates = player.get_facing_coordinates();
@@ -30,17 +30,17 @@ pub fn draw_status_bar(
     let collection_text = String::from("<c>ollected ");
     let joined_collection_line = format!("{:2} {}", collected_items_count, collection_text);
 
-    // show how many missions are open
-    let mission_count = missions
+    // show how many quests are open
+    let quest_count = quests
         .iter()
-        .filter(|mission| !mission.get_inner().is_finished())
+        .filter(|quest| !quest.get_inner().is_finished())
         .count();
-    let mission_text = if mission_count == 1 {
-        String::from("<m>ission ")
+    let quest_text = if quest_count == 1 {
+        String::from("<q>uest ")
     } else {
-        String::from("<m>issions")
+        String::from("<q>uests")
     };
-    let joined_mission_line = format!("{:2} {}", mission_count, mission_text);
+    let joined_quest_line = format!("{:2} {}", quest_count, quest_text);
 
     // show exit game key binding
     let exit_text = "Exit: <ESC>";
@@ -71,7 +71,7 @@ pub fn draw_status_bar(
         joined_collected_items,
         termion::cursor::Goto(1, (GRID_HEIGHT + 2) as u16),
         joined_interaction_line,
-        joined_mission_line,
+        joined_quest_line,
         joined_collection_line,
         exit_text_line,
     )

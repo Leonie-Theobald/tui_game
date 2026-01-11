@@ -1,7 +1,7 @@
 mod inspection;
 mod item;
-mod mission;
 mod player;
+mod quest;
 mod quick_save;
 mod tui;
 
@@ -10,8 +10,8 @@ use termion::{event::Key, input::TermRead, raw::IntoRawMode};
 
 use crate::{
     item::{Item, collected_item::CollectedItems, stationed_item::StationedItems},
-    mission::Mission,
     player::Player,
+    quest::Quest,
     quick_save::QuickSave,
     tui::{
         Orientation,
@@ -26,7 +26,7 @@ fn main() {
     let loading_game_prompt = PopUp {
         options: vec!["Load existing game", "Start new game"],
     };
-    let (mut player, mut collected_items, mut stationed_items, mut missions) = {
+    let (mut player, mut collected_items, mut stationed_items, mut quests) = {
         match loading_game_prompt.get_user_selection() {
             Ok("Load existing game") => QuickSave::load_from_file().disassemble_to_game_state(),
             // for new game or aborted selection
@@ -34,18 +34,12 @@ fn main() {
                 Player::initiate(),
                 CollectedItems::initiate(),
                 StationedItems::initiate(),
-                Mission::initiate(),
+                Quest::initiate(),
             ),
         }
     };
     let grid = Grid::initiate();
-    draw_game(
-        &grid,
-        &player,
-        &collected_items,
-        &stationed_items,
-        &missions,
-    );
+    draw_game(&grid, &player, &collected_items, &stationed_items, &quests);
 
     // start captioning single key inputs in raw mode (single presses instead of waiting for \n)
     let mut stdout = stdout().into_raw_mode().unwrap();
@@ -65,22 +59,18 @@ fn main() {
                 stationed_items.interact(&player, &mut collected_items);
             }
 
-            // show missions
-            Key::Char('m') => {
-                let chained_mission_descriptions = missions
+            // show quests
+            Key::Char('q') => {
+                let chained_quest_descriptions = quests
                     .iter()
-                    .filter(|mission| !mission.get_inner().is_finished())
-                    .fold(
-                        String::new(),
-                        |mut chained_mission_descriptions, mission| {
-                            chained_mission_descriptions
-                                .push_str(&mission.get_inner().get_description());
-                            chained_mission_descriptions.push_str("\r\n");
-                            chained_mission_descriptions
-                        },
-                    );
+                    .filter(|quest| !quest.get_inner().is_finished())
+                    .fold(String::new(), |mut chained_quest_descriptions, quest| {
+                        chained_quest_descriptions.push_str(&quest.get_inner().get_description());
+                        chained_quest_descriptions.push_str("\r\n");
+                        chained_quest_descriptions
+                    });
                 let info_prompt = InfoPopUp {
-                    message: chained_mission_descriptions,
+                    message: chained_quest_descriptions,
                 };
                 info_prompt.show_to_user();
             }
@@ -98,7 +88,7 @@ fn main() {
                     player,
                     collected_items,
                     stationed_items,
-                    missions,
+                    quests,
                 )
                 .save_to_file();
                 break;
@@ -108,14 +98,8 @@ fn main() {
             _ => continue,
         };
 
-        Mission::check_missions(&mut missions, &mut collected_items, &mut stationed_items);
-        draw_game(
-            &grid,
-            &player,
-            &collected_items,
-            &stationed_items,
-            &missions,
-        );
+        Quest::check_quests(&mut quests, &mut collected_items, &mut stationed_items);
+        draw_game(&grid, &player, &collected_items, &stationed_items, &quests);
     }
 
     // clean up terminal and go back to normal mode

@@ -8,7 +8,7 @@ use crate::{
             lost_chest_key::LostChestKey, treasure_chest::TreasureChest,
         },
     },
-    mission::IsMission,
+    quest::IsQuest,
 };
 
 #[derive(Serialize, Deserialize)]
@@ -16,7 +16,7 @@ pub struct UnlockRoom {
     pub finished: bool,
 }
 
-impl IsMission for UnlockRoom {
+impl IsQuest for UnlockRoom {
     fn get_description(&self) -> String {
         String::from("Remove room blockage")
     }

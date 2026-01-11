@@ -5,7 +5,7 @@ use crate::{
         collected_item::{CollectableItem, CollectedItems, treasure_map::TreasureMap},
         stationed_item::StationedItems,
     },
-    mission::IsMission,
+    quest::IsQuest,
 };
 
 #[derive(Serialize, Deserialize)]
@@ -13,7 +13,7 @@ pub struct FindMap {
     pub finished: bool,
 }
 
-impl IsMission for FindMap {
+impl IsQuest for FindMap {
     fn get_description(&self) -> String {
         String::from("Find the hidden map")
     }

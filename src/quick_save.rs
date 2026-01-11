@@ -5,8 +5,8 @@ use std::{
 
 use crate::{
     item::{collected_item::CollectedItems, stationed_item::StationedItems},
-    mission::Mission,
     player::Player,
+    quest::Quest,
 };
 use serde::{Deserialize, Serialize};
 
@@ -15,7 +15,7 @@ pub struct QuickSave {
     player: Player,
     collected_items: CollectedItems,
     stationed_items: StationedItems,
-    missions: Vec<Mission>,
+    quests: Vec<Quest>,
 }
 
 impl QuickSave {
@@ -23,24 +23,22 @@ impl QuickSave {
         player: Player,
         collected_items: CollectedItems,
         stationed_items: StationedItems,
-        missions: Vec<Mission>,
+        quests: Vec<Quest>,
     ) -> Self {
         Self {
             player,
             collected_items,
             stationed_items,
-            missions,
+            quests,
         }
     }
 
-    pub fn disassemble_to_game_state(
-        self,
-    ) -> (Player, CollectedItems, StationedItems, Vec<Mission>) {
+    pub fn disassemble_to_game_state(self) -> (Player, CollectedItems, StationedItems, Vec<Quest>) {
         (
             self.player,
             self.collected_items,
             self.stationed_items,
-            self.missions,
+            self.quests,
         )
     }
 
