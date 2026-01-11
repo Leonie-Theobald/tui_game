@@ -1,6 +1,7 @@
 use crate::inspection::Inspection;
 
 pub mod collected_item;
+pub mod interaction;
 pub mod stationed_item;
 
 pub trait Item {

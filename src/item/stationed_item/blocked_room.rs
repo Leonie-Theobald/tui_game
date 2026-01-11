@@ -3,12 +3,9 @@ use serde::{Deserialize, Serialize};
 use crate::{
     item::{
         Item,
-        stationed_item::{
-            Stationary,
-            interaction::{
-                BangDoor, BreakDownDoor, Interaction, InteractionStatus, UnlockDoorWithKey,
-            },
-        },
+        collected_item::{CollectableItem, CollectedItems, rusty_key::RustyKey},
+        interaction::{Interactable, Interaction, InteractionStatus},
+        stationed_item::Stationary,
     },
     tui::{Drawable, Vector},
 };
@@ -32,9 +29,9 @@ impl BlockedRoom {
             vertical: 8,
         };
         let linked_interactions = vec![
-            Interaction::BangDoor(BangDoor {}),
-            Interaction::BreakDownDoor(BreakDownDoor {}),
-            Interaction::UnlockDoorWithKey(UnlockDoorWithKey {}),
+            Interaction::Door(DoorInteraction::Bang(Bang {})),
+            Interaction::Door(DoorInteraction::BreakDown(BreakDown {})),
+            Interaction::Door(DoorInteraction::UnlockWithKey(UnlockWithKey {})),
         ];
 
         Self {
@@ -122,5 +119,87 @@ impl Drawable for BlockedRoom {
         }
 
         whole_string
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub enum DoorInteraction {
+    Bang(Bang),
+    BreakDown(BreakDown),
+    UnlockWithKey(UnlockWithKey),
+}
+
+impl DoorInteraction {
+    pub fn get_inner(&self) -> &dyn Interactable {
+        match self {
+            DoorInteraction::Bang(bang) => bang,
+            DoorInteraction::BreakDown(break_down) => break_down,
+            DoorInteraction::UnlockWithKey(unlock_with_key) => unlock_with_key,
+        }
+    }
+}
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct Bang;
+impl Interactable for Bang {
+    fn get_prompt(&self) -> String {
+        String::from("Loudly bang on the door")
+    }
+
+    fn interact(
+        &self,
+        _linked_stationary_item: &mut dyn Stationary,
+        _collected_items: &mut CollectedItems,
+    ) -> String {
+        String::from("Nobody opens")
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct BreakDown;
+impl Interactable for BreakDown {
+    fn get_prompt(&self) -> String {
+        String::from("Break down door with raw force")
+    }
+
+    fn interact(
+        &self,
+        _linked_stationary_item: &mut dyn Stationary,
+        _collected_items: &mut CollectedItems,
+    ) -> String {
+        String::from("This is a massive steel door. No chance")
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct UnlockWithKey;
+impl Interactable for UnlockWithKey {
+    fn get_prompt(&self) -> String {
+        String::from("Use key to open door")
+    }
+
+    fn interact(
+        &self,
+        linked_stationary_item: &mut dyn Stationary,
+        collected_items: &mut CollectedItems,
+    ) -> String {
+        if !collected_items
+            .list
+            .contains(&CollectableItem::RustyKey(RustyKey))
+        {
+            return String::from("You have no key to open the door.");
+        }
+
+        // remove key
+        let index = collected_items
+            .list
+            .iter()
+            .position(|available_item| *available_item == CollectableItem::RustyKey(RustyKey))
+            .expect("Checked before that item is available");
+        collected_items.list.remove(index);
+
+        // finish interaction status
+        linked_stationary_item.set_interaction_status_to_finished();
+
+        String::from("This was the correct key to use.")
     }
 }

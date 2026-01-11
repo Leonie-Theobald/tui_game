@@ -1,5 +1,4 @@
 pub mod blocked_room;
-pub mod interaction;
 pub mod lost_chest_key;
 pub mod packet;
 pub mod treasure_chest;
@@ -13,11 +12,9 @@ use crate::{
     item::{
         Item,
         collected_item::CollectedItems,
+        interaction::{Interaction, InteractionStatus},
         stationed_item::{
-            blocked_room::BlockedRoom,
-            interaction::{Interaction, InteractionStatus},
-            lost_chest_key::LostChestKey,
-            packet::Packet,
+            blocked_room::BlockedRoom, lost_chest_key::LostChestKey, packet::Packet,
             treasure_chest::TreasureChest,
         },
     },
