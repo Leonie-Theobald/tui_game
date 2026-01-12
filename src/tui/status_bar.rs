@@ -1,9 +1,5 @@
 use crate::{
-    item::{
-        collected_item::{Collectable, CollectableItem, CollectedItems},
-        stationed_item::StationedItems,
-    },
-    method_on_inner_collected_item,
+    item::{collected_item::CollectedItems, stationed_item::StationedItems},
     player::Player,
     quest::Quests,
     tui::grid::{GRID_HEIGHT, GRID_WIDTH},
@@ -60,7 +56,7 @@ pub fn draw_status_bar(
             .list
             .iter()
             .fold(String::new(), |mut joined_line, item| {
-                let symbol = method_on_inner_collected_item!(item, get_symbol);
+                let symbol = item.get_inner().get_symbol();
                 joined_line.push_str(&format!("{}  ", &symbol,));
                 joined_line
             });

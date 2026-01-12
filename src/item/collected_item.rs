@@ -15,18 +15,6 @@ use crate::{
     tui::pop_up::PopUp,
 };
 
-#[macro_export]
-macro_rules! method_on_inner_collected_item {
-    ($value:expr, $method:ident) => {
-        match $value {
-            CollectableItem::RustyKey(inner) => inner.$method(),
-            CollectableItem::Candle(inner) => inner.$method(),
-            CollectableItem::TreasureMap(inner) => inner.$method(),
-            CollectableItem::ChestKey(inner) => inner.$method(),
-        }
-    };
-}
-
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct CollectedItems {
     pub list: Vec<CollectableItem>,
@@ -42,7 +30,7 @@ impl CollectedItems {
             options: self.list.clone(),
         };
         if let Ok(selected_item) = popup_collected_item.get_user_selection() {
-            let inspection = method_on_inner_collected_item!(selected_item, get_inspection);
+            let inspection = selected_item.get_inner().get_inspection();
             inspection.start_inspection();
             self.show_all_in_popup();
         }
@@ -57,10 +45,21 @@ pub enum CollectableItem {
     ChestKey(ChestKey),
 }
 
+impl CollectableItem {
+    pub fn get_inner(&self) -> &dyn Collectable {
+        match self {
+            CollectableItem::RustyKey(inner) => inner,
+            CollectableItem::Candle(inner) => inner,
+            CollectableItem::TreasureMap(inner) => inner,
+            CollectableItem::ChestKey(inner) => inner,
+        }
+    }
+}
+
 impl std::fmt::Display for CollectableItem {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let name = method_on_inner_collected_item!(self, get_name);
-        let description = method_on_inner_collected_item!(self, get_description);
+        let name = self.get_inner().get_name();
+        let description = self.get_inner().get_description();
 
         writeln!(f, "{} - {}", name, description)
     }
