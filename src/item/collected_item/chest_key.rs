@@ -14,7 +14,31 @@ impl Item for ChestKey {
     }
 
     fn get_detail_view(&self) -> String {
-        todo!()
+        String::from(
+            "
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                          ████                                  
+                                         █    █                                
+                                        █      █                                
+                                        █      █                                
+              ███████████████████████████      █                                
+              █ █                       █      █                                
+                ▘                       █      █                                
+                                         █    █                                 
+                                          ████                                  
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                ",
+        )
     }
 }
 

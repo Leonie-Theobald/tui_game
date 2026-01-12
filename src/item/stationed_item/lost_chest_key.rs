@@ -43,7 +43,31 @@ impl Item for LostChestKey {
     }
 
     fn get_detail_view(&self) -> String {
-        todo!()
+        String::from(
+            "
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                          ████                                  
+                                         █    █                                
+                                        █      █                                
+                                        █      █                                
+              ███████████████████████████      █                                
+              █ █                       █      █                                
+                ▘                       █      █                                
+                                         █    █                                 
+                                          ████                                  
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                
+                                                                                ",
+        )
     }
 }
 
