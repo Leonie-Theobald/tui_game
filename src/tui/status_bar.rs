@@ -5,7 +5,7 @@ use crate::{
     },
     method_on_inner_collected_item,
     player::Player,
-    quest::Quest,
+    quest::Quests,
     tui::grid::{GRID_HEIGHT, GRID_WIDTH},
 };
 
@@ -13,7 +13,7 @@ pub fn draw_status_bar(
     stationed_items: &StationedItems,
     collected_items: &CollectedItems,
     player: &Player,
-    quests: &[Quest],
+    quests: &Quests,
 ) -> String {
     // show how many interactions are possible
     let target_coordinates = player.get_facing_coordinates();
@@ -32,6 +32,7 @@ pub fn draw_status_bar(
 
     // show how many quests are open
     let quest_count = quests
+        .list
         .iter()
         .filter(|quest| !quest.get_inner().is_finished())
         .count();

@@ -4,7 +4,7 @@ use termion::raw::IntoRawMode;
 use crate::{
     item::{collected_item::CollectedItems, stationed_item::StationedItems},
     player::Player,
-    quest::Quest,
+    quest::Quests,
     quick_save::QuickSave,
     tui::{Drawable, grid::Grid, pop_up::PopUp, status_bar},
 };
@@ -14,7 +14,7 @@ pub fn draw_game(
     player: &Player,
     collected_items: &CollectedItems,
     stationed_items: &StationedItems,
-    quests: &[Quest],
+    quests: &Quests,
 ) {
     let mut stdout = stdout().into_raw_mode().unwrap();
     write!(
@@ -31,7 +31,7 @@ pub fn draw_game(
     stdout.flush().unwrap();
 }
 
-pub fn start_game() -> (Player, CollectedItems, StationedItems, Vec<Quest>) {
+pub fn start_game() -> (Player, CollectedItems, StationedItems, Quests) {
     let loading_game_prompt = PopUp {
         options: vec!["Load existing game", "Start new game"],
     };
@@ -42,7 +42,7 @@ pub fn start_game() -> (Player, CollectedItems, StationedItems, Vec<Quest>) {
             Player::initiate(),
             CollectedItems::initiate(),
             StationedItems::initiate(),
-            Quest::initiate(),
+            Quests::initiate(),
         ),
     }
 }
@@ -51,7 +51,7 @@ pub fn save_and_leave_game(
     player: Player,
     collected_items: CollectedItems,
     stationed_items: StationedItems,
-    quests: Vec<Quest>,
+    quests: Quests,
 ) {
     QuickSave::from_current_game_state(player, collected_items, stationed_items, quests)
         .save_to_file();

@@ -16,12 +16,6 @@ pub enum Quest {
 }
 
 impl Quest {
-    pub fn initiate() -> Vec<Self> {
-        vec![
-            Quest::UnlockRoom(UnlockRoom { finished: false }),
-            Quest::FindMap(FindMap { finished: false }),
-        ]
-    }
     pub fn get_inner(&self) -> &dyn IsQuest {
         match self {
             Quest::UnlockRoom(unlock_room) => unlock_room,
@@ -35,9 +29,26 @@ impl Quest {
             Quest::FindMap(find_map) => find_map,
         }
     }
+}
 
-    pub fn show_open_quests(quests: &[Quest]) {
-        let chained_quest_descriptions = quests
+#[derive(Serialize, Deserialize)]
+pub struct Quests {
+    pub list: Vec<Quest>,
+}
+
+impl Quests {
+    pub fn initiate() -> Self {
+        Quests {
+            list: vec![
+                Quest::UnlockRoom(UnlockRoom { finished: false }),
+                Quest::FindMap(FindMap { finished: false }),
+            ],
+        }
+    }
+
+    pub fn show_open_quests(&self) {
+        let chained_quest_descriptions = self
+            .list
             .iter()
             .filter(|quest| !quest.get_inner().is_finished())
             .fold(String::new(), |mut chained_quest_descriptions, quest| {
@@ -52,11 +63,11 @@ impl Quest {
     }
 
     pub fn check_quests(
-        quests: &mut Vec<Quest>,
+        &mut self,
         collected_items: &mut CollectedItems,
         stationed_items: &mut StationedItems,
     ) {
-        for quest in quests {
+        for quest in &mut self.list {
             let inner_quest = quest.get_inner_mut();
             if !inner_quest.is_finished()
                 && inner_quest.check_prerequisites_fulfilled(collected_items, stationed_items)

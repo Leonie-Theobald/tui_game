@@ -11,7 +11,6 @@ use termion::{event::Key, input::TermRead, raw::IntoRawMode};
 
 use crate::{
     game::{draw_game, save_and_leave_game, start_game},
-    quest::Quest,
     tui::{Orientation, grid::Grid},
 };
 
@@ -40,7 +39,7 @@ fn main() {
             }
 
             // show quests
-            Key::Char('q') => Quest::show_open_quests(&quests),
+            Key::Char('q') => quests.show_open_quests(),
 
             // leave game
             Key::Esc => {
@@ -52,7 +51,7 @@ fn main() {
             _ => continue,
         };
 
-        Quest::check_quests(&mut quests, &mut collected_items, &mut stationed_items);
+        quests.check_quests(&mut collected_items, &mut stationed_items);
         draw_game(&grid, &player, &collected_items, &stationed_items, &quests);
     }
 
