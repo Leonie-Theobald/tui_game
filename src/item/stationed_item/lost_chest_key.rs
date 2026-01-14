@@ -11,8 +11,8 @@ use crate::{
 };
 
 const COORDINATES: Vector = Vector {
-    horizontal: 55,
-    vertical: 19,
+    horizontal: 25,
+    vertical: 5,
 };
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]

@@ -20,10 +20,10 @@ impl Player {
     pub fn initiate() -> Self {
         Self {
             coordinates: Vector {
-                horizontal: 15,
-                vertical: 14,
+                horizontal: 20,
+                vertical: 4,
             },
-            orientation: Orientation::North,
+            orientation: Orientation::South,
         }
     }
 

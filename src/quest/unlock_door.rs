@@ -4,19 +4,19 @@ use crate::{
     item::{
         collected_item::CollectedItems,
         stationed_item::{
-            StationaryItem, StationedItems, blocked_room::BlockedRoom,
-            lost_chest_key::LostChestKey, treasure_chest::TreasureChest,
+            StationaryItem, StationedItems, locked_door::LockedDoor, lost_chest_key::LostChestKey,
+            treasure_chest::TreasureChest,
         },
     },
     quest::IsQuest,
 };
 
 #[derive(Serialize, Deserialize)]
-pub struct UnlockRoom {
+pub struct UnlockDoor {
     pub finished: bool,
 }
 
-impl IsQuest for UnlockRoom {
+impl IsQuest for UnlockDoor {
     fn get_description(&self) -> String {
         String::from("Remove room blockage")
     }
@@ -37,7 +37,7 @@ impl IsQuest for UnlockRoom {
         stationary_items.list.iter().any(|item| {
             matches!(
                 item,
-                StationaryItem::BlockedRoom(BlockedRoom { opened: true, .. })
+                StationaryItem::LockedDoor(LockedDoor { opened: true, .. })
             )
         })
     }

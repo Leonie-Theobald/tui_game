@@ -1,7 +1,7 @@
 use crate::item::{
     collected_item::CollectedItems,
     stationed_item::{
-        Stationary, blocked_room::DoorInteraction, lost_chest_key::LostChestKeyInteraction,
+        Stationary, locked_door::LockedDoorInteraction, lost_chest_key::LostChestKeyInteraction,
         packet::PacketInteraction, treasure_chest::TreasureChestInteraction,
     },
 };
@@ -25,7 +25,7 @@ pub trait Interactable {
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub enum Interaction {
     Packet(PacketInteraction),
-    Door(DoorInteraction),
+    LockedDoor(LockedDoorInteraction),
     LostChestKey(LostChestKeyInteraction),
     TreasureChest(TreasureChestInteraction),
 }
@@ -40,7 +40,7 @@ impl Interaction {
     pub fn get_inner(&self) -> &dyn Interactable {
         match self {
             Interaction::Packet(packet_interaction) => packet_interaction.get_inner(),
-            Interaction::Door(door_interaction) => door_interaction.get_inner(),
+            Interaction::LockedDoor(door_interaction) => door_interaction.get_inner(),
             Interaction::LostChestKey(lost_chest_key_interaction) => {
                 lost_chest_key_interaction.get_inner()
             }

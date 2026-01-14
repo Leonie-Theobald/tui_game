@@ -1,31 +1,31 @@
 mod find_map;
-mod unlock_room;
+mod unlock_door;
 
 use serde::{Deserialize, Serialize};
 
 use crate::{
     item::{collected_item::CollectedItems, stationed_item::StationedItems},
-    quest::{find_map::FindMap, unlock_room::UnlockRoom},
+    quest::{find_map::FindMap, unlock_door::UnlockDoor},
     tui::pop_up::InfoPopUp,
 };
 
 #[derive(Serialize, Deserialize)]
 pub enum Quest {
-    UnlockRoom(UnlockRoom),
+    UnlockDoor(UnlockDoor),
     FindMap(FindMap),
 }
 
 impl Quest {
     pub fn get_inner(&self) -> &dyn IsQuest {
         match self {
-            Quest::UnlockRoom(unlock_room) => unlock_room,
+            Quest::UnlockDoor(unlock_door) => unlock_door,
             Quest::FindMap(find_map) => find_map,
         }
     }
 
     pub fn get_inner_mut(&mut self) -> &mut dyn IsQuest {
         match self {
-            Quest::UnlockRoom(unlock_room) => unlock_room,
+            Quest::UnlockDoor(unlock_room) => unlock_room,
             Quest::FindMap(find_map) => find_map,
         }
     }
@@ -40,7 +40,7 @@ impl Quests {
     pub fn initiate() -> Self {
         Quests {
             list: vec![
-                Quest::UnlockRoom(UnlockRoom { finished: false }),
+                Quest::UnlockDoor(UnlockDoor { finished: false }),
                 Quest::FindMap(FindMap { finished: false }),
             ],
         }

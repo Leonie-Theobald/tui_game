@@ -11,40 +11,35 @@ use crate::{
 };
 
 const COORDINATES: Vector = Vector {
-    horizontal: 32,
-    vertical: 12,
+    horizontal: 21,
+    vertical: 7,
 };
+const WIDTH: usize = 3;
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
-pub struct BlockedRoom {
+pub struct LockedDoor {
     linked_interactions: Vec<Interaction>,
     pub opened: bool,
-    dimensions: Vector,
 }
 
-impl BlockedRoom {
+impl LockedDoor {
     pub fn initiate() -> Self {
-        let dimensions = Vector {
-            horizontal: 29,
-            vertical: 8,
-        };
         let linked_interactions = vec![
-            Interaction::Door(DoorInteraction::Bang(Bang {})),
-            Interaction::Door(DoorInteraction::BreakDown(BreakDown {})),
-            Interaction::Door(DoorInteraction::UnlockWithKey(UnlockWithKey {})),
+            Interaction::LockedDoor(LockedDoorInteraction::Bang(Bang {})),
+            Interaction::LockedDoor(LockedDoorInteraction::BreakDown(BreakDown {})),
+            Interaction::LockedDoor(LockedDoorInteraction::UnlockWithKey(UnlockWithKey {})),
         ];
 
         Self {
             linked_interactions,
-            dimensions,
             opened: false,
         }
     }
 }
 
-impl Item for BlockedRoom {
+impl Item for LockedDoor {
     fn get_name(&self) -> &'static str {
-        "Locked Room"
+        "Locked Door"
     }
 
     fn get_description(&self) -> &'static str {
@@ -79,7 +74,7 @@ impl Item for BlockedRoom {
     }
 }
 
-impl Stationary for BlockedRoom {
+impl Stationary for LockedDoor {
     fn list_blocking_coordinates(&self) -> Vec<Vector> {
         if self.opened {
             return Vec::new();
@@ -87,17 +82,11 @@ impl Stationary for BlockedRoom {
 
         let mut blocked_coordinate = Vec::new();
 
-        let horizontal_range =
-            COORDINATES.horizontal..COORDINATES.horizontal + self.dimensions.horizontal;
-        for horizontal_index in horizontal_range {
-            let vertical_range =
-                COORDINATES.vertical..COORDINATES.vertical + self.dimensions.vertical;
-            for vertical_index in vertical_range {
-                blocked_coordinate.push(Vector {
-                    horizontal: horizontal_index,
-                    vertical: vertical_index,
-                })
-            }
+        for horizontal_index in 0..WIDTH {
+            blocked_coordinate.push(Vector {
+                horizontal: COORDINATES.horizontal + horizontal_index,
+                vertical: COORDINATES.vertical,
+            })
         }
 
         blocked_coordinate
@@ -120,44 +109,37 @@ impl Stationary for BlockedRoom {
     }
 }
 
-impl Drawable for BlockedRoom {
+impl Drawable for LockedDoor {
     fn draw(&self) -> String {
         if self.opened {
             return String::new();
         }
-        let symbol = "█";
+        let door_string = "█".repeat(WIDTH);
 
-        let one_line = symbol.repeat(self.dimensions.horizontal);
-
-        let mut whole_string = String::new();
-        for index in 0..self.dimensions.vertical {
-            whole_string.push_str(&format!(
-                "{}{}",
-                termion::cursor::Goto(
-                    (COORDINATES.horizontal + 1) as u16,
-                    (COORDINATES.vertical + index + 1) as u16
-                ),
-                one_line,
-            ))
-        }
-
-        whole_string
+        format!(
+            "{}{}",
+            termion::cursor::Goto(
+                (COORDINATES.horizontal + 1) as u16,
+                (COORDINATES.vertical + 1) as u16
+            ),
+            door_string,
+        )
     }
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
-pub enum DoorInteraction {
+pub enum LockedDoorInteraction {
     Bang(Bang),
     BreakDown(BreakDown),
     UnlockWithKey(UnlockWithKey),
 }
 
-impl DoorInteraction {
+impl LockedDoorInteraction {
     pub fn get_inner(&self) -> &dyn Interactable {
         match self {
-            DoorInteraction::Bang(bang) => bang,
-            DoorInteraction::BreakDown(break_down) => break_down,
-            DoorInteraction::UnlockWithKey(unlock_with_key) => unlock_with_key,
+            LockedDoorInteraction::Bang(bang) => bang,
+            LockedDoorInteraction::BreakDown(break_down) => break_down,
+            LockedDoorInteraction::UnlockWithKey(unlock_with_key) => unlock_with_key,
         }
     }
 }

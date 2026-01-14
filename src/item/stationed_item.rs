@@ -1,4 +1,4 @@
-pub mod blocked_room;
+pub mod locked_door;
 pub mod lost_chest_key;
 pub mod packet;
 pub mod treasure_chest;
@@ -14,7 +14,7 @@ use crate::{
         collected_item::CollectedItems,
         interaction::{Interaction, InteractionStatus},
         stationed_item::{
-            blocked_room::BlockedRoom, lost_chest_key::LostChestKey, packet::Packet,
+            locked_door::LockedDoor, lost_chest_key::LostChestKey, packet::Packet,
             treasure_chest::TreasureChest,
         },
     },
@@ -32,7 +32,7 @@ macro_rules! method_on_inner_stationed_item {
         match &$value {
             StationaryItem::Packet(inner) => inner.$method(),
             StationaryItem::TreasureChest(inner) => inner.$method(),
-            StationaryItem::BlockedRoom(inner) => inner.$method(),
+            StationaryItem::LockedDoor(inner) => inner.$method(),
             StationaryItem::LostChestKey(inner) => inner.$method(),
         }
     };
@@ -41,7 +41,7 @@ macro_rules! method_on_inner_stationed_item {
         match &$value {
             StationaryItem::Packet(inner) => inner.$method( $( $parameter ),* ),
             StationaryItem::TreasureChest(inner) => inner.$method( $( $parameter ),*),
-            StationaryItem::BlockedRoom(inner) => inner.$method( $( $parameter ),* ),
+            StationaryItem::LockedDoor(inner) => inner.$method( $( $parameter ),* ),
             StationaryItem::LostChestKey(inner) => inner.$method( $( $parameter ),* ),
         }
     };
@@ -62,7 +62,7 @@ macro_rules! mut_method_on_inner_stationed_item {
         match &mut $value {
             StationaryItem::Packet(inner) => inner.$method( $( $parameter ),* ),
             StationaryItem::TreasureChest(inner) => inner.$method( $( $parameter ),*),
-            StationaryItem::BlockedRoom(inner) => inner.$method( $( $parameter ),* ),
+            StationaryItem::LockedDoor(inner) => inner.$method( $( $parameter ),* ),
             StationaryItem::LostChestKey(inner) => inner.$method( $( $parameter ),* ),
         }
     };
@@ -78,7 +78,8 @@ impl StationedItems {
         Self {
             list: vec![
                 StationaryItem::Packet(Packet::initiate()),
-                StationaryItem::BlockedRoom(BlockedRoom::initiate()),
+                StationaryItem::LostChestKey(LostChestKey::initiate()),
+                StationaryItem::LockedDoor(LockedDoor::initiate()),
             ],
         }
     }
@@ -208,7 +209,7 @@ pub trait Stationary: Item {
 pub enum StationaryItem {
     Packet(Packet),
     TreasureChest(TreasureChest),
-    BlockedRoom(BlockedRoom),
+    LockedDoor(LockedDoor),
     LostChestKey(LostChestKey),
 }
 
