@@ -53,7 +53,7 @@ impl Stationary for ExtendedRoom {
         let mut blocked_coordinates = Vec::new();
 
         // top and bottom wall
-        for horizontal_offset in 0..DIMENSIONS.horizontal {
+        for horizontal_offset in 0..=DIMENSIONS.horizontal {
             // leave some space where the door is
             if !(11..=13).contains(&horizontal_offset) {
                 blocked_coordinates.push(Vector {
@@ -76,7 +76,7 @@ impl Stationary for ExtendedRoom {
             });
 
             blocked_coordinates.push(Vector {
-                horizontal: COORDINATES.horizontal + DIMENSIONS.horizontal,
+                horizontal: COORDINATES.horizontal + DIMENSIONS.horizontal - 1,
                 vertical: COORDINATES.vertical + vertical_offset,
             });
         }
