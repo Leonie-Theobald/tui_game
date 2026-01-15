@@ -1,4 +1,5 @@
 pub mod extended_room;
+pub mod fireplace;
 pub mod locked_door;
 pub mod lost_chest_key;
 pub mod packet;
@@ -15,8 +16,8 @@ use crate::{
         collected_item::CollectedItems,
         interaction::{Interaction, InteractionStatus},
         stationed_item::{
-            extended_room::ExtendedRoom, locked_door::LockedDoor, lost_chest_key::LostChestKey,
-            packet::Packet, treasure_chest::TreasureChest,
+            extended_room::ExtendedRoom, fireplace::Fireplace, locked_door::LockedDoor,
+            lost_chest_key::LostChestKey, packet::Packet, treasure_chest::TreasureChest,
         },
     },
     player::Player,
@@ -36,6 +37,7 @@ macro_rules! method_on_inner_stationed_item {
             StationaryItem::LockedDoor(inner) => inner.$method(),
             StationaryItem::LostChestKey(inner) => inner.$method(),
             StationaryItem::ExtendedRoom(inner) => inner.$method(),
+            StationaryItem::Fireplace(inner) => inner.$method(),
         }
     };
     // call with parameters
@@ -45,8 +47,8 @@ macro_rules! method_on_inner_stationed_item {
             StationaryItem::TreasureChest(inner) => inner.$method( $( $parameter ),*),
             StationaryItem::LockedDoor(inner) => inner.$method( $( $parameter ),* ),
             StationaryItem::LostChestKey(inner) => inner.$method( $( $parameter ),* ),
-            StationaryItem::ExtendedRoom(inner) => inner.$method(),
             StationaryItem::ExtendedRoom(inner) => inner.$method( $( $parameter ),* ),
+            StationaryItem::Fireplace(inner) => inner.$method( $( $parameter ),* ),
         }
     };
 }
@@ -60,6 +62,7 @@ macro_rules! mut_method_on_inner_stationed_item {
             StationaryItem::BlockedRoom(inner) => inner.$method(),
             StationaryItem::LostChestKey(inner) => inner.$method(),
             StationaryItem::ExtendedRoom(inner) => inner.$method(),
+            StationaryItem::Fireplace(inner) => inner.$method(),
         }
     };
     // call with parameters
@@ -70,6 +73,7 @@ macro_rules! mut_method_on_inner_stationed_item {
             StationaryItem::LockedDoor(inner) => inner.$method( $( $parameter ),* ),
             StationaryItem::LostChestKey(inner) => inner.$method( $( $parameter ),* ),
             StationaryItem::ExtendedRoom(inner) => inner.$method( $( $parameter ),* ),
+            StationaryItem::Fireplace(inner) => inner.$method( $( $parameter ),* ),
         }
     };
 }
@@ -218,6 +222,7 @@ pub enum StationaryItem {
     LockedDoor(LockedDoor),
     LostChestKey(LostChestKey),
     ExtendedRoom(ExtendedRoom),
+    Fireplace(Fireplace),
 }
 
 impl Drawable for StationedItems {
