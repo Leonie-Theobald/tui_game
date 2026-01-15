@@ -1,3 +1,4 @@
+pub mod extended_room;
 pub mod locked_door;
 pub mod lost_chest_key;
 pub mod packet;
@@ -14,8 +15,8 @@ use crate::{
         collected_item::CollectedItems,
         interaction::{Interaction, InteractionStatus},
         stationed_item::{
-            locked_door::LockedDoor, lost_chest_key::LostChestKey, packet::Packet,
-            treasure_chest::TreasureChest,
+            extended_room::ExtendedRoom, locked_door::LockedDoor, lost_chest_key::LostChestKey,
+            packet::Packet, treasure_chest::TreasureChest,
         },
     },
     player::Player,
@@ -34,6 +35,7 @@ macro_rules! method_on_inner_stationed_item {
             StationaryItem::TreasureChest(inner) => inner.$method(),
             StationaryItem::LockedDoor(inner) => inner.$method(),
             StationaryItem::LostChestKey(inner) => inner.$method(),
+            StationaryItem::ExtendedRoom(inner) => inner.$method(),
         }
     };
     // call with parameters
@@ -43,6 +45,8 @@ macro_rules! method_on_inner_stationed_item {
             StationaryItem::TreasureChest(inner) => inner.$method( $( $parameter ),*),
             StationaryItem::LockedDoor(inner) => inner.$method( $( $parameter ),* ),
             StationaryItem::LostChestKey(inner) => inner.$method( $( $parameter ),* ),
+            StationaryItem::ExtendedRoom(inner) => inner.$method(),
+            StationaryItem::ExtendedRoom(inner) => inner.$method( $( $parameter ),* ),
         }
     };
 }
@@ -55,6 +59,7 @@ macro_rules! mut_method_on_inner_stationed_item {
             StationaryItem::TreasureChest(inner) => inner.$method(),
             StationaryItem::BlockedRoom(inner) => inner.$method(),
             StationaryItem::LostChestKey(inner) => inner.$method(),
+            StationaryItem::ExtendedRoom(inner) => inner.$method(),
         }
     };
     // call with parameters
@@ -64,6 +69,7 @@ macro_rules! mut_method_on_inner_stationed_item {
             StationaryItem::TreasureChest(inner) => inner.$method( $( $parameter ),*),
             StationaryItem::LockedDoor(inner) => inner.$method( $( $parameter ),* ),
             StationaryItem::LostChestKey(inner) => inner.$method( $( $parameter ),* ),
+            StationaryItem::ExtendedRoom(inner) => inner.$method( $( $parameter ),* ),
         }
     };
 }
@@ -211,6 +217,7 @@ pub enum StationaryItem {
     TreasureChest(TreasureChest),
     LockedDoor(LockedDoor),
     LostChestKey(LostChestKey),
+    ExtendedRoom(ExtendedRoom),
 }
 
 impl Drawable for StationedItems {

@@ -4,8 +4,7 @@ use crate::{
     item::{
         collected_item::CollectedItems,
         stationed_item::{
-            StationaryItem, StationedItems, locked_door::LockedDoor, lost_chest_key::LostChestKey,
-            treasure_chest::TreasureChest,
+            StationaryItem, StationedItems, extended_room::ExtendedRoom, locked_door::LockedDoor,
         },
     },
     quest::IsQuest,
@@ -49,9 +48,6 @@ impl IsQuest for UnlockDoor {
     ) {
         stationary_items
             .list
-            .push(StationaryItem::TreasureChest(TreasureChest::initiate()));
-        stationary_items
-            .list
-            .push(StationaryItem::LostChestKey(LostChestKey::initiate()));
+            .push(StationaryItem::ExtendedRoom(ExtendedRoom::initiate()));
     }
 }

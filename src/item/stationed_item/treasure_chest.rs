@@ -24,6 +24,7 @@ pub struct TreasureChest {
 }
 
 impl TreasureChest {
+    #[expect(unused)] // for now as no TreasureChest is used currently
     pub fn initiate() -> Self {
         let linked_interactions = vec![Interaction::TreasureChest(
             TreasureChestInteraction::Unlock(Unlock {}),
