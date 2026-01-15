@@ -134,6 +134,15 @@ impl Interactable for TakeBranch {
     ) -> String {
         match linked_stationary_item.get_interaction_status() {
             InteractionStatus::Open => {
+                if collected_items
+                    .list
+                    .iter()
+                    .filter(|item| matches!(item, CollectableItem::Branch(..)))
+                    .count()
+                    >= 2
+                {
+                    return String::from("You already got enough branches.");
+                }
                 collected_items.list.push(CollectableItem::Branch(Branch));
                 String::from("You got a quite straight branch.")
             }
@@ -156,6 +165,12 @@ impl Interactable for ChopSkewer {
     ) -> String {
         match linked_stationary_item.get_interaction_status() {
             InteractionStatus::Open => {
+                if collected_items
+                    .list
+                    .contains(&CollectableItem::Skewer(Skewer))
+                {
+                    return String::from("You already got a skewers.");
+                }
                 collected_items.list.push(CollectableItem::Skewer(Skewer));
                 String::from("You got a good skewer.")
             }
