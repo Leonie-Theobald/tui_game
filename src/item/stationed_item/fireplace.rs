@@ -87,7 +87,7 @@ impl Stationary for Fireplace {
     }
 
     fn get_interaction_status(&self) -> InteractionStatus {
-        InteractionStatus::Finished
+        InteractionStatus::Open
     }
 
     fn set_interaction_status_to_finished(&mut self) {}

@@ -1,8 +1,9 @@
 use crate::item::{
     collected_item::CollectedItems,
     stationed_item::{
-        Stationary, locked_door::LockedDoorInteraction, lost_chest_key::LostChestKeyInteraction,
-        packet::PacketInteraction, treasure_chest::TreasureChestInteraction,
+        Stationary, firewood::FirewoodInteraction, locked_door::LockedDoorInteraction,
+        lost_chest_key::LostChestKeyInteraction, packet::PacketInteraction,
+        treasure_chest::TreasureChestInteraction,
     },
 };
 use serde::{Deserialize, Serialize};
@@ -28,6 +29,7 @@ pub enum Interaction {
     LockedDoor(LockedDoorInteraction),
     LostChestKey(LostChestKeyInteraction),
     TreasureChest(TreasureChestInteraction),
+    Firewood(FirewoodInteraction),
 }
 
 impl std::fmt::Display for Interaction {
@@ -47,6 +49,7 @@ impl Interaction {
             Interaction::TreasureChest(treasure_chest_interaction) => {
                 treasure_chest_interaction.get_inner()
             }
+            Interaction::Firewood(firewood_interaction) => firewood_interaction.get_inner(),
         }
     }
 }

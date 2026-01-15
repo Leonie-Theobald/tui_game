@@ -1,6 +1,8 @@
+pub mod branch;
 pub mod candle;
 pub mod chest_key;
 pub mod rusty_key;
+pub mod skewer;
 pub mod treasure_map;
 
 use serde::{Deserialize, Serialize};
@@ -9,7 +11,8 @@ use crate::{
     item::{
         Item,
         collected_item::{
-            candle::Candle, chest_key::ChestKey, rusty_key::RustyKey, treasure_map::TreasureMap,
+            branch::Branch, candle::Candle, chest_key::ChestKey, rusty_key::RustyKey,
+            skewer::Skewer, treasure_map::TreasureMap,
         },
     },
     tui::pop_up::PopUp,
@@ -43,6 +46,8 @@ pub enum CollectableItem {
     Candle(Candle),
     TreasureMap(TreasureMap),
     ChestKey(ChestKey),
+    Branch(Branch),
+    Skewer(Skewer),
 }
 
 impl CollectableItem {
@@ -52,6 +57,8 @@ impl CollectableItem {
             CollectableItem::Candle(inner) => inner,
             CollectableItem::TreasureMap(inner) => inner,
             CollectableItem::ChestKey(inner) => inner,
+            CollectableItem::Branch(inner) => inner,
+            CollectableItem::Skewer(inner) => inner,
         }
     }
 }
