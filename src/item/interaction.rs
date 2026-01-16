@@ -1,3 +1,4 @@
+pub mod dropped_marshmallow_interaction;
 pub mod fireplace_interaction;
 pub mod firewood_interaction;
 pub mod locked_door_interaction;
@@ -8,6 +9,7 @@ pub mod treasure_chest_interaction;
 use crate::item::{
     collected_item::CollectedItems,
     interaction::{
+        dropped_marshmallow_interaction::DroppedMarshmallowInteraction,
         fireplace_interaction::FireplaceInteraction, firewood_interaction::FirewoodInteraction,
         locked_door_interaction::LockedDoorInteraction,
         lost_chest_key_interaction::LostChestKeyInteraction, packet_interaction::PacketInteraction,
@@ -40,6 +42,7 @@ pub enum Interaction {
     TreasureChest(TreasureChestInteraction),
     Firewood(FirewoodInteraction),
     Fireplace(FireplaceInteraction),
+    DroppedMarshmallow(DroppedMarshmallowInteraction),
 }
 
 impl std::fmt::Display for Interaction {
@@ -61,6 +64,9 @@ impl Interaction {
             }
             Interaction::Firewood(firewood_interaction) => firewood_interaction.get_inner(),
             Interaction::Fireplace(fireplace_interaction) => fireplace_interaction.get_inner(),
+            Interaction::DroppedMarshmallow(dropped_marshmallow_interaction) => {
+                dropped_marshmallow_interaction.get_inner()
+            }
         }
     }
 }

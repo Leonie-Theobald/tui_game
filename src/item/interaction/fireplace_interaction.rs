@@ -2,7 +2,8 @@ use serde::{Deserialize, Serialize};
 
 use crate::item::{
     collected_item::{
-        CollectableItem, CollectedItems, branch::Branch, oiled_branch::OiledBranch, torch::Torch,
+        CollectableItem, CollectedItems, branch::Branch, marshmallow::Marshmallow,
+        oiled_branch::OiledBranch, roasted_marshmallow::RoastedMarshmallow, torch::Torch,
     },
     interaction::{Interactable, InteractionStatus},
     stationed_item::Stationary,
@@ -73,9 +74,28 @@ impl Interactable for RoastMarshmallow {
     fn interact(
         &self,
         _linked_stationary_item: &mut dyn Stationary,
-        _collected_items: &mut CollectedItems,
+        collected_items: &mut CollectedItems,
     ) -> String {
-        todo!()
+        if !collected_items
+            .list
+            .contains(&CollectableItem::Marshmallow(Marshmallow))
+        {
+            return String::from("You have no marshmallow to roast.");
+        }
+
+        // remove marshmallow
+        let index = collected_items
+            .list
+            .iter()
+            .position(|available_item| *available_item == CollectableItem::Marshmallow(Marshmallow))
+            .expect("Checked before that item is available");
+        collected_items.list.remove(index);
+
+        collected_items
+            .list
+            .push(CollectableItem::RoastedMarshmallow(RoastedMarshmallow));
+
+        String::from("You got yourself a crispy marshmallow. Enjoy!")
     }
 }
 
