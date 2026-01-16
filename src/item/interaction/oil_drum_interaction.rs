@@ -44,6 +44,17 @@ impl Interactable for DipBranch {
                     return String::from("You have no branch available.");
                 }
 
+                // limit number of oiled branches player can have
+                if collected_items
+                    .list
+                    .iter()
+                    .filter(|item| matches!(item, CollectableItem::OiledBranch(..)))
+                    .count()
+                    >= 2
+                {
+                    return String::from("You already got enough oiled branches.");
+                }
+
                 // remove branch
                 let index = collected_items
                     .list
