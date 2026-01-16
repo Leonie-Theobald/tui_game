@@ -1,10 +1,17 @@
+pub mod firewood_interaction;
+pub mod locked_door_interaction;
+pub mod lost_chest_key_interaction;
+pub mod packet_interaction;
+pub mod treasure_chest_interaction;
+
 use crate::item::{
     collected_item::CollectedItems,
-    stationed_item::{
-        Stationary, firewood::FirewoodInteraction, locked_door::LockedDoorInteraction,
-        lost_chest_key::LostChestKeyInteraction, packet::PacketInteraction,
-        treasure_chest::TreasureChestInteraction,
+    interaction::{
+        firewood_interaction::FirewoodInteraction, locked_door_interaction::LockedDoorInteraction,
+        lost_chest_key_interaction::LostChestKeyInteraction, packet_interaction::PacketInteraction,
+        treasure_chest_interaction::TreasureChestInteraction,
     },
+    stationed_item::Stationary,
 };
 use serde::{Deserialize, Serialize};
 
