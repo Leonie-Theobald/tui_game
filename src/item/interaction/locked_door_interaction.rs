@@ -16,9 +16,9 @@ pub enum LockedDoorInteraction {
 impl LockedDoorInteraction {
     pub fn get_inner(&self) -> &dyn Interactable {
         match self {
-            LockedDoorInteraction::Bang(bang) => bang,
-            LockedDoorInteraction::BreakDown(break_down) => break_down,
-            LockedDoorInteraction::UnlockWithKey(unlock_with_key) => unlock_with_key,
+            LockedDoorInteraction::Bang(inner) => inner,
+            LockedDoorInteraction::BreakDown(inner) => inner,
+            LockedDoorInteraction::UnlockWithKey(inner) => inner,
         }
     }
 }

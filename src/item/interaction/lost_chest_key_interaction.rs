@@ -14,7 +14,7 @@ pub enum LostChestKeyInteraction {
 impl LostChestKeyInteraction {
     pub fn get_inner(&self) -> &dyn Interactable {
         match self {
-            LostChestKeyInteraction::PickUp(pick_up) => pick_up,
+            LostChestKeyInteraction::PickUp(inner) => inner,
         }
     }
 }

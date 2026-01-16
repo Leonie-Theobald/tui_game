@@ -1,8 +1,12 @@
 pub mod branch;
 pub mod candle;
 pub mod chest_key;
+pub mod marshmallow;
+pub mod oiled_branch;
+pub mod roasted_marshmallow;
 pub mod rusty_key;
 pub mod skewer;
+pub mod torch;
 pub mod treasure_map;
 
 use serde::{Deserialize, Serialize};
@@ -11,8 +15,9 @@ use crate::{
     item::{
         Item,
         collected_item::{
-            branch::Branch, candle::Candle, chest_key::ChestKey, rusty_key::RustyKey,
-            skewer::Skewer, treasure_map::TreasureMap,
+            branch::Branch, candle::Candle, chest_key::ChestKey, marshmallow::Marshmallow,
+            oiled_branch::OiledBranch, roasted_marshmallow::RoastedMarshmallow,
+            rusty_key::RustyKey, skewer::Skewer, torch::Torch, treasure_map::TreasureMap,
         },
     },
     tui::pop_up::PopUp,
@@ -48,6 +53,10 @@ pub enum CollectableItem {
     ChestKey(ChestKey),
     Branch(Branch),
     Skewer(Skewer),
+    OiledBranch(OiledBranch),
+    Torch(Torch),
+    Marshmallow(Marshmallow),
+    RoastedMarshmallow(RoastedMarshmallow),
 }
 
 impl CollectableItem {
@@ -59,6 +68,10 @@ impl CollectableItem {
             CollectableItem::ChestKey(inner) => inner,
             CollectableItem::Branch(inner) => inner,
             CollectableItem::Skewer(inner) => inner,
+            CollectableItem::OiledBranch(inner) => inner,
+            CollectableItem::Torch(inner) => inner,
+            CollectableItem::Marshmallow(inner) => inner,
+            CollectableItem::RoastedMarshmallow(inner) => inner,
         }
     }
 }

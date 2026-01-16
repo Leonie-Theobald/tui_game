@@ -16,9 +16,9 @@ pub enum PacketInteraction {
 impl PacketInteraction {
     pub fn get_inner(&self) -> &dyn Interactable {
         match self {
-            PacketInteraction::Open(open_packet) => open_packet,
-            PacketInteraction::Stomp(stomp_packet) => stomp_packet,
-            PacketInteraction::Shake(shake_packet) => shake_packet,
+            PacketInteraction::Open(inner) => inner,
+            PacketInteraction::Stomp(inner) => inner,
+            PacketInteraction::Shake(inner) => inner,
         }
     }
 }

@@ -15,8 +15,8 @@ pub enum FirewoodInteraction {
 impl FirewoodInteraction {
     pub fn get_inner(&self) -> &dyn Interactable {
         match self {
-            FirewoodInteraction::TakeBranch(open_packet) => open_packet,
-            FirewoodInteraction::ChopSkewer(stomp_packet) => stomp_packet,
+            FirewoodInteraction::TakeBranch(inner) => inner,
+            FirewoodInteraction::ChopSkewer(inner) => inner,
         }
     }
 }

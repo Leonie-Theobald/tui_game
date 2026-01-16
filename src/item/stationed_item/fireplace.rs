@@ -3,7 +3,12 @@ use serde::{Deserialize, Serialize};
 use crate::{
     item::{
         Item,
-        interaction::{Interaction, InteractionStatus},
+        interaction::{
+            Interaction, InteractionStatus,
+            fireplace_interaction::{
+                FireplaceInteraction, LightBranch, RoastMarshmallow, ThrowBranchIntoFire,
+            },
+        },
         stationed_item::Stationary,
     },
     tui::{Drawable, Vector},
@@ -26,7 +31,13 @@ pub struct Fireplace {
 impl Fireplace {
     pub fn initiate() -> Self {
         Self {
-            linked_interactions: Vec::new(),
+            linked_interactions: vec![
+                Interaction::Fireplace(FireplaceInteraction::ThrowBranchIntoFire(
+                    ThrowBranchIntoFire,
+                )),
+                Interaction::Fireplace(FireplaceInteraction::LightBranch(LightBranch)),
+                Interaction::Fireplace(FireplaceInteraction::RoastMarshmallow(RoastMarshmallow)),
+            ],
         }
     }
 }
