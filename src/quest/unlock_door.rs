@@ -6,7 +6,7 @@ use crate::{
         stationed_item::{
             StationaryItem, StationedItems, dropped_marshmallow::DroppedMarshmallow,
             extended_room::ExtendedRoom, fireplace::Fireplace, firewood::Firewood,
-            locked_door::LockedDoor,
+            locked_door::LockedDoor, oil_drum::OilDrum,
         },
     },
     quest::IsQuest,
@@ -62,5 +62,8 @@ impl IsQuest for UnlockDoor {
             .push(StationaryItem::DroppedMarshmallow(
                 DroppedMarshmallow::initiate(),
             ));
+        stationary_items
+            .list
+            .push(StationaryItem::OilDrum(OilDrum::initiate()));
     }
 }

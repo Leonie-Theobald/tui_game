@@ -4,6 +4,7 @@ pub mod fireplace;
 pub mod firewood;
 pub mod locked_door;
 pub mod lost_chest_key;
+pub mod oil_drum;
 pub mod packet;
 pub mod treasure_chest;
 
@@ -20,7 +21,8 @@ use crate::{
         stationed_item::{
             dropped_marshmallow::DroppedMarshmallow, extended_room::ExtendedRoom,
             fireplace::Fireplace, firewood::Firewood, locked_door::LockedDoor,
-            lost_chest_key::LostChestKey, packet::Packet, treasure_chest::TreasureChest,
+            lost_chest_key::LostChestKey, oil_drum::OilDrum, packet::Packet,
+            treasure_chest::TreasureChest,
         },
     },
     player::Player,
@@ -43,6 +45,7 @@ macro_rules! method_on_inner_stationed_item {
             StationaryItem::Fireplace(inner) => inner.$method(),
             StationaryItem::Firewood(inner) => inner.$method(),
             StationaryItem::DroppedMarshmallow(inner) => inner.$method(),
+            StationaryItem::OilDrum(inner) => inner.$method(),
         }
     };
     // call with parameters
@@ -56,6 +59,7 @@ macro_rules! method_on_inner_stationed_item {
             StationaryItem::Fireplace(inner) => inner.$method( $( $parameter ),* ),
             StationaryItem::Firewood(inner) => inner.$method( $( $parameter ),* ),
             StationaryItem::DroppedMarshmallow(inner) => inner.$method( $( $parameter ),* ),
+            StationaryItem::OilDrum(inner) => inner.$method( $( $parameter ),* ),
         }
     };
 }
@@ -85,6 +89,7 @@ macro_rules! mut_method_on_inner_stationed_item {
             StationaryItem::Fireplace(inner) => inner.$method( $( $parameter ),* ),
             StationaryItem::Firewood(inner) => inner.$method( $( $parameter ),* ),
             StationaryItem::DroppedMarshmallow(inner) => inner.$method( $( $parameter ),* ),
+            StationaryItem::OilDrum(inner) => inner.$method( $( $parameter ),* ),
         }
     };
 }
@@ -236,6 +241,7 @@ pub enum StationaryItem {
     Fireplace(Fireplace),
     Firewood(Firewood),
     DroppedMarshmallow(DroppedMarshmallow),
+    OilDrum(OilDrum),
 }
 
 impl Drawable for StationedItems {
