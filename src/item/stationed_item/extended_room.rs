@@ -55,7 +55,7 @@ impl Stationary for ExtendedRoom {
         // top and bottom wall
         for horizontal_offset in 0..=DIMENSIONS.horizontal {
             // leave some space where the door is
-            if !(11..=13).contains(&horizontal_offset) {
+            if !(11..=13).contains(&horizontal_offset) && !(22..=24).contains(&horizontal_offset) {
                 blocked_coordinates.push(Vector {
                     horizontal: COORDINATES.horizontal + horizontal_offset,
                     vertical: COORDINATES.vertical,
@@ -101,23 +101,22 @@ impl Drawable for ExtendedRoom {
 
         // top wall
         walls.push_str(&format!(
-            "{}├{}{}{}┴{}┐",
+            "{}├──────────{}─────┴──{}─────────┐",
+            // go to start of wall
             termion::cursor::Goto(
                 (COORDINATES.horizontal + 1) as u16,
                 (COORDINATES.vertical + 1) as u16,
             ),
-            "─".repeat(10), // left of door
             // leave space for door
             termion::cursor::Goto(
-                // 1 for left wall
-                // 10 for wall left of door
-                // 3 for width of door
-                // 1 to account for 1-offset for cursor::Goto
-                (COORDINATES.horizontal + 1 + 10 + 3 + 1) as u16,
+                (COORDINATES.horizontal + 15) as u16,
                 (COORDINATES.vertical + 1) as u16,
             ),
-            "─".repeat(5), // right of door until upper room ends
-            "─".repeat(DIMENSIONS.horizontal - 21)  // rest of room
+            // leave space for second
+            termion::cursor::Goto(
+                (COORDINATES.horizontal + 26) as u16,
+                (COORDINATES.vertical + 1) as u16,
+            ),
         ));
 
         // left and right wall
@@ -137,12 +136,11 @@ impl Drawable for ExtendedRoom {
 
         // bottom wall
         walls.push_str(&format!(
-            "{}└{}┘",
+            "{}└─────────────────────────────────┘",
             termion::cursor::Goto(
                 (COORDINATES.horizontal + 1) as u16,
                 (COORDINATES.vertical + DIMENSIONS.vertical + 1) as u16,
             ),
-            "─".repeat(DIMENSIONS.horizontal - 2)
         ));
 
         walls
