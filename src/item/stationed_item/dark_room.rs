@@ -99,14 +99,14 @@ impl Stationary for DarkRoom {
 
 impl Drawable for DarkRoom {
     fn draw(&self) -> String {
-        let room = self.get_room_setup();
+        let room_setup = self.get_room_setup();
 
-        let mut darkened_room = String::new();
-        for (vertical_offset, line) in room.lines().enumerate() {
+        let mut room = String::new();
+        for (vertical_offset, line) in room_setup.lines().enumerate() {
             for (horizontal_offset, char) in line.chars().enumerate() {
                 match char {
                     ' ' => continue,
-                    '.' => darkened_room.push_str(&format!(
+                    '.' => room.push_str(&format!(
                         "{}{} {}",
                         termion::cursor::Goto(
                             (COORDINATES.horizontal + horizontal_offset + 1) as u16,
@@ -115,7 +115,7 @@ impl Drawable for DarkRoom {
                         termion::color::Bg(termion::color::LightBlack),
                         termion::color::Bg(termion::color::Reset),
                     )),
-                    _ => darkened_room.push_str(&format!(
+                    _ => room.push_str(&format!(
                         "{}{}",
                         termion::cursor::Goto(
                             (COORDINATES.horizontal + horizontal_offset + 1) as u16,
@@ -127,6 +127,6 @@ impl Drawable for DarkRoom {
             }
         }
 
-        darkened_room
+        room
     }
 }

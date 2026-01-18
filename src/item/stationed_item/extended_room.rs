@@ -14,11 +14,6 @@ const COORDINATES: Vector = Vector {
     vertical: 7,
 };
 
-const DIMENSIONS: Vector = Vector {
-    horizontal: 35,
-    vertical: 9,
-};
-
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct ExtendedRoom {
     linked_interactions: Vec<Interaction>,
@@ -31,6 +26,19 @@ impl ExtendedRoom {
             // reference and you cannot return reference to temporary value
             linked_interactions: Vec::new(),
         }
+    }
+
+    fn get_room_setup(&self) -> &'static str {
+        "├──────────   ─────┴──   ─────────┨
+│                                 │
+│                                 │
+│                                 │
+│                                 │
+│                                 │
+│                                 │
+│                                 │
+│                                 │
+└─────────────────────────────────┘"
     }
 }
 
@@ -50,38 +58,22 @@ impl Item for ExtendedRoom {
 
 impl Stationary for ExtendedRoom {
     fn list_blocking_coordinates(&self) -> Vec<Vector> {
-        let mut blocked_coordinates = Vec::new();
+        let room = self.get_room_setup();
 
-        // top and bottom wall
-        for horizontal_offset in 0..=DIMENSIONS.horizontal {
-            // leave some space where the door is
-            if !(11..=13).contains(&horizontal_offset) && !(22..=24).contains(&horizontal_offset) {
-                blocked_coordinates.push(Vector {
-                    horizontal: COORDINATES.horizontal + horizontal_offset,
-                    vertical: COORDINATES.vertical,
-                });
+        let mut blocked_coordinate = Vec::new();
+        for (vertical_offset, line) in room.lines().enumerate() {
+            for (horizontal_offset, char) in line.chars().enumerate() {
+                match char {
+                    ' ' => continue,
+                    _ => blocked_coordinate.push(Vector {
+                        horizontal: COORDINATES.horizontal + horizontal_offset,
+                        vertical: COORDINATES.vertical + vertical_offset,
+                    }),
+                }
             }
-
-            blocked_coordinates.push(Vector {
-                horizontal: COORDINATES.horizontal + horizontal_offset,
-                vertical: COORDINATES.vertical + DIMENSIONS.vertical,
-            });
         }
 
-        // left and right wall
-        for vertical_offset in 0..=DIMENSIONS.vertical {
-            blocked_coordinates.push(Vector {
-                horizontal: COORDINATES.horizontal,
-                vertical: COORDINATES.vertical + vertical_offset,
-            });
-
-            blocked_coordinates.push(Vector {
-                horizontal: COORDINATES.horizontal + DIMENSIONS.horizontal - 1,
-                vertical: COORDINATES.vertical + vertical_offset,
-            });
-        }
-
-        blocked_coordinates
+        blocked_coordinate
     }
 
     fn get_linked_interactions(&self) -> &Vec<Interaction> {
@@ -97,52 +89,25 @@ impl Stationary for ExtendedRoom {
 
 impl Drawable for ExtendedRoom {
     fn draw(&self) -> String {
-        let mut walls = String::new();
+        let room_setup = self.get_room_setup();
 
-        // top wall
-        walls.push_str(&format!(
-            "{}├──────────{}─────┴──{}─────────┐",
-            // go to start of wall
-            termion::cursor::Goto(
-                (COORDINATES.horizontal + 1) as u16,
-                (COORDINATES.vertical + 1) as u16,
-            ),
-            // leave space for door
-            termion::cursor::Goto(
-                (COORDINATES.horizontal + 15) as u16,
-                (COORDINATES.vertical + 1) as u16,
-            ),
-            // leave space for second
-            termion::cursor::Goto(
-                (COORDINATES.horizontal + 26) as u16,
-                (COORDINATES.vertical + 1) as u16,
-            ),
-        ));
-
-        // left and right wall
-        for vertical_offset in 1..DIMENSIONS.vertical {
-            walls.push_str(&format!(
-                "{}│{}│",
-                termion::cursor::Goto(
-                    (COORDINATES.horizontal + 1) as u16,
-                    (COORDINATES.vertical + vertical_offset + 1) as u16,
-                ),
-                termion::cursor::Goto(
-                    (COORDINATES.horizontal + DIMENSIONS.horizontal) as u16,
-                    (COORDINATES.vertical + vertical_offset + 1) as u16,
-                )
-            ))
+        let mut room = String::new();
+        for (vertical_offset, line) in room_setup.lines().enumerate() {
+            for (horizontal_offset, char) in line.chars().enumerate() {
+                match char {
+                    ' ' => continue,
+                    _ => room.push_str(&format!(
+                        "{}{}",
+                        termion::cursor::Goto(
+                            (COORDINATES.horizontal + horizontal_offset + 1) as u16,
+                            (COORDINATES.vertical + vertical_offset + 1) as u16
+                        ),
+                        char,
+                    )),
+                }
+            }
         }
 
-        // bottom wall
-        walls.push_str(&format!(
-            "{}└─────────────────────────────────┘",
-            termion::cursor::Goto(
-                (COORDINATES.horizontal + 1) as u16,
-                (COORDINATES.vertical + DIMENSIONS.vertical + 1) as u16,
-            ),
-        ));
-
-        walls
+        room
     }
 }
