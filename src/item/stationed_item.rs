@@ -1,3 +1,4 @@
+pub mod dark_room;
 pub mod dropped_marshmallow;
 pub mod extended_room;
 pub mod fireplace;
@@ -19,10 +20,10 @@ use crate::{
         collected_item::CollectedItems,
         interaction::{Interaction, InteractionStatus},
         stationed_item::{
-            dropped_marshmallow::DroppedMarshmallow, extended_room::ExtendedRoom,
-            fireplace::Fireplace, firewood::Firewood, locked_door::LockedDoor,
-            lost_chest_key::LostChestKey, oil_drum::OilDrum, packet::Packet,
-            treasure_chest::TreasureChest,
+            dark_room::DarkRoom, dropped_marshmallow::DroppedMarshmallow,
+            extended_room::ExtendedRoom, fireplace::Fireplace, firewood::Firewood,
+            locked_door::LockedDoor, lost_chest_key::LostChestKey, oil_drum::OilDrum,
+            packet::Packet, treasure_chest::TreasureChest,
         },
     },
     player::Player,
@@ -46,6 +47,7 @@ macro_rules! method_on_inner_stationed_item {
             StationaryItem::Firewood(inner) => inner.$method(),
             StationaryItem::DroppedMarshmallow(inner) => inner.$method(),
             StationaryItem::OilDrum(inner) => inner.$method(),
+            StationaryItem::DarkRoom(inner) => inner.$method(),
         }
     };
     // call with parameters
@@ -76,6 +78,8 @@ macro_rules! mut_method_on_inner_stationed_item {
             StationaryItem::Fireplace(inner) => inner.$method(),
             StationaryItem::Firewood(inner) => inner.$method(),
             StationaryItem::DroppedMarshmallow(inner) => inner.$method(),
+            StationaryItem::OilDrum(inner) => inner.$method(),
+            StationaryItem::DarkRoom(inner) => inner.$method(),
         }
     };
     // call with parameters
@@ -90,6 +94,7 @@ macro_rules! mut_method_on_inner_stationed_item {
             StationaryItem::Firewood(inner) => inner.$method( $( $parameter ),* ),
             StationaryItem::DroppedMarshmallow(inner) => inner.$method( $( $parameter ),* ),
             StationaryItem::OilDrum(inner) => inner.$method( $( $parameter ),* ),
+            StationaryItem::DarkRoom(inner) => inner.$method( $( $parameter ),* ),
         }
     };
 }
@@ -242,6 +247,7 @@ pub enum StationaryItem {
     Firewood(Firewood),
     DroppedMarshmallow(DroppedMarshmallow),
     OilDrum(OilDrum),
+    DarkRoom(DarkRoom),
 }
 
 impl Drawable for StationedItems {

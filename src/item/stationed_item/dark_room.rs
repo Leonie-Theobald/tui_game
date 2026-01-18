@@ -1,0 +1,132 @@
+use serde::{Deserialize, Serialize};
+
+use crate::{
+    item::{
+        Item,
+        interaction::{Interaction, InteractionStatus},
+        stationed_item::Stationary,
+    },
+    tui::{Drawable, Vector},
+};
+
+const COORDINATES: Vector = Vector {
+    horizontal: 29,
+    vertical: 3,
+};
+
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct DarkRoom {
+    linked_interactions: Vec<Interaction>,
+    pub lit_up: bool,
+}
+
+impl DarkRoom {
+    pub fn initiate() -> Self {
+        let linked_interactions = vec![];
+
+        Self {
+            linked_interactions,
+            lit_up: false,
+        }
+    }
+    fn get_room_setup(&self) -> String {
+        let room_setup = "┰──────────────┐
+│..............│
+│...  .........│
+│.      .......│
+┴──   ─────────┨";
+
+        if self.lit_up {
+            // '.' symbolize dark areas
+            // if lit up everything can be seen
+            room_setup.replace('.', " ")
+        } else {
+            String::from(room_setup)
+        }
+    }
+}
+
+impl Item for DarkRoom {
+    fn get_name(&self) -> &'static str {
+        "Dark Room"
+    }
+
+    fn get_description(&self) -> &'static str {
+        "There is not much to see in this room without light."
+    }
+
+    fn get_detail_view(&self) -> String {
+        todo!()
+    }
+}
+
+impl Stationary for DarkRoom {
+    fn list_blocking_coordinates(&self) -> Vec<Vector> {
+        let room = self.get_room_setup();
+
+        let mut blocked_coordinate = Vec::new();
+        for (vertical_offset, line) in room.lines().enumerate() {
+            for (horizontal_offset, char) in line.chars().enumerate() {
+                match char {
+                    ' ' => continue,
+                    _ => blocked_coordinate.push(Vector {
+                        horizontal: COORDINATES.horizontal + horizontal_offset,
+                        vertical: COORDINATES.vertical + vertical_offset,
+                    }),
+                }
+            }
+        }
+
+        blocked_coordinate
+    }
+
+    fn get_linked_interactions(&self) -> &Vec<Interaction> {
+        &self.linked_interactions
+    }
+
+    fn get_interaction_status(&self) -> InteractionStatus {
+        if self.lit_up {
+            InteractionStatus::Finished
+        } else {
+            InteractionStatus::Open
+        }
+    }
+
+    fn set_interaction_status_to_finished(&mut self) {
+        self.lit_up = true;
+    }
+}
+
+impl Drawable for DarkRoom {
+    fn draw(&self) -> String {
+        let room = self.get_room_setup();
+
+        let mut darkened_room = String::new();
+        for (vertical_offset, line) in room.lines().enumerate() {
+            for (horizontal_offset, char) in line.chars().enumerate() {
+                match char {
+                    ' ' => continue,
+                    '.' => darkened_room.push_str(&format!(
+                        "{}{} {}",
+                        termion::cursor::Goto(
+                            (COORDINATES.horizontal + horizontal_offset + 1) as u16,
+                            (COORDINATES.vertical + vertical_offset + 1) as u16
+                        ),
+                        termion::color::Bg(termion::color::LightBlack),
+                        termion::color::Bg(termion::color::Reset),
+                    )),
+                    _ => darkened_room.push_str(&format!(
+                        "{}{}",
+                        termion::cursor::Goto(
+                            (COORDINATES.horizontal + horizontal_offset + 1) as u16,
+                            (COORDINATES.vertical + vertical_offset + 1) as u16
+                        ),
+                        char,
+                    )),
+                }
+            }
+        }
+
+        darkened_room
+    }
+}
