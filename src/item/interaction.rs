@@ -5,6 +5,7 @@ pub mod locked_door_interaction;
 pub mod lost_chest_key_interaction;
 pub mod oil_drum_interaction;
 pub mod packet_interaction;
+pub mod torch_holder_interaction;
 pub mod treasure_chest_interaction;
 
 use crate::item::{
@@ -15,6 +16,7 @@ use crate::item::{
         locked_door_interaction::LockedDoorInteraction,
         lost_chest_key_interaction::LostChestKeyInteraction,
         oil_drum_interaction::OilDrumInteraction, packet_interaction::PacketInteraction,
+        torch_holder_interaction::TorchHolderInteraction,
         treasure_chest_interaction::TreasureChestInteraction,
     },
     stationed_item::Stationary,
@@ -46,6 +48,7 @@ pub enum Interaction {
     Fireplace(FireplaceInteraction),
     DroppedMarshmallow(DroppedMarshmallowInteraction),
     OilDrum(OilDrumInteraction),
+    TorchHolder(TorchHolderInteraction),
 }
 
 impl std::fmt::Display for Interaction {
@@ -71,6 +74,9 @@ impl Interaction {
                 dropped_marshmallow_interaction.get_inner()
             }
             Interaction::OilDrum(oil_drum_interaction) => oil_drum_interaction.get_inner(),
+            Interaction::TorchHolder(torch_holder_interaction) => {
+                torch_holder_interaction.get_inner()
+            }
         }
     }
 }

@@ -17,7 +17,6 @@ const COORDINATES: Vector = Vector {
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct DarkRoom {
     linked_interactions: Vec<Interaction>,
-    pub lit_up: bool,
 }
 
 impl DarkRoom {
@@ -26,23 +25,14 @@ impl DarkRoom {
 
         Self {
             linked_interactions,
-            lit_up: false,
         }
     }
-    fn get_room_setup(&self) -> String {
-        let room_setup = "┰──────────────┐
-│..............│
-│...  .........│
-│.      .......│
-┴──   ─────────┨";
-
-        if self.lit_up {
-            // '.' symbolize dark areas
-            // if lit up everything can be seen
-            room_setup.replace('.', " ")
-        } else {
-            String::from(room_setup)
-        }
+    fn get_room_setup(&self) -> &'static str {
+        "┰──────────────┐
+│              │
+│              │
+│              │
+┴──   ─────────┨"
     }
 }
 
@@ -85,16 +75,10 @@ impl Stationary for DarkRoom {
     }
 
     fn get_interaction_status(&self) -> InteractionStatus {
-        if self.lit_up {
-            InteractionStatus::Finished
-        } else {
-            InteractionStatus::Open
-        }
+        InteractionStatus::Open
     }
 
-    fn set_interaction_status_to_finished(&mut self) {
-        self.lit_up = true;
-    }
+    fn set_interaction_status_to_finished(&mut self) {}
 }
 
 impl Drawable for DarkRoom {
@@ -106,15 +90,6 @@ impl Drawable for DarkRoom {
             for (horizontal_offset, char) in line.chars().enumerate() {
                 match char {
                     ' ' => continue,
-                    '.' => room.push_str(&format!(
-                        "{}{} {}",
-                        termion::cursor::Goto(
-                            (COORDINATES.horizontal + horizontal_offset + 1) as u16,
-                            (COORDINATES.vertical + vertical_offset + 1) as u16
-                        ),
-                        termion::color::Bg(termion::color::LightBlack),
-                        termion::color::Bg(termion::color::Reset),
-                    )),
                     _ => room.push_str(&format!(
                         "{}{}",
                         termion::cursor::Goto(
