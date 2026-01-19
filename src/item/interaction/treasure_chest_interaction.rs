@@ -5,7 +5,7 @@ use crate::item::{
         CollectableItem, CollectedItems, candle::Candle, chest_key::ChestKey,
         treasure_map::TreasureMap,
     },
-    interaction::Interactable,
+    interaction::{Interactable, InteractionStatus},
     stationed_item::Stationary,
 };
 
@@ -34,6 +34,10 @@ impl Interactable for Unlock {
         linked_stationary_item: &mut dyn Stationary,
         collected_items: &mut CollectedItems,
     ) -> String {
+        if let InteractionStatus::Finished = linked_stationary_item.get_interaction_status() {
+            return String::from("You have already opened the chest.");
+        }
+
         if !collected_items
             .list
             .contains(&CollectableItem::ChestKey(ChestKey))
