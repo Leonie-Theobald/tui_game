@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 use crate::{
     item::{
         Item,
+        collected_item::torch::Torch,
         interaction::{
             Interaction, InteractionStatus,
             torch_holder_interaction::{MountTorch, TorchHolderInteraction},
@@ -58,7 +59,80 @@ impl Item for TorchHolder {
     }
 
     fn get_detail_view(&self) -> String {
-        todo!()
+        let torch_holder = if self.holds_torch {
+            "  
+  
+                                           
+                                          
+                                         
+                                          
+                                           
+                                           
+                                          
+                                       
+                                       
+                                      
+                     │          ╱╱   ╱╱
+                     ╞╦════════╱╱   ╱╱
+                     │║       ╱╱===╱╱ 
+                      ║               
+                      ║               
+                      ║               
+                      ║   ╱╱   ╱╱     
+                      ╚══╱╱   ╱╱      
+                        ╱╱===╱╱"
+        } else {
+            "  
+  
+                                           
+                                          
+                                         
+                                          
+                                           
+                                           
+                                          
+                                       
+                                       
+                                      
+                     │          ╱╱===╱╱
+                     ╞╦════════╱╱   ╱╱
+                     │║       ╱╱===╱╱ 
+                      ║               
+                      ║               
+                      ║               
+                      ║   ╱╱===╱╱     
+                      ╚══╱╱   ╱╱      
+                        ╱╱===╱╱"
+        };
+
+        let mut colored_torch_holder = String::new();
+        for (vertical_offset, line) in torch_holder.lines().enumerate() {
+            for (horizontal_offset, char) in line.chars().enumerate() {
+                match char {
+                    ' ' => continue,
+                    c => colored_torch_holder.push_str(&format!(
+                        "{}{}{}{}{}{}",
+                        termion::cursor::Goto(
+                            (horizontal_offset + 1) as u16,
+                            (vertical_offset + 1) as u16
+                        ),
+                        termion::color::Bg(termion::color::AnsiValue(242)),
+                        termion::color::Fg(termion::color::AnsiValue(233)),
+                        c,
+                        termion::color::Bg(termion::color::Reset),
+                        termion::color::Fg(termion::color::Reset),
+                    )),
+                }
+            }
+        }
+
+        let colored_torch = if self.holds_torch {
+            Torch.get_detail_view()
+        } else {
+            String::new()
+        };
+
+        format!("{}{}", colored_torch, colored_torch_holder)
     }
 }
 

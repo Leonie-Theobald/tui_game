@@ -48,59 +48,108 @@ impl Item for Packet {
     }
 
     fn get_detail_view(&self) -> String {
-        if self.opened {
-            String::from(
-                "                                                               
+        let uncolored_packet = if self.opened {
+            "                                                               
 
 
                        ____________________________                              
-                /\\    /                           /
-               /  \\  /                           /                              
-              /    \\/__________________________ /______                            
-             /     /|                          /      /                            
-             \\    / |                         /      /                             
-              \\  /  |                        /      /                              
+                /\\    /.........................../
+               /..\\  /.........................../                              
+              /....\\/__________________________./______                            
+             /...../|........................../....../                            
+             \\..../.|........................./....../                             
+              \\../..|......................../....../                              
                \\/___________________________/______/                               
-               /                            \\   |                               
-              /                              \\  |
-             /________________________________\\ |                               
-               |        ███████████        |    |                               
-               |        █  PACKET █        |    |                               
-               |        ███████████        |    |                               
-               |                           |   /                                
-               |      HANDLE WITH CARE     |  /                                 
-               |                           | /                                  
+               /............................\\...|                               
+              /..............................\\..|
+             /________________________________\\.|                               
+               |........wwwwwwwwww.........|....|                               
+               |........wwPACKETww.........|....|                               
+               |........wwwwwwwwww.........|....|                               
+               |...........................|.../                                
+               |.....wHANDLEwWITHwCAREw....|../                                 
+               |...........................|./                                  
                |___________________________|/                                 
                                                                                 
 
-                                                                                ",
-            )
+                                                                                "
         } else {
-            String::from(
-                "                                                               
+            "                                                               
                                                                                 
 
                                                                                 
                     ____________________________                                
-                   /                           /|       
-                  /___________________________/ |                               
-                 /                           /  |                               
-                /___________________________/   |                               
-               |                           |    |                               
-               |       SEALED PACKAGE      |    |                               
-               |                           |    |                               
-               |        ███████████        |    |                               
-               |        █  PACKET █        |    |                               
-               |        ███████████        |    |                               
-               |                           |   /                                
-               |      HANDLE WITH CARE     |  /                                 
-               |                           | /                                  
+                   /.........................../|       
+                  /___________________________/.|                               
+                 /.........................../..|                               
+                /___________________________/...|                               
+               |...........................|....|                               
+               |......wSEALEDwPACKAGEw.....|....|                               
+               |...........................|....|                               
+               |........wwwwwwwwww.........|....|                               
+               |........wwPACKETww.........|....|                               
+               |........wwwwwwwwww.........|....|                               
+               |...........................|.../                                
+               |.....wHANDLEwWITHwCAREw....|../                                 
+               |...........................|./                                  
                |___________________________|/                                 
                                                                                 
                                                                                 
-                                                                                ",
-            )
+                                                                                "
+        };
+
+        let mut colored_packet = String::new();
+        for (vertical_offset, line) in uncolored_packet.lines().enumerate() {
+            for (horizontal_offset, char) in line.chars().enumerate() {
+                match char {
+                    ' ' => continue,
+                    'w' => colored_packet.push_str(&format!(
+                        "{}{} {}",
+                        termion::cursor::Goto(
+                            (horizontal_offset + 1) as u16,
+                            (vertical_offset + 1) as u16
+                        ),
+                        termion::color::Bg(termion::color::White),
+                        termion::color::Bg(termion::color::Reset),
+                    )),
+                    '.' => colored_packet.push_str(&format!(
+                        "{}{} {}",
+                        termion::cursor::Goto(
+                            (horizontal_offset + 1) as u16,
+                            (vertical_offset + 1) as u16
+                        ),
+                        termion::color::Bg(termion::color::AnsiValue(137)),
+                        termion::color::Bg(termion::color::Reset),
+                    )),
+                    c if c.is_alphabetic() => colored_packet.push_str(&format!(
+                        "{}{}{}{}{}{}",
+                        termion::cursor::Goto(
+                            (horizontal_offset + 1) as u16,
+                            (vertical_offset + 1) as u16
+                        ),
+                        termion::color::Bg(termion::color::White),
+                        termion::color::Fg(termion::color::Black),
+                        c,
+                        termion::color::Bg(termion::color::Reset),
+                        termion::color::Fg(termion::color::Reset),
+                    )),
+                    c => colored_packet.push_str(&format!(
+                        "{}{}{}{}{}{}",
+                        termion::cursor::Goto(
+                            (horizontal_offset + 1) as u16,
+                            (vertical_offset + 1) as u16
+                        ),
+                        termion::color::Bg(termion::color::AnsiValue(137)),
+                        termion::color::Fg(termion::color::Black),
+                        c,
+                        termion::color::Bg(termion::color::Reset),
+                        termion::color::Fg(termion::color::Reset),
+                    )),
+                }
+            }
         }
+
+        colored_packet
     }
 }
 

@@ -1,4 +1,7 @@
-use crate::item::{Item, collected_item::Collectable};
+use crate::item::{
+    Item,
+    collected_item::{Collectable, branch::Branch},
+};
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
@@ -14,48 +17,45 @@ impl Item for OiledBranch {
     }
 
     fn get_detail_view(&self) -> String {
-        let branch = String::from(
-            "
-
-
+        let oiled_part = " 
+ 
+ 
                          _          
                         //
                        //
                       //
-                _____/.__
-                    /./ \\   
-                   /./___/   
-             \\___/ /_ \\         
-                /  /   _ 
-              _/  /___/___/    
-            _/  _/   \\ 
-        ___/ __/ 
-        \\___/",
-        );
+                -----/.__/
+                    /./  \\   
+                   /./___";
 
-        let mut oiled_branch = String::new();
-        for (index, line) in branch.lines().enumerate() {
-            if index < 10 {
-                // part covered with oil
-                for char in line.chars() {
-                    if char.is_whitespace() {
-                        oiled_branch.push(char);
-                    } else {
-                        oiled_branch.push_str(&format!(
-                            "{}{}{}",
-                            termion::color::Bg(termion::color::AnsiValue(234)),
-                            char,
+        let mut colored_oiled_part = String::new();
+        for (vertical_offset, line) in oiled_part.lines().enumerate() {
+            for (horizontal_offset, char) in line.chars().enumerate() {
+                match char {
+                    ' ' => continue,
+                    c => {
+                        let transformed_char = if c == '.' { ' ' } else { c };
+
+                        colored_oiled_part.push_str(&format!(
+                            "{}{}{}{}{}{}",
+                            termion::cursor::Goto(
+                                (horizontal_offset + 1) as u16,
+                                (vertical_offset + 1) as u16
+                            ),
+                            termion::color::Fg(termion::color::AnsiValue(237)),
+                            termion::color::Bg(termion::color::AnsiValue(239)),
+                            transformed_char,
+                            termion::color::Fg(termion::color::Reset),
                             termion::color::Bg(termion::color::Reset),
                         ))
                     }
                 }
-            } else {
-                oiled_branch.push_str(line);
             }
-            oiled_branch.push_str("\r\n");
         }
 
-        oiled_branch
+        let colored_branch = Branch.get_detail_view();
+
+        format!("{}{}", colored_branch, colored_oiled_part)
     }
 }
 

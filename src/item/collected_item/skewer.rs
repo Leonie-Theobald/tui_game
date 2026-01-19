@@ -14,16 +14,35 @@ impl Item for Skewer {
     }
 
     fn get_detail_view(&self) -> String {
-        String::from(
-            "
+        let uncolored_skewer = "
 
 
                          /         
                         /
                        /
                       /
-                     /",
-        )
+                     /";
+
+        let mut colored_skewer = String::new();
+        for (vertical_offset, line) in uncolored_skewer.lines().enumerate() {
+            for (horizontal_offset, char) in line.chars().enumerate() {
+                match char {
+                    ' ' => continue,
+                    c => colored_skewer.push_str(&format!(
+                        "{}{}{}{}",
+                        termion::cursor::Goto(
+                            (horizontal_offset + 1) as u16,
+                            (vertical_offset + 1) as u16
+                        ),
+                        termion::color::Fg(termion::color::AnsiValue(130)),
+                        c,
+                        termion::color::Fg(termion::color::Reset),
+                    )),
+                }
+            }
+        }
+
+        colored_skewer
     }
 }
 

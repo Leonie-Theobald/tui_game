@@ -14,50 +14,81 @@ impl Item for RoastedMarshmallow {
     }
 
     fn get_detail_view(&self) -> String {
-        let plain_marshmallow = String::from(
+        let uncolored_marshmallow = String::from(
             "
-                                                          \r
-                             _____________________        \r
-                         ___/.....................\\___   \r
-                        /.............................\\  \r
-                       |\\_..........................._/| \r
-                       |..\\_________________________/..| \r
-                       |...............................|  \r
-                       |...............................|  \r
-                       |...............................|  \r
-                       |...............................|  \r
-                       |...............................|  \r
-                       |...............................|  \r
-                       |...............................|  \r
-                       |...............................|  \r
-                       |...............................|  \r
-                       |...............................|  \r
-                       |...............................|  \r
-                       |...............................|  \r
-                       |...............................|  \r
-                        \\_..........................._/  \r
-                          \\_________________________/    \r
+                                                         
+                             _____________________       
+                         ___/...............bbbb..\\___  
+                        /........bbbbb......bxxb......\\ 
+                       |\\_......bxxx.......bbbb......_/|
+                       |..\\_________________________/..|
+                       |....bxxb.......bbbb............| 
+                       |....bxxb.......bxxb............| 
+                       |....bbbb.......bxxb............| 
+                       |...............bbbb............| 
+                       |...............................| 
+                       |...............................| 
+                       |.............bbbb..............| 
+                       |.............bxxb..............| 
+                       |...bbbb......bxxb..............| 
+                       |...bxxb......bbbb......bbbb....| 
+                       |...bxxb................bxxb....| 
+                       |...bbbb................bxxb....| 
+                       |.......................bbbb....| 
+                        \\_..........................._/ 
+                          \\_________________________/   
                                                          ",
         );
 
-        plain_marshmallow
-            .chars()
-            .fold(String::new(), |mut brown_marshmallow, c| {
-                if c.is_whitespace() {
-                    brown_marshmallow.push(c);
-                } else {
-                    brown_marshmallow.push_str(&format!(
-                        "{}{}{}{}{}",
-                        termion::color::Bg(termion::color::AnsiValue(130)),
-                        termion::color::Fg(termion::color::Black),
-                        c,
+        let mut colored_marshmallow = String::new();
+        for (vertical_offset, line) in uncolored_marshmallow.lines().enumerate() {
+            for (horizontal_offset, char) in line.chars().enumerate() {
+                match char {
+                    ' ' => continue,
+                    '.' => colored_marshmallow.push_str(&format!(
+                        "{}{} {}",
+                        termion::cursor::Goto(
+                            (horizontal_offset + 1) as u16,
+                            (vertical_offset + 1) as u16
+                        ),
+                        termion::color::Bg(termion::color::AnsiValue(215)),
                         termion::color::Bg(termion::color::Reset),
-                        termion::color::Fg(termion::color::Reset)
-                    ))
+                    )),
+                    'x' => colored_marshmallow.push_str(&format!(
+                        "{}{} {}",
+                        termion::cursor::Goto(
+                            (horizontal_offset + 1) as u16,
+                            (vertical_offset + 1) as u16
+                        ),
+                        termion::color::Bg(termion::color::AnsiValue(235)),
+                        termion::color::Bg(termion::color::Reset),
+                    )),
+                    'b' => colored_marshmallow.push_str(&format!(
+                        "{}{} {}",
+                        termion::cursor::Goto(
+                            (horizontal_offset + 1) as u16,
+                            (vertical_offset + 1) as u16
+                        ),
+                        termion::color::Bg(termion::color::AnsiValue(130)),
+                        termion::color::Bg(termion::color::Reset),
+                    )),
+                    c => colored_marshmallow.push_str(&format!(
+                        "{}{}{}{}{}{}",
+                        termion::cursor::Goto(
+                            (horizontal_offset + 1) as u16,
+                            (vertical_offset + 1) as u16
+                        ),
+                        termion::color::Fg(termion::color::LightBlack),
+                        termion::color::Bg(termion::color::AnsiValue(215)),
+                        c,
+                        termion::color::Fg(termion::color::Reset),
+                        termion::color::Bg(termion::color::Reset),
+                    )),
                 }
-                brown_marshmallow
-            })
-            .replace(".", " ")
+            }
+        }
+
+        colored_marshmallow
     }
 }
 

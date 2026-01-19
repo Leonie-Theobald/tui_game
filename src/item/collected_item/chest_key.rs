@@ -14,8 +14,7 @@ impl Item for ChestKey {
     }
 
     fn get_detail_view(&self) -> String {
-        String::from(
-            "
+        let uncolored_key = "
                                                                                 
                                                                                 
                                                                                 
@@ -37,8 +36,26 @@ impl Item for ChestKey {
                                                                                 
                                                                                 
                                                                                 
-                                                                                ",
-        )
+                                                                                ";
+        let mut colored_key = String::new();
+        for (vertical_offset, line) in uncolored_key.lines().enumerate() {
+            for (horizontal_offset, char) in line.chars().enumerate() {
+                match char {
+                    ' ' => continue,
+                    c => colored_key.push_str(&format!(
+                        "{}{}{}{}",
+                        termion::cursor::Goto(
+                            (horizontal_offset + 1) as u16,
+                            (vertical_offset + 1) as u16
+                        ),
+                        termion::color::Fg(termion::color::AnsiValue(242)),
+                        c,
+                        termion::color::Fg(termion::color::Reset),
+                    )),
+                }
+            }
+        }
+        colored_key
     }
 }
 

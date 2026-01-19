@@ -47,7 +47,7 @@ impl Item for Firewood {
     }
 
     fn get_detail_view(&self) -> String {
-        String::from(
+        let uncolored_firewood =
             "                                                                                
                                                                                 
                                                                                 
@@ -55,16 +55,41 @@ impl Item for Firewood {
                                                                                 
                                                                                 
                                      ____ __                                    
-                                   /  _  \\  \\_                                  
-                                   |  O\\ |    \\_                                
+                                   /xx_xx\\xx\\_                                  
+                                   |xxO\\x|xxxx\\_                                
                            ________\\_____/______\\________                       
-                          /                       /      \\                      
-                         /                       /   __   \\                     
-                         |                       |  /  \\  |                     
-                         |                       |  \\__/  |                     
-                         \\                       \\        /                     
-                          \\_______________________\\______/",
-        )
+                          /xxxxxxxxxxxxxxxxxxxxxxx/xxxxxx\\                      
+                         /xxxxxxxxxxxxxxxxxxxxxxx/xxx__xxx\\                     
+                         |xxxxxxxxxxxxxxxxxxxxxxx|xx/xx\\xx|                     
+                         |xxxxxxxxxxxxxxxxxxxxxxx|xx\\__/xx|                     
+                         \\xxxxxxxxxxxxxxxxxxxxxxx\\xxxxxxxx/                     
+                          \\_______________________\\______/";
+
+        let mut colored_firewood = String::new();
+        for (vertical_offset, line) in uncolored_firewood.lines().enumerate() {
+            for (horizontal_offset, char) in line.chars().enumerate() {
+                match char {
+                    ' ' => continue,
+                    c => {
+                        let transformed_char = if c == 'x' { ' ' } else { c };
+                        colored_firewood.push_str(&format!(
+                            "{}{}{}{}{}{}",
+                            termion::cursor::Goto(
+                                (horizontal_offset + 1) as u16,
+                                (vertical_offset + 1) as u16
+                            ),
+                            termion::color::Bg(termion::color::AnsiValue(130)),
+                            termion::color::Fg(termion::color::Black),
+                            transformed_char,
+                            termion::color::Bg(termion::color::Reset),
+                            termion::color::Fg(termion::color::Reset),
+                        ))
+                    }
+                }
+            }
+        }
+
+        colored_firewood
     }
 }
 

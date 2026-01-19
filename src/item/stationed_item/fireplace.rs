@@ -52,29 +52,131 @@ impl Item for Fireplace {
     }
 
     fn get_detail_view(&self) -> String {
-        String::from(
-            "
+        let fireplace = "
 
- .___________________________________________________________________________. 
- |                                                                           | 
- |___________________________________________________________________________| 
-   |     !           |           |           |           |           |     |   
-   |_____|__,________|___________|______.____}__,________}___________|_____|   
-   |         |  \\   \\   \\   \\   \\    |   |    /   /   /   /   /  |         |   
-   |_________|___\\_,_\\___\\___\\.__|___|___|___|___/___/___/___/___|_________|   
-   |     |   |      |     \\/ ,\".). ',     \\/. ',          |      |   |     |   
-   |_____|___|      |. ' ,'|// / (/ ,.  ' ,\\(   / ,       |      |___|_____|   
-   |         |     ,|  '|\\/ \\|  \\\\,' ,'.' ||  \\\\,' .'    ,|  '   |         |   
-   |_._______|   \" ,|' .| \\_ |\\/ |#\\_/#| /_|\\_ |#\\_/,) ',.|,'    |_________|   
-   |     |   |   #|(,'  )  \\\\\\#\\ \\##/  ||/ \\#\\  \\###/\\ \\/ \\/.',  |   |     |   
-   |_____|__,|   || ) | \\ |/ /#/ |#( \\|\\\\|  |#/ /##(  )|  \\\\'/   |___|_____|   
-   |         |    \\ |.\\\\ |\\_/#| /#)|##\\ \\\\_/#| |######\\ \\\\/#|    |         |   
-   |_________|    /\\\\_/# |#\\##/# \\#/     \\|/ /  @\\# #@#\\ /#/\\    |_____.___|   
-   |     |   |   /  ##/#  ##\\/#@####@@###V###\\/#@####@@#Y### \\   |   |     |   
-   |___._|___|  / :Y##@@##@##@@###@@@###@##@@###@@@###@####:  \\  |___|_____|   
-   |         | / :;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:  \\ |         |   
-   |_________|/    ::::::::::::::::::::::::::::::::             \\|_________|   ",
-        )
+ .___________________________________________________________________________.
+ |xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
+ |___________________________________________________________________________|
+   |xxxxx!xxxxxxxxxxx|xxxxxxxxxxx|xxxxxxxxxxx|xxxxxxxxxxx|xxxxxxxxxxx|xxxxx|
+   |_____|__,________|___________|______.____}__,________}___________|_____|
+   |xxxxxxxxx|xx\\xxx\\xxx\\xxx\\xxx\\xxxx|xxx|xxxx/xxx/xxx/xxx/xxx/xx|xxxxxxxxx|
+   |_________|___\\_,_\\___\\___\\.__|___|___|___|___/___/___/___/___|_________|
+   |xxxxx|xxx|xxxxx|                                       |xxxxx|xxx|xxxxx|
+   |_____|___|xxxxx|                                       |xxxxx|___|_____|
+   |xxxxxxxxx|xxxxx|                                       |xxxxx|xxxxxxxxx|
+   |_._______|xxxxx|                                       |xxxxx|_________|
+   |xxxxx|xxx|xxxxx|                                       |xxxxx|xxx|xxxxx|
+   |_____|__,|xxxxx|                                       |xxxxx|___|_____|
+   |xxxxxxxxx|xxxxx|                                       |xxxxx|xxxxxxxxx|
+   |_________|xxxx/                                         \\xxxx|_____.___|
+   |xxxxx|xxx|xxx/                                           \\xxx|xxx|xxxxx|
+   |___._|___|xx/                                             \\xx|___|_____|
+   |xxxxxxxxx|x/                                               \\x|xxxxxxxxx|
+   |_________|/                                                 \\|_________|";
+        let fire = "
+
+                                                                               
+                                                                               
+                                                                               
+                                                                               
+                                                                               
+                                                                                    
+                                  .                                                
+                          \\/ ,\".). ',     \\/. ',                               
+                     . ' ,'|// / (/ ,.  ' ,\\(   / ,                            
+                   ,   '|\\/ \\|  \\\\,' ,'.' ||  \\\\,' .'    ,   '                 
+                 \" ,|' .| \\_ |\\/ |#\\_/#| /_|\\_ |#\\_/,) ',. ,'                  
+                 #|(,'  )  \\\\\\#\\ \\##/  ||/ \\#\\  \\###/\\ \\/ \\/.',                
+                 || ) | \\ |/ /#/ |#( \\|\\\\|  |#/ /##(  )|  \\\\'/                 
+                  \\ |.\\\\ |\\_/#| /#)|##\\ \\\\_/#| |######\\ \\\\/#|                  
+                  /\\\\_/# |#\\##/# \\#/     \\|/ /  @\\# #@#\\ /#/\\                  
+                 /  ##/#  ##\\/#@####@@###V###\\/#@####@@#Y###                    
+                  :Y##@@##@##@@###@@@###@##@@###@@@###@####:";
+        let stones = "
+
+                                                                               
+                                                                               
+                                                                               
+                                                                               
+                                                                               
+                                                                                    
+                                                                                   
+                                                                                  
+                                                                                
+                                                                                     
+                                                                                     
+                                                                                          
+                                                                                     
+                                                                                         
+                                                                                       
+                                                                                  
+                                                                                
+                 :;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:                   
+                   ::::::::::::::::::::::::::::::::                             ";
+
+        let mut colored_fireplace = String::new();
+        for (vertical_offset, line) in fireplace.lines().enumerate() {
+            for (horizontal_offset, char) in line.chars().enumerate() {
+                match char {
+                    ' ' => continue,
+                    c => {
+                        let transformed_char = if c == 'x' { ' ' } else { c };
+                        colored_fireplace.push_str(&format!(
+                            "{}{}{}{}",
+                            termion::cursor::Goto(
+                                (horizontal_offset + 1) as u16,
+                                (vertical_offset + 1) as u16
+                            ),
+                            termion::color::Bg(termion::color::AnsiValue(88)),
+                            transformed_char,
+                            termion::color::Bg(termion::color::Reset),
+                        ))
+                    }
+                }
+            }
+        }
+
+        let mut colored_fire = String::new();
+        for (vertical_offset, line) in fire.lines().enumerate() {
+            for (horizontal_offset, char) in line.chars().enumerate() {
+                match char {
+                    ' ' => continue,
+                    c => colored_fire.push_str(&format!(
+                        "{}{}{}{}{}{}",
+                        termion::cursor::Goto(
+                            (horizontal_offset + 1) as u16,
+                            (vertical_offset + 1) as u16
+                        ),
+                        termion::color::Fg(termion::color::AnsiValue(166)),
+                        termion::color::Bg(termion::color::AnsiValue(214)),
+                        c,
+                        termion::color::Fg(termion::color::Reset),
+                        termion::color::Bg(termion::color::Reset),
+                    )),
+                }
+            }
+        }
+
+        let mut colored_stones = String::new();
+        for (vertical_offset, line) in stones.lines().enumerate() {
+            for (horizontal_offset, char) in line.chars().enumerate() {
+                match char {
+                    ' ' => continue,
+                    c => colored_stones.push_str(&format!(
+                        "{}{}{}{}",
+                        termion::cursor::Goto(
+                            (horizontal_offset + 1) as u16,
+                            (vertical_offset + 1) as u16
+                        ),
+                        termion::color::Bg(termion::color::AnsiValue(8)),
+                        c,
+                        termion::color::Bg(termion::color::Reset),
+                    )),
+                }
+            }
+        }
+
+        format!("{}{}{}", colored_fireplace, colored_stones, colored_fire)
     }
 }
 

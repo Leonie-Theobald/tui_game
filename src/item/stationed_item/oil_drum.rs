@@ -46,50 +46,82 @@ impl Item for OilDrum {
     }
 
     fn get_detail_view(&self) -> String {
-        let plain_drum = String::from(
-            "
-                                                          \r
-                             _____________________        \r
-                         ___/..................._.\\___   \r
-                        /...................../ \\....\\  \r
-                       |\\_....................\\ /...._/| \r
-                       |..\\_________________________/..| \r
-                       |...............................|  \r
-                       |...............................|  \r
-                       |...............................|  \r
-                       |...............................|  \r
-                       |...........╔═════╗.............|  \r
-                       |...........║.OIL.║.............|  \r
-                       |...........╚═════╝.............|  \r
-                       |...............................|  \r
-                       |...............................|  \r
-                       |...............................|  \r
-                       |...............................|  \r
-                       |...............................|  \r
-                       |...............................|  \r
-                        \\_..........................._/  \r
-                          \\_________________________/    \r
-                                                         ",
-        );
+        let uncolored_oil_drum = "
+                                                          
+                             _____________________        
+                         ___/.................._..\\___   
+                        /...................../ \\....\\  
+                       |\\_....................\\ /...._/|
+                       |..\\_________________________/..| 
+                       |...............................|  
+                       |...............................|  
+                       |...............................|  
+                       |...............................|  
+                       |...........╔═════╗.............|  
+                       |...........║wOILw║.............|  
+                       |...........╚═════╝.............|  
+                       |...............................|  
+                       |...............................|  
+                       |...............................|  
+                       |...............................|  
+                       |...............................|  
+                       |...............................|  
+                        \\_..........................._/  
+                          \\_________________________/    
+                                                         ";
 
-        plain_drum
-            .chars()
-            .fold(String::new(), |mut red_drum, c| {
-                if c.is_whitespace() {
-                    red_drum.push(c);
-                } else {
-                    red_drum.push_str(&format!(
-                        "{}{}{}{}{}",
-                        termion::color::Bg(termion::color::Red),
-                        termion::color::Fg(termion::color::LightBlack),
+        let mut colored_oil_drum = String::new();
+        for (vertical_offset, line) in uncolored_oil_drum.lines().enumerate() {
+            for (horizontal_offset, char) in line.chars().enumerate() {
+                match char {
+                    ' ' => continue,
+                    c @ ('╔' | '═' | '╗' | '║' | '╚' | '╝' | 'O' | 'I' | 'L') => {
+                        colored_oil_drum.push_str(&format!(
+                            "{}{}{}{}{}{}",
+                            termion::cursor::Goto(
+                                (horizontal_offset + 1) as u16,
+                                (vertical_offset + 1) as u16
+                            ),
+                            termion::color::Bg(termion::color::White),
+                            termion::color::Fg(termion::color::Black),
+                            c,
+                            termion::color::Bg(termion::color::Reset),
+                            termion::color::Fg(termion::color::Reset),
+                        ))
+                    }
+                    'w' => colored_oil_drum.push_str(&format!(
+                        "{}{} {}",
+                        termion::cursor::Goto(
+                            (horizontal_offset + 1) as u16,
+                            (vertical_offset + 1) as u16
+                        ),
+                        termion::color::Bg(termion::color::White),
+                        termion::color::Bg(termion::color::Reset),
+                    )),
+                    '.' => colored_oil_drum.push_str(&format!(
+                        "{}{} {}",
+                        termion::cursor::Goto(
+                            (horizontal_offset + 1) as u16,
+                            (vertical_offset + 1) as u16
+                        ),
+                        termion::color::Bg(termion::color::AnsiValue(160)),
+                        termion::color::Bg(termion::color::Reset),
+                    )),
+                    c => colored_oil_drum.push_str(&format!(
+                        "{}{}{}{}",
+                        termion::cursor::Goto(
+                            (horizontal_offset + 1) as u16,
+                            (vertical_offset + 1) as u16
+                        ),
+                        termion::color::Bg(termion::color::AnsiValue(160)),
                         c,
                         termion::color::Bg(termion::color::Reset),
-                        termion::color::Fg(termion::color::Reset)
-                    ))
+                    )),
                 }
-                red_drum
-            })
-            .replace(".", " ")
+            }
+        }
+
+        colored_oil_drum
     }
 }
 

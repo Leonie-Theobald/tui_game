@@ -14,27 +14,51 @@ impl Item for RustyKey {
     }
 
     fn get_detail_view(&self) -> String {
-        String::from(
-            "
+        let uncolored_key = "
 
 
                                   __________
-                                _/          \\_    
-                               /       ____   \\    
-                             _/       /    \\   \\   
-                            /         |     |   |  
-                            |          \\___/    |  
-                           /                    |  
-                           |                    |  
-                        ___/                   /   
-                    ___/    __                /    
-                ___/   __  |  \\______________/     
-            ___/    _  \\ \\  \\        
-        ___/       / \\_/  \\_/                         
-       |      __   \\                                
-       |     /  \\__|                                
-       |____|",
-        )
+                                _/xxxxxxxxxx\\_    
+                               /xxxxxxx____xxx\\    
+                             _/xxxxxxx/    \\xxx\\   
+                            /xxxxxxxxx|     |xxx|  
+                            |xxxxxxxxxx\\___/xxxx|  
+                           /xxxxxxxxxxxxxxxxxxxx|  
+                           |xxxxxxxxxxxxxxxxxxxx|  
+                        ___/xxxxxxxxxxxxxxxxxxx/   
+                    ___/xxxxxxxxxxxxxxxxxxxxxx/    
+                ___/xxx__xxxx/\\______________/     
+            ___/xxxxxxx\\ \\xx\\        
+        ___/xxxxxxx/ \\_/  \\_/                         
+       |xxxxxx__xxx\\                                
+       |xxxxx/  \\__|                                
+       |____|";
+
+        let mut colored_key = String::new();
+        for (vertical_offset, line) in uncolored_key.lines().enumerate() {
+            for (horizontal_offset, char) in line.chars().enumerate() {
+                match char {
+                    ' ' => continue,
+                    c => {
+                        let transformed_char = if c == 'x' { ' ' } else { c };
+
+                        colored_key.push_str(&format!(
+                            "{}{}{}{}{}{}",
+                            termion::cursor::Goto(
+                                (horizontal_offset + 1) as u16,
+                                (vertical_offset + 1) as u16
+                            ),
+                            termion::color::Fg(termion::color::Black),
+                            termion::color::Bg(termion::color::AnsiValue(220)),
+                            transformed_char,
+                            termion::color::Fg(termion::color::Reset),
+                            termion::color::Bg(termion::color::Reset),
+                        ))
+                    }
+                }
+            }
+        }
+        colored_key
     }
 }
 

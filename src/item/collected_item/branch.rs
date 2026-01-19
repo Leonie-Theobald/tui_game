@@ -14,24 +14,43 @@ impl Item for Branch {
     }
 
     fn get_detail_view(&self) -> String {
-        String::from(
-            "
+        let uncolored_branch = "
 
 
                          _          
                         //
                        //
                       //
-                _____/ __
-                    / / \\   
-                   / /___/   
-             \\___/ /_ \\         
+                -----/ __/
+                    / /  \\   
+                   / /___   
+              \\___/ /__        
                 /  /   _ 
               _/  /___/___/    
-            _/  _/   \\ 
-        ___/ __/ 
-        \\___/",
-        )
+            _/  _/    \\ 
+         __/  _/ 
+        \\___/";
+
+        let mut colored_branch = String::new();
+        for (vertical_offset, line) in uncolored_branch.lines().enumerate() {
+            for (horizontal_offset, char) in line.chars().enumerate() {
+                match char {
+                    ' ' => continue,
+                    c => colored_branch.push_str(&format!(
+                        "{}{}{}{}",
+                        termion::cursor::Goto(
+                            (horizontal_offset + 1) as u16,
+                            (vertical_offset + 1) as u16
+                        ),
+                        termion::color::Fg(termion::color::AnsiValue(130)),
+                        c,
+                        termion::color::Fg(termion::color::Reset),
+                    )),
+                }
+            }
+        }
+
+        colored_branch
     }
 }
 

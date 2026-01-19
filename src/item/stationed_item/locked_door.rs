@@ -49,30 +49,79 @@ impl Item for LockedDoor {
     }
 
     fn get_detail_view(&self) -> String {
-        String::from(
+        let uncolored_door =
             "                                                                               
                                                                                
                                                                                
                                                                                
                    █▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀█                                                       
-                  █           |            █                                
-                  █           |            █                                      
-                  █           |            █                                      
-                █▛▀           |            ▀█▌                                
-                █▌            |             █▌                                
-                █▌            |             █▌                                
-                █▌            |             █▌                                
-                █▌          O | O           █▌                                
-                █▌            |             █▌                                
-                █▌            |             █▌                                
-                █▌            |             █▌                                
-                █▌            |             █▌                                
-                █▌            |             █▌                                
-    //////////////////////////////////////////////////////////////////          
-    //////////////////////////////////////////////////////////////////          
-                                                                                
-                                                                                ",
-        )
+                  █xxxxxxxxxxx|xxxxxxxxxxxx█                                
+                  █xxxxxxxxxxx|xxxxxxxxxxxx█                                      
+                  █xxxxxxxxxxx|xxxxxxxxxxxx█                                      
+                █▛▀xxxxxxxxxxx|xxxxxxxxxxxx▀█▌                                
+                █▌xxxxxxxxxxxx|xxxxxxxxxxxxx█▌                                
+                █▌xxxxxxxxxxxx|xxxxxxxxxxxxx█▌                                
+                █▌xxxxxxxxxxxx|xxxxxxxxxxxxx█▌                                
+                █▌xxxxxxxxxxOx|xOxxxxxxxxxxx█▌                                
+                █▌xxxxxxxxxxxx|xxxxxxxxxxxxx█▌                                
+                █▌xxxxxxxxxxxx|xxxxxxxxxxxxx█▌                                
+                █▌xxxxxxxxxxxx|xxxxxxxxxxxxx█▌                                
+                █▌xxxxxxxxxxxx|xxxxxxxxxxxxx█▌                                
+                █▌xxxxxxxxxxxx|xxxxxxxxxxxxx█▌                                
+    //////////////////////////////////////////////////////          
+    //////////////////////////////////////////////////////";
+
+        let mut colored_door = String::new();
+        for (vertical_offset, line) in uncolored_door.lines().enumerate() {
+            for (horizontal_offset, char) in line.chars().enumerate() {
+                match char {
+                    ' ' => continue,
+                    'O' => colored_door.push_str(&format!(
+                        "{}{}{}O{}{}",
+                        termion::cursor::Goto(
+                            (horizontal_offset + 1) as u16,
+                            (vertical_offset + 1) as u16
+                        ),
+                        termion::color::Bg(termion::color::AnsiValue(22)),
+                        termion::color::Fg(termion::color::Black),
+                        termion::color::Bg(termion::color::Reset),
+                        termion::color::Fg(termion::color::Reset),
+                    )),
+                    '/' => colored_door.push_str(&format!(
+                        "{}{}{}/{}{}",
+                        termion::cursor::Goto(
+                            (horizontal_offset + 1) as u16,
+                            (vertical_offset + 1) as u16
+                        ),
+                        termion::color::Bg(termion::color::LightBlack),
+                        termion::color::Fg(termion::color::AnsiValue(246)),
+                        termion::color::Bg(termion::color::Reset),
+                        termion::color::Fg(termion::color::Reset),
+                    )),
+                    'x' => colored_door.push_str(&format!(
+                        "{}{} {}",
+                        termion::cursor::Goto(
+                            (horizontal_offset + 1) as u16,
+                            (vertical_offset + 1) as u16
+                        ),
+                        termion::color::Bg(termion::color::AnsiValue(22)),
+                        termion::color::Bg(termion::color::Reset),
+                    )),
+                    c => colored_door.push_str(&format!(
+                        "{}{}{}{}",
+                        termion::cursor::Goto(
+                            (horizontal_offset + 1) as u16,
+                            (vertical_offset + 1) as u16
+                        ),
+                        termion::color::Fg(termion::color::AnsiValue(130)),
+                        c,
+                        termion::color::Fg(termion::color::Reset),
+                    )),
+                }
+            }
+        }
+
+        colored_door
     }
 }
 
@@ -119,12 +168,14 @@ impl Drawable for LockedDoor {
         let door_string = "█".repeat(WIDTH);
 
         format!(
-            "{}{}",
+            "{}{}{}{}",
             termion::cursor::Goto(
                 (COORDINATES.horizontal + 1) as u16,
                 (COORDINATES.vertical + 1) as u16
             ),
+            termion::color::Fg(termion::color::AnsiValue(22)),
             door_string,
+            termion::color::Fg(termion::color::Reset)
         )
     }
 }

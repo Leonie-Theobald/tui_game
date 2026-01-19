@@ -46,7 +46,7 @@ impl Item for DarkRoom {
     }
 
     fn get_detail_view(&self) -> String {
-        todo!()
+        String::new()
     }
 }
 

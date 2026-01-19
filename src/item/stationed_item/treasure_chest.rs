@@ -12,8 +12,8 @@ use crate::{
 use serde::{Deserialize, Serialize};
 
 const COORDINATES: Vector = Vector {
-    horizontal: 45,
-    vertical: 16,
+    horizontal: 35,
+    vertical: 12,
 };
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
@@ -46,44 +46,29 @@ impl Item for TreasureChest {
     }
 
     fn get_detail_view(&self) -> String {
-        if self.opened {
-            String::from(
-                "
+        let uncolored_chest = if self.opened {
+            "
                                                                                 
                                                                                 
                                                                                 
-                 x                                                              
+                                                                                
                                                                                 
                                                                                 
                       _______________________________                                                          
-                      \\                              \\                           
+                      \\..............................\\                           
                        \\______________________________\\
-                       /|                            /|
-                      /-┵---------------------------/ |
-                      |  ┏━━━━━━━━━━━━━━━━━━━━━━━┓  | |
-                      |  ┃        ╔═════╗        ┃  | |
-                      |  ┃        ║  o  ║        ┃  | |
-                      |  ┃        ╚═════╝        ┃  | |
-                      |  ┃                       ┃  | |
-                      |  ┃                       ┃  | |
-                      |  ┗━━━━━━━━━━━━━━━━━━━━━━━┛  | |
-                      |_____________________________|/
-                                                                                
-                                                                                
-                                                                                
-                                                                                
-                                                                                
-                                                                                
-                                                                                
-                                                                                
-                                                                                
-                                                                                
-                                                                                
-                                                                                ",
-            )
+                       /|............................/|
+                      /-┵---------------------------/.|
+                      |..┏━━━━━━━━━━━━━━━━━━━━━━━┓..|.|
+                      |..┃aaaaaaaa╔═════╗aaaaaaaa┃..|.|
+                      |..┃aaaaaaaa║bbobb║aaaaaaaa┃..|.|
+                      |..┃aaaaaaaa╚═════╝aaaaaaaa┃..|.|
+                      |..┃aaaaaaaaaaaaaaaaaaaaaaa┃..|.|
+                      |..┃aaaaaaaaaaaaaaaaaaaaaaa┃..|.|
+                      |..┗━━━━━━━━━━━━━━━━━━━━━━━┛..|.|
+                      |_____________________________|/"
         } else {
-            String::from(
-                "
+            "
                                                                                 
                                                                                 
                                                                                 
@@ -94,30 +79,109 @@ impl Item for TreasureChest {
                                                                                 
                                                                                 
                         ______________________________
-                       /                             /|
-                      /-----------------------------/ |
-                      |  ┏━━━━━━━━━━━━━━━━━━━━━━━┓  | |
-                      |  ┃        ╔═════╗        ┃  | |
-                      |  ┃        ║  o  ║        ┃  | |
-                      |  ┃        ╚═════╝        ┃  | |
-                      |  ┃                       ┃  | |
-                      |  ┃                       ┃  | |
-                      |  ┗━━━━━━━━━━━━━━━━━━━━━━━┛  | |
-                      |_____________________________|/
-                                                                                
-                                                                                
-                                                                                
-                                                                                
-                                                                                
-                                                                                
-                                                                                
-                                                                                
-                                                                                
-                                                                                
-                                                                                
-                                                                                ",
-            )
+                       /............................./|
+                      /-----------------------------/.|
+                      |..┏━━━━━━━━━━━━━━━━━━━━━━━┓..|.|
+                      |..┃aaaaaaaa╔═════╗aaaaaaaa┃..|.|
+                      |..┃aaaaaaaa║bbobb║aaaaaaaa┃..|.|
+                      |..┃aaaaaaaa╚═════╝aaaaaaaa┃..|.|
+                      |..┃aaaaaaaaaaaaaaaaaaaaaaa┃..|.|
+                      |..┃aaaaaaaaaaaaaaaaaaaaaaa┃..|.|
+                      |..┗━━━━━━━━━━━━━━━━━━━━━━━┛..|.|
+                      |_____________________________|/"
+        };
+
+        let mut colored_chest = String::new();
+        for (vertical_offset, line) in uncolored_chest.lines().enumerate() {
+            for (horizontal_offset, char) in line.chars().enumerate() {
+                match char {
+                    ' ' => continue,
+                    c @ ('┵' | '\\' | '/' | '_' | '-' | '|') => colored_chest.push_str(&format!(
+                        "{}{}{}{}{}{}",
+                        termion::cursor::Goto(
+                            (horizontal_offset + 1) as u16,
+                            (vertical_offset + 1) as u16
+                        ),
+                        termion::color::Fg(termion::color::AnsiValue(237)),
+                        termion::color::Bg(termion::color::AnsiValue(130)),
+                        c,
+                        termion::color::Fg(termion::color::Reset),
+                        termion::color::Bg(termion::color::Reset),
+                    )),
+                    '.' => colored_chest.push_str(&format!(
+                        "{}{} {}",
+                        termion::cursor::Goto(
+                            (horizontal_offset + 1) as u16,
+                            (vertical_offset + 1) as u16
+                        ),
+                        termion::color::Bg(termion::color::AnsiValue(130)),
+                        termion::color::Bg(termion::color::Reset),
+                    )),
+                    c @ ('┏' | '┃' | '━' | '┓' | '┗' | '┛') => {
+                        colored_chest.push_str(&format!(
+                            "{}{}{}{}{}{}",
+                            termion::cursor::Goto(
+                                (horizontal_offset + 1) as u16,
+                                (vertical_offset + 1) as u16
+                            ),
+                            termion::color::Fg(termion::color::AnsiValue(94)),
+                            termion::color::Bg(termion::color::AnsiValue(215)),
+                            c,
+                            termion::color::Fg(termion::color::Reset),
+                            termion::color::Bg(termion::color::Reset),
+                        ))
+                    }
+                    'a' => colored_chest.push_str(&format!(
+                        "{}{} {}",
+                        termion::cursor::Goto(
+                            (horizontal_offset + 1) as u16,
+                            (vertical_offset + 1) as u16
+                        ),
+                        termion::color::Bg(termion::color::AnsiValue(215)),
+                        termion::color::Bg(termion::color::Reset),
+                    )),
+                    c @ ('╔' | '═' | '╗' | '║' | '╚' | '╝') => {
+                        colored_chest.push_str(&format!(
+                            "{}{}{}{}{}{}",
+                            termion::cursor::Goto(
+                                (horizontal_offset + 1) as u16,
+                                (vertical_offset + 1) as u16
+                            ),
+                            termion::color::Fg(termion::color::AnsiValue(236)),
+                            termion::color::Bg(termion::color::AnsiValue(240)),
+                            c,
+                            termion::color::Fg(termion::color::Reset),
+                            termion::color::Bg(termion::color::Reset),
+                        ))
+                    }
+                    'b' => colored_chest.push_str(&format!(
+                        "{}{} {}",
+                        termion::cursor::Goto(
+                            (horizontal_offset + 1) as u16,
+                            (vertical_offset + 1) as u16
+                        ),
+                        termion::color::Bg(termion::color::AnsiValue(240)),
+                        termion::color::Bg(termion::color::Reset),
+                    )),
+                    'o' => colored_chest.push_str(&format!(
+                        "{}{}{}o{}{}",
+                        termion::cursor::Goto(
+                            (horizontal_offset + 1) as u16,
+                            (vertical_offset + 1) as u16
+                        ),
+                        termion::color::Fg(termion::color::AnsiValue(236)),
+                        termion::color::Bg(termion::color::AnsiValue(240)),
+                        termion::color::Fg(termion::color::Reset),
+                        termion::color::Bg(termion::color::Reset),
+                    )),
+                    c => {
+                        panic!("The character '{c}' should not be part of treasure chest drawing.")
+                    }
+                }
+            }
         }
+
+        colored_chest
     }
 }
 
