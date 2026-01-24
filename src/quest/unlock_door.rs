@@ -7,7 +7,7 @@ use crate::{
             StationaryItem, StationedItems, dark_room::DarkRoom,
             dropped_marshmallow::DroppedMarshmallow, extended_room::ExtendedRoom,
             fireplace::Fireplace, firewood::Firewood, locked_door::LockedDoor, oil_drum::OilDrum,
-            torch_holder::TorchHolder,
+            terminal::Terminal, torch_holder::TorchHolder,
         },
     },
     quest::IsQuest,
@@ -72,5 +72,8 @@ impl IsQuest for UnlockDoor {
         stationary_items
             .list
             .push(StationaryItem::TorchHolder(TorchHolder::initiate()));
+        stationary_items
+            .list
+            .push(StationaryItem::Terminal(Terminal::initiate()));
     }
 }

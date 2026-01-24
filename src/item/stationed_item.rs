@@ -7,6 +7,7 @@ pub mod locked_door;
 pub mod lost_chest_key;
 pub mod oil_drum;
 pub mod packet;
+pub mod terminal;
 pub mod torch_holder;
 pub mod treasure_chest;
 
@@ -24,7 +25,8 @@ use crate::{
             dark_room::DarkRoom, dropped_marshmallow::DroppedMarshmallow,
             extended_room::ExtendedRoom, fireplace::Fireplace, firewood::Firewood,
             locked_door::LockedDoor, lost_chest_key::LostChestKey, oil_drum::OilDrum,
-            packet::Packet, torch_holder::TorchHolder, treasure_chest::TreasureChest,
+            packet::Packet, terminal::Terminal, torch_holder::TorchHolder,
+            treasure_chest::TreasureChest,
         },
     },
     player::Player,
@@ -50,6 +52,7 @@ macro_rules! method_on_inner_stationed_item {
             StationaryItem::OilDrum(inner) => inner.$method(),
             StationaryItem::DarkRoom(inner) => inner.$method(),
             StationaryItem::TorchHolder(inner) => inner.$method(),
+            StationaryItem::Terminal(inner) => inner.$method(),
         }
     };
     // call with parameters
@@ -64,6 +67,9 @@ macro_rules! method_on_inner_stationed_item {
             StationaryItem::Firewood(inner) => inner.$method( $( $parameter ),* ),
             StationaryItem::DroppedMarshmallow(inner) => inner.$method( $( $parameter ),* ),
             StationaryItem::OilDrum(inner) => inner.$method( $( $parameter ),* ),
+            StationaryItem::DarkRoom(inner) => inner.$method( $( $parameter ),* ),
+            StationaryItem::TorchHolder(inner) => inner.$method( $( $parameter ),* ),
+            StationaryItem::Terminal(inner) => inner.$method( $( $parameter ),* ),
         }
     };
 }
@@ -82,6 +88,8 @@ macro_rules! mut_method_on_inner_stationed_item {
             StationaryItem::DroppedMarshmallow(inner) => inner.$method(),
             StationaryItem::OilDrum(inner) => inner.$method(),
             StationaryItem::DarkRoom(inner) => inner.$method(),
+            StationaryItem::TorchHolder(inner) => inner.$method(),
+            StationaryItem::Terminal(inner) => inner.$method(),
         }
     };
     // call with parameters
@@ -98,6 +106,7 @@ macro_rules! mut_method_on_inner_stationed_item {
             StationaryItem::OilDrum(inner) => inner.$method( $( $parameter ),* ),
             StationaryItem::DarkRoom(inner) => inner.$method( $( $parameter ),* ),
             StationaryItem::TorchHolder(inner) => inner.$method( $( $parameter ),* ),
+            StationaryItem::Terminal(inner) => inner.$method( $( $parameter ),* ),
         }
     };
 }
@@ -252,6 +261,7 @@ pub enum StationaryItem {
     OilDrum(OilDrum),
     DarkRoom(DarkRoom),
     TorchHolder(TorchHolder),
+    Terminal(Terminal),
 }
 
 impl Drawable for StationedItems {
