@@ -5,7 +5,7 @@ use crate::{
         collected_item::{CollectableItem, CollectedItems, treasure_map::TreasureMap},
         stationed_item::StationedItems,
     },
-    quest::IsQuest,
+    quest::{IsQuest, Quest},
 };
 
 #[derive(Serialize, Deserialize)]
@@ -40,6 +40,7 @@ impl IsQuest for FindMap {
         &self,
         _collected_items: &mut CollectedItems,
         _stationary_items: &mut StationedItems,
-    ) {
+    ) -> Vec<Quest> {
+        Vec::new()
     }
 }

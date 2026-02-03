@@ -10,7 +10,7 @@ use crate::{
             terminal::Terminal, torch_holder::TorchHolder,
         },
     },
-    quest::IsQuest,
+    quest::{IsQuest, Quest, light_room::LightRoom},
 };
 
 #[derive(Serialize, Deserialize)]
@@ -48,7 +48,7 @@ impl IsQuest for UnlockDoor {
         &self,
         _collected_items: &mut CollectedItems,
         stationary_items: &mut StationedItems,
-    ) {
+    ) -> Vec<Quest> {
         stationary_items
             .list
             .push(StationaryItem::ExtendedRoom(ExtendedRoom::initiate()));
@@ -75,5 +75,7 @@ impl IsQuest for UnlockDoor {
         stationary_items
             .list
             .push(StationaryItem::Terminal(Terminal::initiate()));
+
+        vec![Quest::LightRoom(LightRoom { finished: false })]
     }
 }

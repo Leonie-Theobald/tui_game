@@ -21,7 +21,7 @@ const COORDINATES: Vector = Vector {
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct TorchHolder {
     linked_interactions: Vec<Interaction>,
-    holds_torch: bool,
+    pub holds_torch: bool,
 }
 
 impl TorchHolder {

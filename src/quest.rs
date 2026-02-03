@@ -1,11 +1,12 @@
 mod find_map;
+mod light_room;
 mod unlock_door;
 
 use serde::{Deserialize, Serialize};
 
 use crate::{
     item::{collected_item::CollectedItems, stationed_item::StationedItems},
-    quest::{find_map::FindMap, unlock_door::UnlockDoor},
+    quest::{find_map::FindMap, light_room::LightRoom, unlock_door::UnlockDoor},
     tui::pop_up::InfoPopUp,
 };
 
@@ -13,6 +14,7 @@ use crate::{
 pub enum Quest {
     UnlockDoor(UnlockDoor),
     FindMap(FindMap),
+    LightRoom(LightRoom),
 }
 
 impl Quest {
@@ -20,6 +22,7 @@ impl Quest {
         match self {
             Quest::UnlockDoor(unlock_door) => unlock_door,
             Quest::FindMap(find_map) => find_map,
+            Quest::LightRoom(light_room) => light_room,
         }
     }
 
@@ -27,6 +30,7 @@ impl Quest {
         match self {
             Quest::UnlockDoor(unlock_room) => unlock_room,
             Quest::FindMap(find_map) => find_map,
+            Quest::LightRoom(light_room) => light_room,
         }
     }
 }
@@ -39,10 +43,7 @@ pub struct Quests {
 impl Quests {
     pub fn initiate() -> Self {
         Quests {
-            list: vec![
-                Quest::UnlockDoor(UnlockDoor { finished: false }),
-                Quest::FindMap(FindMap { finished: false }),
-            ],
+            list: vec![Quest::UnlockDoor(UnlockDoor { finished: false })],
         }
     }
 
@@ -67,15 +68,17 @@ impl Quests {
         collected_items: &mut CollectedItems,
         stationed_items: &mut StationedItems,
     ) {
+        let mut new_quests = Vec::new();
         for quest in &mut self.list {
             let inner_quest = quest.get_inner_mut();
             if !inner_quest.is_finished()
                 && inner_quest.check_prerequisites_fulfilled(collected_items, stationed_items)
             {
                 inner_quest.set_to_finished();
-                inner_quest.update_game(collected_items, stationed_items);
+                new_quests.append(&mut inner_quest.update_game(collected_items, stationed_items));
             }
         }
+        self.list.append(&mut new_quests);
     }
 }
 
@@ -92,5 +95,5 @@ pub trait IsQuest {
         &self,
         collected_items: &mut CollectedItems,
         stationary_items: &mut StationedItems,
-    );
+    ) -> Vec<Quest>;
 }

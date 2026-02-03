@@ -12,8 +12,8 @@ use crate::{
 use serde::{Deserialize, Serialize};
 
 const COORDINATES: Vector = Vector {
-    horizontal: 35,
-    vertical: 12,
+    horizontal: 31,
+    vertical: 4,
 };
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
@@ -23,7 +23,6 @@ pub struct TreasureChest {
 }
 
 impl TreasureChest {
-    #[expect(unused)] // for now as no TreasureChest is used currently
     pub fn initiate() -> Self {
         let linked_interactions = vec![Interaction::TreasureChest(
             TreasureChestInteraction::Unlock(Unlock),
