@@ -10,7 +10,7 @@ impl Item for Candle {
     }
 
     fn get_description(&self) -> &'static str {
-        "A candle that is not burning."
+        "A candle that is burning."
     }
 
     fn get_detail_view(&self) -> String {
