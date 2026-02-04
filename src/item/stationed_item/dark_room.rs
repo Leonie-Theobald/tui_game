@@ -30,7 +30,7 @@ impl DarkRoom {
     fn get_room_setup(&self) -> &'static str {
         "┰──────────────┐
 │              │
-│              │
+│               
 │              │
 ┴──   ─────────┨"
     }

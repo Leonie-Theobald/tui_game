@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use crate::{
     item::{
         collected_item::{CollectableItem, CollectedItems, treasure_map::TreasureMap},
-        stationed_item::StationedItems,
+        stationed_item::{StationaryItem, StationedItems, pressure_plate::PressurePlate},
     },
     quest::{IsQuest, Quest},
 };
@@ -39,8 +39,12 @@ impl IsQuest for FindMap {
     fn update_game(
         &self,
         _collected_items: &mut CollectedItems,
-        _stationary_items: &mut StationedItems,
+        stationary_items: &mut StationedItems,
     ) -> Vec<Quest> {
+        stationary_items
+            .list
+            .push(StationaryItem::PressurePlate(PressurePlate::initiate()));
+
         Vec::new()
     }
 }

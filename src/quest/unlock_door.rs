@@ -7,7 +7,7 @@ use crate::{
             StationaryItem, StationedItems, dark_room::DarkRoom,
             dropped_marshmallow::DroppedMarshmallow, extended_room::ExtendedRoom,
             fireplace::Fireplace, firewood::Firewood, locked_door::LockedDoor, oil_drum::OilDrum,
-            torch_holder::TorchHolder,
+            pressure_plate::PressurePlate, torch_holder::TorchHolder,
         },
     },
     quest::{IsQuest, Quest, light_room::LightRoom},
@@ -72,6 +72,9 @@ impl IsQuest for UnlockDoor {
         stationary_items
             .list
             .push(StationaryItem::TorchHolder(TorchHolder::initiate()));
+        stationary_items
+            .list
+            .push(StationaryItem::PressurePlate(PressurePlate::initiate()));
 
         vec![Quest::LightRoom(LightRoom { finished: false })]
     }
