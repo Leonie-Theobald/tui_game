@@ -23,6 +23,10 @@ pub struct Terminal {
     linked_interactions: Vec<Interaction>,
 }
 
+#[expect(
+    unused,
+    reason = "Terminal will only be needed later in the game implementation"
+)]
 impl Terminal {
     pub fn initiate() -> Self {
         let linked_interactions = vec![Interaction::Terminal(TerminalInteraction::EnterDigits(
