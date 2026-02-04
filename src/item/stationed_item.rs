@@ -215,6 +215,7 @@ pub trait Stationary: Item {
             .map(|interaction| interaction.get_inner().get_prompt())
             .collect::<Vec<_>>();
         prompts.push(String::from("Inspect closer"));
+        prompts.push(String::from("Go back"));
 
         let pop_up = PopUp { options: prompts };
         let selected_interaction = match pop_up.get_user_selection() {
@@ -222,6 +223,9 @@ pub trait Stationary: Item {
                 let inspection = self.get_inspection();
                 inspection.start_inspection();
                 self.interact(collected_items);
+                return;
+            }
+            Ok(selected_prompt) if selected_prompt == "Go back" => {
                 return;
             }
             Ok(selected_prompt) => self

@@ -24,7 +24,7 @@ impl Inspection {
         );
 
         let key_binding_info_line = format!(
-            "{}<b>ack",
+            "{}<backspace>",
             termion::cursor::Goto(1, (GRID_HEIGHT + 2) as u16)
         );
 
@@ -45,7 +45,7 @@ impl Inspection {
         // wait for key press to return
         for k in stdin().keys() {
             match k.as_ref().unwrap() {
-                Key::Char('b') => return,
+                Key::Backspace => return,
                 _ => continue,
             }
         }

@@ -19,7 +19,7 @@ impl InfoPopUp {
         // Write general infos
         write!(
             stdout,
-            "{}{}{}Press ENTER to continue{}{}",
+            "{}{}{}Press BACKSPACE to go back{}{}",
             termion::style::Italic,
             termion::color::Fg(color::LightBlack),
             termion::cursor::Goto(1, 4),
@@ -34,7 +34,7 @@ impl InfoPopUp {
 
         for k in stdin().keys() {
             match k.as_ref().unwrap() {
-                event::Key::Char('\n') => return,
+                event::Key::Backspace => return,
                 // ignore everything else
                 _ => continue,
             };
