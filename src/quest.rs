@@ -1,12 +1,15 @@
 mod find_map;
 mod light_room;
+mod press_plate;
 mod unlock_door;
 
 use serde::{Deserialize, Serialize};
 
 use crate::{
     item::{collected_item::CollectedItems, stationed_item::StationedItems},
-    quest::{find_map::FindMap, light_room::LightRoom, unlock_door::UnlockDoor},
+    quest::{
+        find_map::FindMap, light_room::LightRoom, press_plate::PressPlate, unlock_door::UnlockDoor,
+    },
     tui::pop_up::InfoPopUp,
 };
 
@@ -15,6 +18,7 @@ pub enum Quest {
     UnlockDoor(UnlockDoor),
     FindMap(FindMap),
     LightRoom(LightRoom),
+    PressPlate(PressPlate),
 }
 
 impl Quest {
@@ -23,6 +27,7 @@ impl Quest {
             Quest::UnlockDoor(unlock_door) => unlock_door,
             Quest::FindMap(find_map) => find_map,
             Quest::LightRoom(light_room) => light_room,
+            Quest::PressPlate(press_plate) => press_plate,
         }
     }
 
@@ -31,6 +36,7 @@ impl Quest {
             Quest::UnlockDoor(unlock_room) => unlock_room,
             Quest::FindMap(find_map) => find_map,
             Quest::LightRoom(light_room) => light_room,
+            Quest::PressPlate(press_plate) => press_plate,
         }
     }
 }

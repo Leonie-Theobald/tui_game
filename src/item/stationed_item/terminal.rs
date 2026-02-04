@@ -13,8 +13,8 @@ use crate::{
 };
 
 const COORDINATES: Vector = Vector {
-    horizontal: 39,
-    vertical: 3,
+    horizontal: 44,
+    vertical: 5,
 };
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
@@ -23,10 +23,6 @@ pub struct Terminal {
     linked_interactions: Vec<Interaction>,
 }
 
-#[expect(
-    unused,
-    reason = "Terminal will only be needed later in the game implementation"
-)]
 impl Terminal {
     pub fn initiate() -> Self {
         let linked_interactions = vec![Interaction::Terminal(TerminalInteraction::EnterDigits(

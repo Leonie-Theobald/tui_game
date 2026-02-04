@@ -19,7 +19,7 @@ const COORDINATES: Vector = Vector {
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct PressurePlate {
-    pressed: bool,
+    pub pressed: bool,
     linked_interactions: Vec<Interaction>,
 }
 

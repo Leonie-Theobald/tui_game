@@ -5,7 +5,7 @@ use crate::{
         collected_item::{CollectableItem, CollectedItems, treasure_map::TreasureMap},
         stationed_item::{StationaryItem, StationedItems, pressure_plate::PressurePlate},
     },
-    quest::{IsQuest, Quest},
+    quest::{IsQuest, Quest, press_plate::PressPlate},
 };
 
 #[derive(Serialize, Deserialize)]
@@ -45,6 +45,6 @@ impl IsQuest for FindMap {
             .list
             .push(StationaryItem::PressurePlate(PressurePlate::initiate()));
 
-        Vec::new()
+        vec![Quest::PressPlate(PressPlate { finished: false })]
     }
 }
