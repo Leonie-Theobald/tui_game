@@ -12,7 +12,7 @@ use crate::{
 use serde::{Deserialize, Serialize};
 
 const COORDINATES: Vector = Vector {
-    horizontal: 31,
+    horizontal: 38,
     vertical: 4,
 };
 
@@ -222,7 +222,7 @@ impl Stationary for TreasureChest {
 
 impl Drawable for TreasureChest {
     fn draw(&self) -> String {
-        let symbol = if self.opened { "X" } else { "🧳" };
+        let symbol = "🧳";
 
         format!(
             "{}{}",
