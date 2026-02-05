@@ -3,9 +3,7 @@ use serde::{Deserialize, Serialize};
 use crate::{
     item::{
         collected_item::CollectedItems,
-        stationed_item::{
-            StationaryItem, StationedItems, pressure_plate::PressurePlate, terminal::Terminal,
-        },
+        stationed_item::{StationaryItem, StationedItems, pressure_plate::PressurePlate},
     },
     quest::{IsQuest, Quest},
 };
@@ -44,12 +42,8 @@ impl IsQuest for PressPlate {
     fn update_game(
         &self,
         _collected_items: &mut CollectedItems,
-        stationary_items: &mut StationedItems,
+        _stationary_items: &mut StationedItems,
     ) -> Vec<Quest> {
-        stationary_items
-            .list
-            .push(StationaryItem::Terminal(Terminal::initiate()));
-
         Vec::new()
     }
 }

@@ -13,13 +13,13 @@ use crate::{
 };
 
 const COORDINATES: Vector = Vector {
-    horizontal: 44,
-    vertical: 5,
+    horizontal: 30,
+    vertical: 7,
 };
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct Terminal {
-    correct_code_entered: bool,
+    pub correct_code_entered: bool,
     linked_interactions: Vec<Interaction>,
 }
 
@@ -288,10 +288,12 @@ impl Item for Terminal {
 
 impl Stationary for Terminal {
     fn list_blocking_coordinates(&self) -> Vec<Vector> {
+        let width = if self.correct_code_entered { 2 } else { 5 };
+
         let mut blocked_coordinate = Vec::new();
 
         // +-1 around the symbol is also blocked
-        let horizontal_range = COORDINATES.horizontal..COORDINATES.horizontal + 2;
+        let horizontal_range = COORDINATES.horizontal..COORDINATES.horizontal + width;
         for horizontal_index in horizontal_range {
             let vertical_range = COORDINATES.vertical..COORDINATES.vertical + 1;
             for vertical_index in vertical_range {
@@ -324,12 +326,24 @@ impl Stationary for Terminal {
 
 impl Drawable for Terminal {
     fn draw(&self) -> String {
-        format!(
-            "{}📟",
-            termion::cursor::Goto(
-                (COORDINATES.horizontal + 1) as u16,
-                (COORDINATES.vertical + 1) as u16
-            ),
-        )
+        if self.correct_code_entered {
+            format!(
+                "{}📟",
+                termion::cursor::Goto(
+                    (COORDINATES.horizontal + 1) as u16,
+                    (COORDINATES.vertical + 1) as u16
+                ),
+            )
+        } else {
+            format!(
+                "{}📟{}███{}",
+                termion::cursor::Goto(
+                    (COORDINATES.horizontal + 1) as u16,
+                    (COORDINATES.vertical + 1) as u16
+                ),
+                termion::color::Fg(termion::color::AnsiValue(136)),
+                termion::color::Fg(termion::color::Reset)
+            )
+        }
     }
 }

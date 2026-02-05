@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use crate::{
     item::{
         collected_item::{CollectableItem, CollectedItems, treasure_map::TreasureMap},
-        stationed_item::{StationaryItem, StationedItems, pressure_plate::PressurePlate},
+        stationed_item::{StationaryItem, StationedItems},
     },
     quest::{IsQuest, Quest, press_plate::PressPlate},
 };
@@ -41,9 +41,12 @@ impl IsQuest for FindMap {
         _collected_items: &mut CollectedItems,
         stationary_items: &mut StationedItems,
     ) -> Vec<Quest> {
-        stationary_items
-            .list
-            .push(StationaryItem::PressurePlate(PressurePlate::initiate()));
+        for item in stationary_items.list.iter_mut() {
+            match item {
+                StationaryItem::PressurePlate(pressure_plate) => pressure_plate.activated = true,
+                _ => continue,
+            }
+        }
 
         vec![Quest::PressPlate(PressPlate { finished: false })]
     }

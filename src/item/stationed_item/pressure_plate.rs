@@ -19,6 +19,7 @@ const COORDINATES: Vector = Vector {
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct PressurePlate {
+    pub activated: bool,
     pub pressed: bool,
     linked_interactions: Vec<Interaction>,
 }
@@ -30,6 +31,7 @@ impl PressurePlate {
         )];
 
         Self {
+            activated: false,
             pressed: false,
             linked_interactions,
         }
@@ -74,10 +76,10 @@ impl Stationary for PressurePlate {
     }
 
     fn get_interaction_status(&self) -> InteractionStatus {
-        if self.pressed {
-            InteractionStatus::Finished
-        } else {
-            InteractionStatus::Open
+        match (self.activated, self.pressed) {
+            (false, _) => InteractionStatus::Finished,
+            (true, true) => InteractionStatus::Finished,
+            (true, false) => InteractionStatus::Open,
         }
     }
 

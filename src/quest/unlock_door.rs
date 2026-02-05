@@ -4,13 +4,12 @@ use crate::{
     item::{
         collected_item::CollectedItems,
         stationed_item::{
-            StationaryItem, StationedItems, dark_room::DarkRoom,
-            dropped_marshmallow::DroppedMarshmallow, extended_room::ExtendedRoom,
-            fireplace::Fireplace, firewood::Firewood, locked_door::LockedDoor, oil_drum::OilDrum,
-            torch_holder::TorchHolder,
+            StationaryItem, StationedItems, dropped_marshmallow::DroppedMarshmallow,
+            extended_room::ExtendedRoom, fireplace::Fireplace, firewood::Firewood,
+            locked_door::LockedDoor, oil_drum::OilDrum, terminal::Terminal,
         },
     },
-    quest::{IsQuest, Quest, light_room::LightRoom},
+    quest::{IsQuest, Quest, unlock_terminal::UnlockTerminal},
 };
 
 #[derive(Serialize, Deserialize)]
@@ -68,11 +67,8 @@ impl IsQuest for UnlockDoor {
             .push(StationaryItem::OilDrum(OilDrum::initiate()));
         stationary_items
             .list
-            .push(StationaryItem::DarkRoom(DarkRoom::initiate()));
-        stationary_items
-            .list
-            .push(StationaryItem::TorchHolder(TorchHolder::initiate()));
+            .push(StationaryItem::Terminal(Terminal::initiate()));
 
-        vec![Quest::LightRoom(LightRoom { finished: false })]
+        vec![Quest::UnlockTerminal(UnlockTerminal { finished: false })]
     }
 }

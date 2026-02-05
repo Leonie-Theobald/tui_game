@@ -35,9 +35,9 @@ impl Interactable for Press {
             InteractionStatus::Open => {
                 linked_stationary_item.set_interaction_status_to_finished();
 
-                String::from("The wall has moved to the side revealing a hidden terminal.")
+                String::from("The wall has moved to the side revealing your birthday cake.")
             }
-            InteractionStatus::Finished => String::from("Pressure plate is already activated."),
+            InteractionStatus::Finished => String::from("Nothing can be done here."),
         }
     }
 }
