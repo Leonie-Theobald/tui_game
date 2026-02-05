@@ -50,6 +50,17 @@ pub fn draw_status_bar(
         exit_text
     );
 
+    // show help key binding
+    let help_text = "Help: <?>";
+    let help_text_line = format!(
+        "{}{}",
+        termion::cursor::Goto(
+            (GRID_WIDTH - help_text.len() - exit_text.len() - 2) as u16,
+            (GRID_HEIGHT + 2) as u16
+        ),
+        help_text
+    );
+
     // display symbols of currently collected items
     let joined_collected_items =
         collected_items
@@ -63,13 +74,14 @@ pub fn draw_status_bar(
 
     // bring everything together
     format!(
-        "{} {} {} {} {} {}{}",
+        "{} {} {} {} {} {} {} {}",
         termion::cursor::Goto(1, (GRID_HEIGHT + 1) as u16),
         joined_collected_items,
         termion::cursor::Goto(1, (GRID_HEIGHT + 2) as u16),
         joined_interaction_line,
         joined_quest_line,
         joined_collection_line,
-        exit_text_line,
+        help_text_line,
+        exit_text_line
     )
 }

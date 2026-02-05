@@ -11,7 +11,7 @@ use std::io::{stdin, stdout};
 use termion::{event::Key, input::TermRead, raw::IntoRawMode};
 
 use crate::{
-    game::{draw_game, save_and_leave_game, start_game},
+    game::{draw_game, explain_game, save_and_leave_game, start_game},
     tui::{Orientation, clean_up::clean_up_terminal, grid::Grid},
 };
 
@@ -42,6 +42,9 @@ fn main() {
 
             // show quests
             Key::Char('q') => quests.show_open_quests(),
+
+            // re-explain game controls
+            Key::Char('?') => explain_game(),
 
             // leave game
             Key::Esc => {
