@@ -1,3 +1,4 @@
+mod final_cut_scene;
 mod game;
 mod inspection;
 mod item;
@@ -6,12 +7,12 @@ mod quest;
 mod quick_save;
 mod tui;
 
-use std::io::{Write, stdin, stdout};
+use std::io::{stdin, stdout};
 use termion::{event::Key, input::TermRead, raw::IntoRawMode};
 
 use crate::{
     game::{draw_game, save_and_leave_game, start_game},
-    tui::{Orientation, grid::Grid},
+    tui::{Orientation, clean_up::clean_up_terminal, grid::Grid},
 };
 
 fn main() {
@@ -21,7 +22,8 @@ fn main() {
     draw_game(&grid, &player, &collected_items, &stationed_items, &quests);
 
     // start captioning single key inputs in raw mode (single presses instead of waiting for \n)
-    let mut stdout = stdout().into_raw_mode().unwrap();
+    let _stdout = stdout().into_raw_mode().unwrap();
+
     for k in stdin().keys() {
         match k.as_ref().unwrap() {
             // player's movement
@@ -55,14 +57,5 @@ fn main() {
         draw_game(&grid, &player, &collected_items, &stationed_items, &quests);
     }
 
-    // clean up terminal and go back to normal mode
-    write!(
-        stdout,
-        "{}{}{}",
-        termion::clear::All,
-        termion::cursor::Goto(1, 1),
-        termion::cursor::Show
-    )
-    .unwrap();
-    stdout.suspend_raw_mode().unwrap();
+    clean_up_terminal();
 }

@@ -1,3 +1,4 @@
+pub mod clean_up;
 pub mod grid;
 pub mod pop_up;
 pub mod status_bar;

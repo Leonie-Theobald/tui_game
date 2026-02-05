@@ -67,4 +67,8 @@ impl QuickSave {
         )
         .expect("Could not deserialize")
     }
+
+    pub fn clear_save_file() {
+        File::create(Self::get_path()).expect("Failed to create or open the file");
+    }
 }

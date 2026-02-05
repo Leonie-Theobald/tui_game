@@ -1,9 +1,12 @@
 use serde::{Deserialize, Serialize};
 
-use crate::item::{
-    collected_item::CollectedItems,
-    interaction::{Interactable, InteractionStatus},
-    stationed_item::Stationary,
+use crate::{
+    final_cut_scene::play_final_cut_scene,
+    item::{
+        collected_item::CollectedItems,
+        interaction::{Interactable, InteractionStatus},
+        stationed_item::Stationary,
+    },
 };
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
@@ -35,7 +38,8 @@ impl Interactable for Press {
             InteractionStatus::Open => {
                 linked_stationary_item.set_interaction_status_to_finished();
 
-                String::from("The wall has moved to the side revealing your birthday cake.")
+                play_final_cut_scene();
+                unreachable!()
             }
             InteractionStatus::Finished => String::from("Nothing can be done here."),
         }
