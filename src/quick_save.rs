@@ -1,5 +1,5 @@
 use std::{
-    fs::File,
+    fs::{File, remove_file},
     io::{Read, Write},
 };
 
@@ -57,18 +57,26 @@ impl QuickSave {
     }
 
     pub fn load_from_file() -> Self {
-        let mut file = File::open(Self::get_path()).expect("Failed to open the file");
+        let mut file = File::open(Self::get_path()).expect(
+            "Couldn't find save file. Are you in correct location? Otherwise try starting new game with cargo run again",
+        );
         let mut serialized_content = Vec::new();
         file.read_to_end(&mut serialized_content)
-            .expect("Failed to read file");
+            .expect("Couldn't read save file. Maybe try starting new game with cargo run again");
 
         serde_json::from_str(
-            &String::from_utf8(serialized_content).expect("Could not form String from utf8 slice"),
+            &String::from_utf8(serialized_content).expect(
+                "Couldn't read save file. Maybe try starting new game with cargo run again",
+            ),
         )
-        .expect("Could not deserialize")
+        .expect("Couldn't read save file. Maybe try starting new game with cargo run again")
     }
 
-    pub fn clear_save_file() {
-        File::create(Self::get_path()).expect("Failed to create or open the file");
+    pub fn delete_save_file() {
+        #[expect(
+            unused,
+            reason = "If file cannot be deleted, we don't need to try anthing different."
+        )]
+        remove_file(Self::get_path());
     }
 }

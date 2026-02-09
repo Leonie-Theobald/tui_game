@@ -21,7 +21,7 @@ pub fn prepare_leaving_game() {
     for k in stdin().keys() {
         match k.as_ref().unwrap() {
             Key::Char('L') | Key::Char('l') => {
-                QuickSave::clear_save_file();
+                QuickSave::delete_save_file();
                 break;
             }
             _ => continue,
