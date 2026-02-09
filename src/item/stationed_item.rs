@@ -8,6 +8,7 @@ pub mod lost_chest_key;
 pub mod oil_drum;
 pub mod packet;
 pub mod pressure_plate;
+pub mod start_room;
 pub mod terminal;
 pub mod torch_holder;
 pub mod treasure_chest;
@@ -26,8 +27,8 @@ use crate::{
             dark_room::DarkRoom, dropped_marshmallow::DroppedMarshmallow,
             extended_room::ExtendedRoom, fireplace::Fireplace, firewood::Firewood,
             locked_door::LockedDoor, lost_chest_key::LostChestKey, oil_drum::OilDrum,
-            packet::Packet, pressure_plate::PressurePlate, terminal::Terminal,
-            torch_holder::TorchHolder, treasure_chest::TreasureChest,
+            packet::Packet, pressure_plate::PressurePlate, start_room::StartRoom,
+            terminal::Terminal, torch_holder::TorchHolder, treasure_chest::TreasureChest,
         },
     },
     player::Player,
@@ -42,6 +43,7 @@ macro_rules! method_on_inner_stationed_item {
     // call without parameters
     ($value:expr, $method:ident) => {
         match &$value {
+            StationaryItem::StartRoom(inner) => inner.$method(),
             StationaryItem::Packet(inner) => inner.$method(),
             StationaryItem::TreasureChest(inner) => inner.$method(),
             StationaryItem::LockedDoor(inner) => inner.$method(),
@@ -60,6 +62,7 @@ macro_rules! method_on_inner_stationed_item {
     // call with parameters
     ($value:expr, $method:ident ($ ( $parameter:expr ),* $(,)? )) => {
         match &$value {
+            StationaryItem::StartRoom(inner) => inner.$method( $( $parameter ),* ),
             StationaryItem::Packet(inner) => inner.$method( $( $parameter ),* ),
             StationaryItem::TreasureChest(inner) => inner.$method( $( $parameter ),*),
             StationaryItem::LockedDoor(inner) => inner.$method( $( $parameter ),* ),
@@ -81,6 +84,7 @@ macro_rules! mut_method_on_inner_stationed_item {
     // call without parameters
     ($value:expr, $method:ident) => {
         match &mut $value {
+            StationaryItem::StartRoom(inner) => inner.$method(),
             StationaryItem::Packet(inner) => inner.$method(),
             StationaryItem::TreasureChest(inner) => inner.$method(),
             StationaryItem::BlockedRoom(inner) => inner.$method(),
@@ -99,6 +103,7 @@ macro_rules! mut_method_on_inner_stationed_item {
     // call with parameters
     ($value:expr, $method:ident ($ ( $parameter:expr ),* $(,)? )) => {
         match &mut $value {
+            StationaryItem::StartRoom(inner) => inner.$method( $( $parameter ),* ),
             StationaryItem::Packet(inner) => inner.$method( $( $parameter ),* ),
             StationaryItem::TreasureChest(inner) => inner.$method( $( $parameter ),*),
             StationaryItem::LockedDoor(inner) => inner.$method( $( $parameter ),* ),
@@ -125,6 +130,7 @@ impl StationedItems {
     pub fn initiate() -> Self {
         Self {
             list: vec![
+                StationaryItem::StartRoom(StartRoom::initiate()),
                 StationaryItem::Packet(Packet::initiate()),
                 StationaryItem::LostChestKey(LostChestKey::initiate()),
                 StationaryItem::LockedDoor(LockedDoor::initiate()),
@@ -259,6 +265,7 @@ pub trait Stationary: Item {
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub enum StationaryItem {
+    StartRoom(StartRoom),
     Packet(Packet),
     TreasureChest(TreasureChest),
     LockedDoor(LockedDoor),
