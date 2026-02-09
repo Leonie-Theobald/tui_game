@@ -191,16 +191,13 @@ impl Stationary for Packet {
 
 impl Drawable for Packet {
     fn draw(&self) -> String {
-        let symbol = if self.opened { "X" } else { "📦" };
-
         format!(
-            "{}{}{}{}",
+            "{}{}📦{}",
             termion::cursor::Goto(
                 (COORDINATES.horizontal + 1) as u16,
                 (COORDINATES.vertical + 1) as u16
             ),
             termion::color::Bg(BACKGROUND_COLOR),
-            symbol,
             termion::color::Bg(termion::color::Reset),
         )
     }

@@ -107,6 +107,10 @@ impl Item for DroppedMarshmallow {
 
 impl Stationary for DroppedMarshmallow {
     fn list_blocking_coordinates(&self) -> Vec<Vector> {
+        if self.picked_up {
+            return Vec::new();
+        }
+
         let mut blocked_coordinate = Vec::new();
 
         // +-1 around the symbol is also blocked
@@ -143,7 +147,7 @@ impl Stationary for DroppedMarshmallow {
 
 impl Drawable for DroppedMarshmallow {
     fn draw(&self) -> String {
-        let symbol = if self.picked_up { "X" } else { "🖱️" };
+        let symbol = if self.picked_up { "" } else { "🖱️" };
 
         format!(
             "{}{}{}{}",

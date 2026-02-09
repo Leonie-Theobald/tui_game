@@ -94,6 +94,10 @@ impl Item for LostChestKey {
 
 impl Stationary for LostChestKey {
     fn list_blocking_coordinates(&self) -> Vec<Vector> {
+        if self.found {
+            return Vec::new();
+        }
+
         let mut blocked_coordinate = Vec::new();
 
         // +-1 around the symbol is also blocked
@@ -130,7 +134,7 @@ impl Stationary for LostChestKey {
 
 impl Drawable for LostChestKey {
     fn draw(&self) -> String {
-        let symbol = if self.found { "X" } else { "🗝️" };
+        let symbol = if self.found { "" } else { "🗝️" };
 
         format!(
             "{}{}{}{}",
