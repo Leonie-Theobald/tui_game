@@ -217,7 +217,7 @@ impl Item for Terminal {
                 )
             } else {
                 format!(
-                    "{}{}{}******{}{}",
+                    "{}{}{}***6**{}{}",
                     termion::cursor::Goto(
                         (horizontal_origin + 6) as u16,
                         (vertical_origin + 4) as u16
@@ -243,7 +243,7 @@ impl Item for Terminal {
         // │ ┌─────────────────────┐ │
         // │ │                     │ │
         // │ │   Enter Password:   │ │
-        // │ │   ******            │ │
+        // │ │   ***6**            │ │
         // │ │                     │ │
         // │ │                     │ │
         // │ └─────────────────────┘ │
@@ -269,7 +269,7 @@ impl Item for Terminal {
         // │ │                     │ │
         // │ │        Enter        │ │
         // │ │      Password       │ │
-        // │ │       ******        │ │
+        // │ │       ***6**        │ │
         // │ │                     │ │
         // │ └─────────────────────┘ │
         // │      ┌───┰───┰───┐      │

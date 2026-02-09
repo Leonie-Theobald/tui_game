@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 use crate::{
     item::{
         Item,
+        collected_item::chest_key::ChestKey,
         interaction::{
             Interaction, InteractionStatus,
             lost_chest_key_interaction::{LostChestKeyInteraction, PickUp},
@@ -45,50 +46,7 @@ impl Item for LostChestKey {
     }
 
     fn get_detail_view(&self) -> String {
-        let uncolored_key = "
-                                                                                
-                                                                                
-                                                                                
-                                                                                
-                                                                                
-                                                                                
-                                          ████                                  
-                                         █    █                                
-                                        █      █                                
-                                        █      █                                
-              ███████████████████████████      █                                
-              █ █                       █      █                                
-                ▘                       █      █                                
-                                         █    █                                 
-                                          ████                                  
-                                                                                
-                                                                                
-                                                                                
-                                                                                
-                                                                                
-                                                                                
-                                                                                ";
-        let mut colored_key = String::new();
-        for (vertical_offset, line) in uncolored_key.lines().enumerate() {
-            for (horizontal_offset, char) in line.chars().enumerate() {
-                match char {
-                    ' ' => continue,
-                    c => colored_key.push_str(&format!(
-                        "{}{}{}{}{}{}",
-                        termion::cursor::Goto(
-                            (horizontal_offset + 1) as u16,
-                            (vertical_offset + 1) as u16
-                        ),
-                        termion::color::Bg(BACKGROUND_COLOR),
-                        termion::color::Fg(termion::color::AnsiValue(242)),
-                        c,
-                        termion::color::Bg(termion::color::Reset),
-                        termion::color::Fg(termion::color::Reset),
-                    )),
-                }
-            }
-        }
-        colored_key
+        ChestKey.get_detail_view()
     }
 }
 

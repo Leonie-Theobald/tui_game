@@ -57,7 +57,7 @@ impl Item for Fireplace {
  .___________________________________________________________________________.
  |xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|
  |___________________________________________________________________________|
-   |xxxxx!xxxxxxxxxxx|xxxxxxxxxxx|xxxxxxxxxxx|xxxxxxxxxxx|xxxxxxxxxxx|xxxxx|
+   |xxxxx!xxxxxxxxxxx|xxxxxxxxxxx|xxxxxxxxxxx|xxxFx=x8xxx|xxxxxxxxxxx|xxxxx|
    |_____|__,________|___________|______.____}__,________}___________|_____|
    |xxxxxxxxx|xx\\xxx\\xxx\\xxx\\xxx\\xxxx|xxx|xxxx/xxx/xxx/xxx/xxx/xx|xxxxxxxxx|
    |_________|___\\_,_\\___\\___\\.__|___|___|___|___/___/___/___/___|_________|
@@ -112,13 +112,25 @@ impl Item for Fireplace {
                                                                                   
                                                                                 
                  :;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:                   
-                   ::::::::::::::::::::::::::::::::                             ";
+                   ::::::::::::::::::::::::::::::::::::::::                     ";
 
         let mut colored_fireplace = String::new();
         for (vertical_offset, line) in fireplace.lines().enumerate() {
             for (horizontal_offset, char) in line.chars().enumerate() {
                 match char {
                     ' ' => continue,
+                    c @ ('F' | '=' | '8') => colored_fireplace.push_str(&format!(
+                        "{}{}{}{}{}{}",
+                        termion::cursor::Goto(
+                            (horizontal_offset + 1) as u16,
+                            (vertical_offset + 1) as u16
+                        ),
+                        termion::color::Bg(termion::color::AnsiValue(88)),
+                        termion::color::Fg(termion::color::AnsiValue(160)),
+                        c,
+                        termion::color::Bg(termion::color::Reset),
+                        termion::color::Fg(termion::color::Reset),
+                    )),
                     c => {
                         let transformed_char = if c == 'x' { ' ' } else { c };
                         colored_fireplace.push_str(&format!(

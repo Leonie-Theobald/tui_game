@@ -56,7 +56,7 @@ impl Item for Packet {
                 /\\    /.........................../
                /..\\  /.........................../                              
               /....\\/__________________________./______                            
-             /...../|........................../....../                            
+             /...../|....................B.=.5./....../                            
              \\..../.|........................./....../                             
               \\../..|......................../....../                              
                \\/___________________________/______/                               
@@ -103,6 +103,19 @@ impl Item for Packet {
             for (horizontal_offset, char) in line.chars().enumerate() {
                 match char {
                     ' ' => continue,
+                    // encode one password letter for `Terminal`
+                    c @ ('B' | '=' | '5') => colored_packet.push_str(&format!(
+                        "{}{}{}{}{}{}",
+                        termion::cursor::Goto(
+                            (horizontal_offset + 1) as u16,
+                            (vertical_offset + 1) as u16
+                        ),
+                        termion::color::Fg(termion::color::AnsiValue(130)),
+                        termion::color::Bg(termion::color::AnsiValue(137)),
+                        c,
+                        termion::color::Fg(termion::color::Reset),
+                        termion::color::Bg(termion::color::Reset),
+                    )),
                     'w' => colored_packet.push_str(&format!(
                         "{}{} {}",
                         termion::cursor::Goto(

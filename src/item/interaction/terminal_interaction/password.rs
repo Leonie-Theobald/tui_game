@@ -10,13 +10,20 @@ pub struct Password {
 impl Password {
     pub fn get_correct() -> Self {
         Self {
+            // Numbers are written on items in the detailed view of inspection
+            // A = 1 (Fire Wood)
+            // B = 5 (Packet)
+            // C = 9 (Chest Key)
+            // D = 6 (Terminal)
+            // E = 3 (Oil Drum)
+            // F = 8 (Fire Place)
             digits: [
                 Digit::One,
-                Digit::One,
-                Digit::One,
-                Digit::One,
-                Digit::One,
-                Digit::One,
+                Digit::Five,
+                Digit::Nine,
+                Digit::Six,
+                Digit::Three,
+                Digit::Eight,
             ],
         }
     }

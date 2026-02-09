@@ -58,7 +58,7 @@ impl Item for Firewood {
                                    /xx_xx\\xx\\_                                  
                                    |xxO\\x|xxxx\\_                                
                            ________\\_____/______\\________                       
-                          /xxxxxxxxxxxxxxxxxxxxxxx/xxxxxx\\                      
+                          /xAx=x1xxxxxxxxxxxxxxxxx/xxxxxx\\                      
                          /xxxxxxxxxxxxxxxxxxxxxxx/xxx__xxx\\                     
                          |xxxxxxxxxxxxxxxxxxxxxxx|xx/xx\\xx|                     
                          |xxxxxxxxxxxxxxxxxxxxxxx|xx\\__/xx|                     
@@ -70,6 +70,18 @@ impl Item for Firewood {
             for (horizontal_offset, char) in line.chars().enumerate() {
                 match char {
                     ' ' => continue,
+                    c @ ('A' | '=' | '1') => colored_firewood.push_str(&format!(
+                        "{}{}{}{}{}{}",
+                        termion::cursor::Goto(
+                            (horizontal_offset + 1) as u16,
+                            (vertical_offset + 1) as u16
+                        ),
+                        termion::color::Bg(termion::color::AnsiValue(130)),
+                        termion::color::Fg(termion::color::AnsiValue(137)),
+                        c,
+                        termion::color::Bg(termion::color::Reset),
+                        termion::color::Fg(termion::color::Reset),
+                    )),
                     c => {
                         let transformed_char = if c == 'x' { ' ' } else { c };
                         colored_firewood.push_str(&format!(
