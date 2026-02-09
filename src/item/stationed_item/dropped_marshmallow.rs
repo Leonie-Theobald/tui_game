@@ -9,7 +9,7 @@ use crate::{
         },
         stationed_item::Stationary,
     },
-    tui::{Drawable, Vector},
+    tui::{Drawable, Vector, background::BACKGROUND_COLOR},
 };
 
 const COORDINATES: Vector = Vector {
@@ -146,12 +146,14 @@ impl Drawable for DroppedMarshmallow {
         let symbol = if self.picked_up { "X" } else { "🖱️" };
 
         format!(
-            "{}{}",
+            "{}{}{}{}",
             termion::cursor::Goto(
                 (COORDINATES.horizontal + 1) as u16,
                 (COORDINATES.vertical + 1) as u16
             ),
+            termion::color::Bg(BACKGROUND_COLOR),
             symbol,
+            termion::color::Bg(termion::color::Reset),
         )
     }
 }

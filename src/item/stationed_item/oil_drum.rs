@@ -9,7 +9,7 @@ use crate::{
         },
         stationed_item::Stationary,
     },
-    tui::{Drawable, Vector},
+    tui::{Drawable, Vector, background::BACKGROUND_COLOR},
 };
 
 const COORDINATES: Vector = Vector {
@@ -154,12 +154,14 @@ impl Stationary for OilDrum {
 impl Drawable for OilDrum {
     fn draw(&self) -> String {
         format!(
-            "{}{}",
+            "{}{}{}{}",
             termion::cursor::Goto(
                 (COORDINATES.horizontal + 1) as u16,
                 (COORDINATES.vertical + 1) as u16
             ),
-            "🛢️"
+            termion::color::Bg(BACKGROUND_COLOR),
+            "🛢️",
+            termion::color::Bg(termion::color::Reset),
         )
     }
 }

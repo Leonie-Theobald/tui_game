@@ -2,7 +2,10 @@ use std::io::{Write, stdin, stdout};
 
 use termion::{event::Key, input::TermRead, raw::IntoRawMode};
 
-use crate::tui::grid::GRID_HEIGHT;
+use crate::tui::{
+    background::{BACKGROUND_COLOR, colored_background},
+    grid::GRID_HEIGHT,
+};
 
 pub struct Inspection {
     pub name: String,
@@ -11,33 +14,34 @@ pub struct Inspection {
 }
 
 impl Inspection {
-    fn get_tui_compatible_detailed_view(&self) -> String {
-        self.detail_view.replace('\n', "\r\n")
-    }
-
     pub fn start_inspection(&self) {
         let title_line = format!(
-            "{}{} - {}",
+            "{}{}{} - {}{}",
             termion::cursor::Goto(1, 1),
+            termion::color::Bg(BACKGROUND_COLOR),
             self.name,
-            self.description
+            self.description,
+            termion::color::Bg(termion::color::Reset)
         );
 
         let key_binding_info_line = format!(
-            "{}<backspace>",
-            termion::cursor::Goto(1, (GRID_HEIGHT + 2) as u16)
+            "{}{}<backspace>{}",
+            termion::color::Bg(BACKGROUND_COLOR),
+            termion::cursor::Goto(1, (GRID_HEIGHT + 2) as u16),
+            termion::color::Bg(termion::color::Reset),
         );
 
         // draw the inspection view on screen
         let mut stdout = stdout().into_raw_mode().unwrap();
         write!(
             stdout,
-            "{}{}{}{}{}",
+            "{}{}{}{}{}{}",
             termion::clear::All,
+            colored_background(),
             title_line,
-            self.get_tui_compatible_detailed_view(),
+            self.detail_view,
             key_binding_info_line,
-            termion::cursor::Hide
+            termion::cursor::Hide,
         )
         .unwrap();
         stdout.flush().unwrap();

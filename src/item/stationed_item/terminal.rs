@@ -9,7 +9,7 @@ use crate::{
         },
         stationed_item::Stationary,
     },
-    tui::{Drawable, Vector},
+    tui::{Drawable, Vector, background::BACKGROUND_COLOR},
 };
 
 const COORDINATES: Vector = Vector {
@@ -328,21 +328,25 @@ impl Drawable for Terminal {
     fn draw(&self) -> String {
         if self.correct_code_entered {
             format!(
-                "{}📟",
+                "{}{}📟{}",
                 termion::cursor::Goto(
                     (COORDINATES.horizontal + 1) as u16,
                     (COORDINATES.vertical + 1) as u16
                 ),
+                termion::color::Bg(BACKGROUND_COLOR),
+                termion::color::Bg(termion::color::Reset),
             )
         } else {
             format!(
-                "{}📟{}███{}",
+                "{}{}📟{}███{}{}",
                 termion::cursor::Goto(
                     (COORDINATES.horizontal + 1) as u16,
                     (COORDINATES.vertical + 1) as u16
                 ),
+                termion::color::Bg(BACKGROUND_COLOR),
                 termion::color::Fg(termion::color::AnsiValue(136)),
-                termion::color::Fg(termion::color::Reset)
+                termion::color::Bg(termion::color::Reset),
+                termion::color::Fg(termion::color::Reset),
             )
         }
     }

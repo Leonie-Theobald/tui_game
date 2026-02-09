@@ -1,3 +1,4 @@
+pub mod background;
 pub mod clean_up;
 pub mod grid;
 pub mod pop_up;

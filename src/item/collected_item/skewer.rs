@@ -1,4 +1,7 @@
-use crate::item::{Item, collected_item::Collectable};
+use crate::{
+    item::{Item, collected_item::Collectable},
+    tui::background::BACKGROUND_COLOR,
+};
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
@@ -29,13 +32,15 @@ impl Item for Skewer {
                 match char {
                     ' ' => continue,
                     c => colored_skewer.push_str(&format!(
-                        "{}{}{}{}",
+                        "{}{}{}{}{}{}",
                         termion::cursor::Goto(
                             (horizontal_offset + 1) as u16,
                             (vertical_offset + 1) as u16
                         ),
+                        termion::color::Bg(BACKGROUND_COLOR),
                         termion::color::Fg(termion::color::AnsiValue(130)),
                         c,
+                        termion::color::Bg(termion::color::Reset),
                         termion::color::Fg(termion::color::Reset),
                     )),
                 }
@@ -49,8 +54,10 @@ impl Item for Skewer {
 impl Collectable for Skewer {
     fn get_symbol(&self) -> String {
         format!(
-            "{}/{}",
+            "{}{}/{}{}",
+            termion::color::Bg(BACKGROUND_COLOR),
             termion::color::Fg(termion::color::AnsiValue(130)),
+            termion::color::Bg(termion::color::Reset),
             termion::color::Fg(termion::color::Reset)
         )
     }

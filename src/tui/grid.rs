@@ -1,4 +1,4 @@
-use crate::tui::{Drawable, Orientation, TuiError, Vector};
+use crate::tui::{Drawable, Orientation, TuiError, Vector, background::BACKGROUND_COLOR};
 
 pub const GRID_WIDTH: usize = 80;
 pub const GRID_HEIGHT: usize = 22;
@@ -103,13 +103,22 @@ impl Grid {
 
 impl Drawable for Grid {
     fn draw(&self) -> String {
-        let grid = self
-            .pixels
-            .iter()
-            .map(|row| row.iter().collect())
-            .collect::<Vec<String>>()
-            .join("\r\n");
+        let mut colored_grid = String::new();
+        for (vertical_offset, line) in self.pixels.iter().enumerate() {
+            for (horizontal_offset, char) in line.iter().enumerate() {
+                colored_grid.push_str(&format!(
+                    "{}{}{}{}",
+                    termion::cursor::Goto(
+                        (horizontal_offset + 1) as u16,
+                        (vertical_offset + 1) as u16
+                    ),
+                    termion::color::Bg(BACKGROUND_COLOR),
+                    char,
+                    termion::color::Bg(termion::color::Reset),
+                ));
+            }
+        }
 
-        format!("{}{}", termion::cursor::Goto(1, 1), grid)
+        colored_grid
     }
 }

@@ -6,7 +6,7 @@ use crate::{
         interaction::{Interaction, InteractionStatus},
         stationed_item::Stationary,
     },
-    tui::{Drawable, Vector},
+    tui::{Drawable, Vector, background::BACKGROUND_COLOR},
 };
 
 const COORDINATES: Vector = Vector {
@@ -91,12 +91,14 @@ impl Drawable for DarkRoom {
                 match char {
                     ' ' => continue,
                     _ => room.push_str(&format!(
-                        "{}{}",
+                        "{}{}{}{}",
                         termion::cursor::Goto(
                             (COORDINATES.horizontal + horizontal_offset + 1) as u16,
                             (COORDINATES.vertical + vertical_offset + 1) as u16
                         ),
+                        termion::color::Bg(BACKGROUND_COLOR),
                         char,
+                        termion::color::Bg(termion::color::Reset)
                     )),
                 }
             }

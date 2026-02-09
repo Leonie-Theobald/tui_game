@@ -9,7 +9,7 @@ use crate::{
         },
         stationed_item::Stationary,
     },
-    tui::{Drawable, Vector},
+    tui::{Drawable, Vector, background::BACKGROUND_COLOR},
 };
 
 const COORDINATES: Vector = Vector {
@@ -74,13 +74,15 @@ impl Item for LostChestKey {
                 match char {
                     ' ' => continue,
                     c => colored_key.push_str(&format!(
-                        "{}{}{}{}",
+                        "{}{}{}{}{}{}",
                         termion::cursor::Goto(
                             (horizontal_offset + 1) as u16,
                             (vertical_offset + 1) as u16
                         ),
+                        termion::color::Bg(BACKGROUND_COLOR),
                         termion::color::Fg(termion::color::AnsiValue(242)),
                         c,
+                        termion::color::Bg(termion::color::Reset),
                         termion::color::Fg(termion::color::Reset),
                     )),
                 }
@@ -131,12 +133,14 @@ impl Drawable for LostChestKey {
         let symbol = if self.found { "X" } else { "🗝️" };
 
         format!(
-            "{}{}",
+            "{}{}{}{}",
             termion::cursor::Goto(
                 (COORDINATES.horizontal + 1) as u16,
                 (COORDINATES.vertical + 1) as u16
             ),
+            termion::color::Bg(BACKGROUND_COLOR),
             symbol,
+            termion::color::Bg(termion::color::Reset),
         )
     }
 }

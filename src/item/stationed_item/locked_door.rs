@@ -9,7 +9,7 @@ use crate::{
         },
         stationed_item::Stationary,
     },
-    tui::{Drawable, Vector},
+    tui::{Drawable, Vector, background::BACKGROUND_COLOR},
 };
 
 const COORDINATES: Vector = Vector {
@@ -108,13 +108,15 @@ impl Item for LockedDoor {
                         termion::color::Bg(termion::color::Reset),
                     )),
                     c => colored_door.push_str(&format!(
-                        "{}{}{}{}",
+                        "{}{}{}{}{}{}",
                         termion::cursor::Goto(
                             (horizontal_offset + 1) as u16,
                             (vertical_offset + 1) as u16
                         ),
+                        termion::color::Bg(BACKGROUND_COLOR),
                         termion::color::Fg(termion::color::AnsiValue(130)),
                         c,
+                        termion::color::Bg(termion::color::Reset),
                         termion::color::Fg(termion::color::Reset),
                     )),
                 }
@@ -168,13 +170,15 @@ impl Drawable for LockedDoor {
         let door_string = "█".repeat(WIDTH);
 
         format!(
-            "{}{}{}{}",
+            "{}{}{}{}{}{}",
             termion::cursor::Goto(
                 (COORDINATES.horizontal + 1) as u16,
                 (COORDINATES.vertical + 1) as u16
             ),
+            termion::color::Bg(BACKGROUND_COLOR),
             termion::color::Fg(termion::color::AnsiValue(22)),
             door_string,
+            termion::color::Bg(termion::color::Reset),
             termion::color::Fg(termion::color::Reset)
         )
     }

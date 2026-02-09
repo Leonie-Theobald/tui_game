@@ -4,7 +4,7 @@ mod tests;
 use crate::{
     item::stationed_item::{Stationary, StationaryItem, StationedItems},
     method_on_inner_stationed_item,
-    tui::{Drawable, Orientation, Vector, grid::Grid},
+    tui::{Drawable, Orientation, Vector, background::BACKGROUND_COLOR, grid::Grid},
 };
 use serde::{Deserialize, Serialize};
 use std::fmt::Debug;
@@ -79,13 +79,15 @@ impl Drawable for Player {
             Orientation::West => '◀',
         };
         format!(
-            "{}{}{}{}",
+            "{}{}{}{}{}{}",
             termion::cursor::Goto(
                 (self.coordinates.horizontal + 1) as u16,
                 (self.coordinates.vertical + 1) as u16
             ),
+            color::Bg(BACKGROUND_COLOR),
             color::Fg(color::Magenta),
             symbol,
+            color::Bg(color::Reset),
             color::Fg(color::Reset),
         )
     }

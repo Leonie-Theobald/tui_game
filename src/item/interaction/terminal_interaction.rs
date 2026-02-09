@@ -1,7 +1,10 @@
 pub mod digit;
 pub mod password;
 
-use inquire::CustomType;
+use inquire::{
+    CustomType,
+    ui::{RenderConfig, StyleSheet, Styled},
+};
 use serde::{Deserialize, Serialize};
 
 use crate::item::{
@@ -40,10 +43,24 @@ impl Interactable for EnterDigits {
     ) -> String {
         match linked_stationary_item.get_interaction_status() {
             InteractionStatus::Open => {
+                // define inquire rendering
+                let render_config = RenderConfig {
+                    prompt_prefix: Styled {
+                        content: "",
+                        style: StyleSheet::new().with_bg(inquire::ui::Color::Black),
+                    },
+                    prompt: StyleSheet::new().with_bg(inquire::ui::Color::Black),
+                    help_message: StyleSheet::new()
+                        .with_bg(inquire::ui::Color::Black)
+                        .with_fg(inquire::ui::Color::White),
+                    answer: StyleSheet::new().with_bg(inquire::ui::Color::Black),
+                    ..Default::default()
+                };
                 let result =
                     CustomType::<Password>::new(&format!("Type in {:?} digits:", PASSWORD_LENGTH))
                         .with_error_message("Please type a valid number")
                         .with_help_message("E.g. 123456")
+                        .with_render_config(render_config)
                         .prompt();
 
                 let correct_password = Password::get_correct();

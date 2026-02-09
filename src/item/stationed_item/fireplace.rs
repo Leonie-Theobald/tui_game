@@ -11,7 +11,7 @@ use crate::{
         },
         stationed_item::Stationary,
     },
-    tui::{Drawable, Vector},
+    tui::{Drawable, Vector, background::BACKGROUND_COLOR},
 };
 
 const COORDINATES: Vector = Vector {
@@ -216,12 +216,14 @@ impl Drawable for Fireplace {
         let mut fireplace_string = String::new();
         for (index, line) in fireplace.lines().enumerate() {
             fireplace_string.push_str(&format!(
-                "{}{}",
+                "{}{}{}{}",
                 termion::cursor::Goto(
                     (COORDINATES.horizontal + 1) as u16,
                     (COORDINATES.vertical + index + 1) as u16
                 ),
-                line
+                termion::color::Bg(BACKGROUND_COLOR),
+                line,
+                termion::color::Bg(termion::color::Reset),
             ))
         }
 

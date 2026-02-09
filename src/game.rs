@@ -6,7 +6,13 @@ use crate::{
     player::Player,
     quest::Quests,
     quick_save::QuickSave,
-    tui::{Drawable, grid::Grid, pop_up::PopUp, status_bar},
+    tui::{
+        Drawable,
+        background::{BACKGROUND_COLOR, colored_background},
+        grid::Grid,
+        pop_up::PopUp,
+        status_bar,
+    },
 };
 
 pub fn draw_game(
@@ -36,60 +42,81 @@ pub fn explain_game() {
 
     let mut info_prompt = String::new();
     info_prompt.push_str(&format!(
-        "{}{}{}Game Explanation{}",
+        "{}{}{}{}Game Explanation{}{}",
         termion::cursor::Goto(2, 1),
+        termion::color::Bg(BACKGROUND_COLOR),
         termion::style::Bold,
         termion::style::Italic,
-        termion::style::Reset
+        termion::style::Reset,
+        termion::color::Bg(termion::color::Reset),
     ));
     info_prompt.push_str(&format!(
-        "{}You are this: {}▲{}",
+        "{}{}You are this: {}▲{}{}",
         termion::cursor::Goto(2, 2),
+        termion::color::Bg(BACKGROUND_COLOR),
         termion::color::Fg(termion::color::Magenta),
         termion::color::Fg(termion::color::Reset),
+        termion::color::Bg(termion::color::Reset),
     ));
     info_prompt.push_str(&format!(
-        "{}You control your avatar by pressing w a s d",
+        "{}{}You control your avatar by pressing w a s d{}",
         termion::cursor::Goto(2, 3),
+        termion::color::Bg(BACKGROUND_COLOR),
+        termion::color::Bg(termion::color::Reset),
     ));
     info_prompt.push_str(&format!(
-        "{}You can interact with objects by pressing e",
+        "{}{}You can interact with objects by pressing e{}",
         termion::cursor::Goto(2, 4),
+        termion::color::Bg(BACKGROUND_COLOR),
+        termion::color::Bg(termion::color::Reset),
     ));
     info_prompt.push_str(&format!(
-        "{}You can view your collected items by pressing c",
+        "{}{}You can view your collected items by pressing c{}",
         termion::cursor::Goto(2, 5),
+        termion::color::Bg(BACKGROUND_COLOR),
+        termion::color::Bg(termion::color::Reset),
     ));
     info_prompt.push_str(&format!(
-        "{}You can view your current quests by pressing q",
+        "{}{}You can view your current quests by pressing q{}",
         termion::cursor::Goto(2, 6),
+        termion::color::Bg(BACKGROUND_COLOR),
+        termion::color::Bg(termion::color::Reset),
     ));
     info_prompt.push_str(&format!(
-        "{}You can leave the game by pressing ESC",
+        "{}{}You can leave the game by pressing ESC{}",
         termion::cursor::Goto(2, 7),
+        termion::color::Bg(BACKGROUND_COLOR),
+        termion::color::Bg(termion::color::Reset),
     ));
     info_prompt.push_str(&format!(
-        "{}You can view these explanations again by pressing ?",
+        "{}{}You can view these explanations again by pressing ?{}",
         termion::cursor::Goto(2, 8),
+        termion::color::Bg(BACKGROUND_COLOR),
+        termion::color::Bg(termion::color::Reset),
     ));
     info_prompt.push_str(&format!(
-        "{}Walk around, take a look, have fun!",
+        "{}{}Walk around, take a look, have fun!{}",
         termion::cursor::Goto(2, 10),
+        termion::color::Bg(BACKGROUND_COLOR),
+        termion::color::Bg(termion::color::Reset),
     ));
 
     info_prompt.push_str(&format!(
-        "{}{}{}Press ENTER to continue{}{}",
+        "{}{}{}{}Press ENTER to continue{}{}{}",
         termion::cursor::Goto(2, 12),
+        termion::color::Bg(BACKGROUND_COLOR),
         termion::color::Fg(termion::color::LightBlack),
         termion::style::Italic,
+        termion::color::Bg(termion::color::Reset),
         termion::color::Fg(termion::color::Reset),
         termion::style::Reset,
     ));
 
     write!(
         stdout,
-        "{}{}{}",
+        "{}{}{}{}",
         termion::clear::All,
+        colored_background(),
         info_prompt,
         termion::cursor::Hide
     )

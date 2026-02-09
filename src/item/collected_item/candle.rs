@@ -1,4 +1,7 @@
-use crate::item::{Item, collected_item::Collectable};
+use crate::{
+    item::{Item, collected_item::Collectable},
+    tui::background::BACKGROUND_COLOR,
+};
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
@@ -142,6 +145,11 @@ impl Item for Candle {
 
 impl Collectable for Candle {
     fn get_symbol(&self) -> String {
-        String::from("🕯️")
+        format!(
+            "{}{}{}",
+            termion::color::Bg(BACKGROUND_COLOR),
+            "🕯️",
+            termion::color::Bg(termion::color::Reset)
+        )
     }
 }
