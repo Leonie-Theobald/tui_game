@@ -1,10 +1,7 @@
-use std::{
-    io::{Write, stdin, stdout},
-    process::exit,
-};
+use std::io::{Write, stdin, stdout};
 use termion::{event::Key, input::TermRead, raw::IntoRawMode};
 
-use crate::{quick_save::QuickSave, tui::clean_up::clean_up_terminal};
+use crate::quick_save::QuickSave;
 
 pub fn prepare_leaving_game() {
     let mut stdout = stdout().into_raw_mode().unwrap();
@@ -25,8 +22,7 @@ pub fn prepare_leaving_game() {
         match k.as_ref().unwrap() {
             Key::Char('L') | Key::Char('l') => {
                 QuickSave::clear_save_file();
-                clean_up_terminal();
-                exit(0);
+                break;
             }
             _ => continue,
         };

@@ -12,7 +12,7 @@ use crate::{
     quest::{IsQuest, Quest, unlock_terminal::UnlockTerminal},
 };
 
-#[derive(Serialize, Deserialize)]
+#[derive(PartialEq, Serialize, Deserialize)]
 pub struct UnlockDoor {
     pub finished: bool,
 }

@@ -15,7 +15,7 @@ use crate::{
     tui::pop_up::InfoPopUp,
 };
 
-#[derive(Serialize, Deserialize)]
+#[derive(PartialEq, Serialize, Deserialize)]
 pub enum Quest {
     UnlockDoor(UnlockDoor),
     UnlockTerminal(UnlockTerminal),
@@ -90,6 +90,11 @@ impl Quests {
             }
         }
         self.list.append(&mut new_quests);
+    }
+
+    pub fn check_game_finished(&self) -> bool {
+        self.list
+            .contains(&Quest::PressPlate(PressPlate { finished: true }))
     }
 }
 

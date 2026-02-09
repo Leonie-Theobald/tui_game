@@ -8,7 +8,7 @@ use crate::{
     quest::{IsQuest, Quest, press_plate::PressPlate},
 };
 
-#[derive(Serialize, Deserialize)]
+#[derive(PartialEq, Serialize, Deserialize)]
 pub struct FindMap {
     pub finished: bool,
 }

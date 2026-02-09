@@ -39,7 +39,8 @@ impl Interactable for Press {
                 linked_stationary_item.set_interaction_status_to_finished();
 
                 play_final_cut_scene();
-                unreachable!()
+                linked_stationary_item.set_interaction_status_to_finished();
+                String::from("You found yourself a cake. Happy Birthday!")
             }
             InteractionStatus::Finished => String::from("Nothing can be done here."),
         }

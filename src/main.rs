@@ -57,6 +57,9 @@ fn main() {
         };
 
         quests.check_quests(&mut collected_items, &mut stationed_items);
+        if quests.check_game_finished() {
+            break;
+        }
         draw_game(&grid, &player, &collected_items, &stationed_items, &quests);
     }
 

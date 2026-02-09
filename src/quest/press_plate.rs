@@ -8,7 +8,7 @@ use crate::{
     quest::{IsQuest, Quest},
 };
 
-#[derive(Serialize, Deserialize)]
+#[derive(PartialEq, Serialize, Deserialize)]
 pub struct PressPlate {
     pub finished: bool,
 }

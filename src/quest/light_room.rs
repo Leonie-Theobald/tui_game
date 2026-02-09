@@ -11,7 +11,7 @@ use crate::{
     quest::{IsQuest, Quest, find_map::FindMap},
 };
 
-#[derive(Serialize, Deserialize)]
+#[derive(PartialEq, Serialize, Deserialize)]
 pub struct LightRoom {
     pub finished: bool,
 }
