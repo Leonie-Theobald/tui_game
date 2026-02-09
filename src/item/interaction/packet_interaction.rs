@@ -41,7 +41,7 @@ impl Interactable for Open {
                     .list
                     .push(CollectableItem::RustyKey(RustyKey));
                 linked_stationary_item.set_interaction_status_to_finished();
-                String::from("Hurray! You found something.")
+                String::from("Hurray! You found a key.")
             }
             InteractionStatus::Finished => String::from("The packet has already been opened."),
         }

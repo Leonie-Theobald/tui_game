@@ -37,7 +37,7 @@ impl Interactable for PickUp {
                     .list
                     .push(CollectableItem::ChestKey(ChestKey));
                 linked_stationary_item.set_interaction_status_to_finished();
-                String::from("Hurray! You found something.")
+                String::from("You found a old looking key.")
             }
             InteractionStatus::Finished => String::from("Nothing there"),
         }
