@@ -1,6 +1,6 @@
 mod find_map;
 mod light_room;
-mod press_plate;
+pub mod press_plate; // public export because it is needed to check for game finished condition
 mod unlock_door;
 mod unlock_terminal;
 
@@ -90,11 +90,6 @@ impl Quests {
             }
         }
         self.list.append(&mut new_quests);
-    }
-
-    pub fn check_game_finished(&self) -> bool {
-        self.list
-            .contains(&Quest::PressPlate(PressPlate { finished: true }))
     }
 }
 

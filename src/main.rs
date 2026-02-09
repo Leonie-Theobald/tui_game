@@ -11,7 +11,7 @@ use std::io::{stdin, stdout};
 use termion::{event::Key, input::TermRead, raw::IntoRawMode};
 
 use crate::{
-    game::{draw_game, explain_game, save_and_leave_game, start_game},
+    game::{check_game_finished, draw_game, explain_game, save_and_leave_game, start_game},
     tui::{Orientation, clean_up::clean_up_terminal, grid::Grid},
 };
 
@@ -57,7 +57,7 @@ fn main() {
         };
 
         quests.check_quests(&mut collected_items, &mut stationed_items);
-        if quests.check_game_finished() {
+        if check_game_finished(&collected_items, &stationed_items, &quests) {
             break;
         }
         draw_game(&grid, &player, &collected_items, &stationed_items, &quests);

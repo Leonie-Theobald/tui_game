@@ -4,7 +4,7 @@ use termion::{event, input::TermRead, raw::IntoRawMode};
 use crate::{
     item::{collected_item::CollectedItems, stationed_item::StationedItems},
     player::Player,
-    quest::Quests,
+    quest::{Quest, Quests, press_plate::PressPlate},
     quick_save::QuickSave,
     tui::{
         Drawable,
@@ -160,4 +160,14 @@ pub fn save_and_leave_game(
 ) {
     QuickSave::from_current_game_state(player, collected_items, stationed_items, quests)
         .save_to_file();
+}
+
+pub fn check_game_finished(
+    _collected_items: &CollectedItems,
+    _stationed_items: &StationedItems,
+    quests: &Quests,
+) -> bool {
+    quests
+        .list
+        .contains(&Quest::PressPlate(PressPlate { finished: true }))
 }
