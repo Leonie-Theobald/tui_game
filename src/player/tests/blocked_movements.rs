@@ -43,16 +43,16 @@ mod tests {
         };
         let mut player = Player {
             coordinates: Vector {
-                horizontal: 15,
-                vertical: 6,
+                horizontal: 13,
+                vertical: 5,
             },
             orientation: Orientation::North,
         };
 
         let target_player = Player {
             coordinates: Vector {
-                horizontal: 15,
-                vertical: 6,
+                horizontal: 13,
+                vertical: 5,
             },
             orientation: Orientation::South,
         };
