@@ -1,0 +1,29 @@
+{
+  "name": "Room Rust DevContainer",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "runArgs": [
+    "--env", "TERM=xterm-256color"
+  ],
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "rust-lang.rust-analyzer",
+        "vadimcn.vscode-lldb",
+        "tamasfe.even-better-toml"
+      ],
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "terminal.integrated.env.linux": {
+          "TERM": "xterm-256color"
+        }
+      }
+    }
+  },
+  "postCreateCommand": "bash .devcontainer/postCreate.sh",
+  "mounts": [
+  "source=${localWorkspaceFolder}/quick_saves,target=/workspaces/${localWorkspaceFolderBasename}/quick_saves,type=bind"
+],
+  "remoteUser": "vscode"
+}
