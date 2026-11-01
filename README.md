@@ -9,6 +9,11 @@
 - Read game instructions
 - Continue to start with actual game
 
+### Use Docker Desktop with `devcontainer`
+- Run `devcontainer up --workspace-folder .` to build and start container
+- Run `devcontainer exec --workspace-folder . bash` to enter container
+- Start game with `cargo run`
+
 ## Continue Existing Game
 > Whenever a running game is stopped with exit key binding (`ESC`), the current game state is stored into `/quick_saves/quick_save`
 - Start game with `cargo run`
